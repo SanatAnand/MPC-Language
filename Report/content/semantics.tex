@@ -12,7 +12,8 @@
 
 Standard protocol definition. Protocols may be defined within other protocols. Standard scoping rules are applied. We have an optional USES statement which must specify at the very begining which other protocols are called by this one.
 
-The argument list can be used to pass standard formal variables (may be arrays but bounds must be specified beforehand) or other protocols. i.e. other protocols can also be passed as arguments to protocols. The list of real parties for the protocol must be specified (may be arrays of parties but bounds must be specified). In addition, it can also be used to specify list of ports in the parties which are in the protocol. This port declaration is done because ports are outward facing. i.e. protocols calling this protocol may need knowledge of the ports in the parties. These ports must be declared in an IN clause as ports are private to parties.
+The argument list can be used to pass standard formal variables (may be arrays but bounds must be specified beforehand) or other protocols. i.e. other protocols can also be passed as arguments to protocols. The list of real parties for the protocol must be specified (may be arrays of parties but bounds must be specified). In addition, it can also be used to specify list of ports in the parties which are in the protocol. This port declaration is done because ports are outward facing. i.e.
+protocols calling this protocol may need knowledge of the ports in the parties. These ports must be declared in an IN clause as ports are private to parties.
 
 The prot\_decl part of the protocol is the actual declartion. It is externally advertised for other protocols to call it.
 
@@ -21,7 +22,8 @@ The prot\_decl part of the protocol is the actual declartion. It is externally a
 \item term: var dimlist $|$ ENV $|$ IDEAL $|$ RAND\_PORT $|$ ENV\_PORT
 \end{itemize}
 
-There are two special parties - The environment and the Ideal party. The environment is used to denote the caller of every party in the protocol. In reality, each party has a different caller but since callers are not part of the protocol, we use a single symbol Environment to denote all of them. The Ideal party is a special party which doesn't really exist. It is used to specify fuctionalities which are then compiled into protocols by replacing the code for Ideal party by some interative protocol (eg - GMW compiler, BGW compiler etc) or by simply running the Ideal party code in some physical trusted party.
+There are two special parties - The environment and the Ideal party. The environment is used to denote the caller of every party in the protocol. In reality, each party has a different caller but since callers are not part of the protocol, we use a single symbol Environment to denote all of them. The Ideal party is a special party which doesn't really exist. It is used to specify fuctionalities which are then compiled into protocols by replacing the code for Ideal party by some interative
+protocol (eg - GMW compiler, BGW compiler etc) or by simply running the Ideal party code in some physical trusted party.
 
 Similarly, every party has two special ports - Random port and Environment port. The RANDOM port is assumed to contain a lot of true randomness (in reality it'll be simulated by some PRG). The party receives bits from the RANDOM port whenever it wishes to sample random bits. The environment port is used to mediate communication with the party's own environment.
 
@@ -185,7 +187,12 @@ The optional conditional has two flavors - WHERE and EXCEPT. WHERE will make the
 \item connect\_statement: CONNECT exp to\_and exp ';'
 \end{itemize}
 
-Connect is used to permanently join two ports such that all information received in one port is forwarded to the other port. Ports across parties can be connected (exact restrictions can be debated - whether any two ports can be connected or should there be a restriction for parent-child and the like). It has two flavors - TO and AND. TO forms a one sided connection where messages are only forwarded from the left port to the right. AND creates a dual connction where messages are forwarded in both directions.
+Connect is used to permanently join two ports such that all information received
+in one port is forwarded to the other port. Ports across parties can be connected
+(exact restrictions can be debated - whether any two ports can be connected or should
+ there be a restriction for parent-child and the like). It has two flavors - TO and AND.
+ TO forms a one sided connection where messages are only forwarded from the left port to
+ the right. AND creates a dual connction where messages are forwarded in both directions.
 
 
 \subsubsection{Forward Statement}
@@ -194,5 +201,3 @@ Connect is used to permanently join two ports such that all information received
 \end{itemize}
 
 Forward is a one-time connect statement where all the information is a port is forwarded to the other port.
-
-\end{document}
