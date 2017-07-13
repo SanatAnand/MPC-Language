@@ -1,0 +1,198 @@
+% !TeX encoding = UTF-8
+% !TeX root = ../report.tex
+
+\section{Semantics}
+
+\subsection{Protocol}
+
+\begin{itemize}
+\item protocol: prot\_decl '\{' opt\_uses statement\_list '\}'
+\item prot\_decl: PROTOCOL NAME '(' opt\_arg\_list ')' ':' PARTY p\_list
+\end{itemize}
+
+Standard protocol definition. Protocols may be defined within other protocols. Standard scoping rules are applied. We have an optional USES statement which must specify at the very begining which other protocols are called by this one.
+
+The argument list can be used to pass standard formal variables (may be arrays but bounds must be specified beforehand) or other protocols. i.e. other protocols can also be passed as arguments to protocols. The list of real parties for the protocol must be specified (may be arrays of parties but bounds must be specified). In addition, it can also be used to specify list of ports in the parties which are in the protocol. This port declaration is done because ports are outward facing. i.e. protocols calling this protocol may need knowledge of the ports in the parties. These ports must be declared in an IN clause as ports are private to parties.
+
+The prot\_decl part of the protocol is the actual declartion. It is externally advertised for other protocols to call it.
+
+\subsection{Term}
+\begin{itemize}
+\item term: var dimlist $|$ ENV $|$ IDEAL $|$ RAND\_PORT $|$ ENV\_PORT
+\end{itemize}
+
+There are two special parties - The environment and the Ideal party. The environment is used to denote the caller of every party in the protocol. In reality, each party has a different caller but since callers are not part of the protocol, we use a single symbol Environment to denote all of them. The Ideal party is a special party which doesn't really exist. It is used to specify fuctionalities which are then compiled into protocols by replacing the code for Ideal party by some interative protocol (eg - GMW compiler, BGW compiler etc) or by simply running the Ideal party code in some physical trusted party.
+
+Similarly, every party has two special ports - Random port and Environment port. The RANDOM port is assumed to contain a lot of true randomness (in reality it'll be simulated by some PRG). The party receives bits from the RANDOM port whenever it wishes to sample random bits. The environment port is used to mediate communication with the party's own environment.
+
+The language also allows you to build multi-dimentional arrays of any type (int, party, port etc.) whose bounds may or may not be specified beforehand (Depends case to case, specifics yet to be figured).
+
+\subsection{Expression}
+
+\subsubsection{Arithmetic Expression}
+\begin{itemize}
+\item exp: exp '+' exp $|$ exp '-' exp $|$ exp '*' exp $|$ exp '/' exp $|$ '-' exp
+\end{itemize}
+
+The standard arithemetic expressions like BODMAS are part of the language and it can easily be extended to include modulo and other requisite operations if required. More importantly, the particular FIELD must specify the operations and how they are to be performed on its elements.
+
+\subsubsection{Boolean Expression}
+\begin{itemize}
+\item $|$ exp B\_AND exp $|$ exp OR exp $|$ NOT exp $|$ exp EQ exp $|$ exp LT exp $|$ exp GT exp $|$ exp NE exp $|$ exp LE exp $|$ exp GE exp $|$ '(' exp ')'
+
+\end{itemize}
+
+Standard relational and boolean operations are also present
+
+\subsubsection{Party Expression}
+\begin{itemize}
+\item $|$ exp '$|$' exp $|$ exp '.' exp
+\end{itemize}
+There are two party operations '.' (sub-party) and '|' (port) - The sub-party operation is used to denote the particular party inside a party which is being referred to. It can have arbitrary nesting. The port operation is used to specify the particular port in a party.
+
+\subsubsection{List expressions}
+\begin{itemize}
+\item $|$ exp\_list $|$ fixed\_list $|$ term
+\end{itemize}
+An language also allows for expression lists (although the lists themselves should be typed - debatable) and fixed lists (python like) to specify a numerical range or something of that sort.
+
+\subsection{Variables}
+\begin{itemize}
+\item var: NAME $|$ '\#' NAME $|$ '@' $|$ RAND $|$ constant
+\end{itemize}
+
+Array indices can also be qualified by a '\#' which indicates that particular dimention is being iterated through. This would be used in any EACH statement (IN EACH, FOR EACH etc). The language will automatically detect array bounds for that dimension and set the iteration accordingly. The variable which is qualified by '\#' will denote the indice value in that iteration for statements inside the EACH clause.
+
+We use the '@' symbol inside the WRAP statement as a macro to denote the party which is being wrapped. This is entirely syntactic sugar.
+
+An assignment of a variable to a '\$' symbol represents the variable to take a random value. The method of generating randomness must be specified in the field of which the variable is a part. (Later we can qualify this to take distributions as argument).
+
+\subsection{Types}
+
+\subsubsection{General types}
+\begin{itemize}
+\item type: PARTY $|$ INTEGER $|$ SESSION $|$ UNKNOWN
+\end{itemize}
+
+The UNKNOWN type is used a special type which can take any other type value. It is like a base class for every other type and allows only equality checking (useful for communication when you don't know what type of message you'll receive).
+
+\subsubsection{Port types}
+\begin{itemize}
+\item $|$ PORT $|$ INPORT $|$ OUTPORT
+\end{itemize}
+Ports, inports and outports are just buffers for communication. Messages can be sent to and received from them. An inport only allows receiving messages from it and an outport only allows sending to it. (The receiving or sending is done at the other side by the port it may be connected to).
+
+\subsubsection{Field types}
+\begin{itemize}
+\item $|$ BOOL $|$ FIELD $|$ NAME
+\end{itemize}
+Field is a meta-type (like class or struct) used to specify other types. Each field declared is a type in itself. Fields can't be declared in the code body and must be specified as formal arguments for the protocol. Because each field must be instantiated at runtime and only formal variables are visible to the runtime. Every field which is declared is a type in itself and we must type-check our code considering all if them seperately.
+
+Later we can have other meta-constructs like RINGS, GROUPS, POSETS etc.
+
+\subsection{Statements}
+
+\subsubsection{Abort statement}
+\begin{itemize}
+\item abort\_statement: ABORTING ';'
+\end{itemize}
+
+If a party sees abort, it immediately signals to the parent party and all its children party. Then it terminates. By chain action, the parents and children all terminate after signalling to their parents and children. This ways, the whole execution of any party associated with that terminates. (Later we can also add qualifiers to specify if something other than usual is to be done on abort).
+
+\subsubsection{Set Statement}
+\begin{itemize}
+\item set\_statement: SET exp AS prot\_call DOUBLE\_COLON exp ';''
+\end{itemize}
+
+Set statement is used to simulate a real party in the current protocol as some party of another protocol. It sets the execution steps of that particular party as that dictated by in the protocol it is set to. (We can decide whether we're allowed to reset the same party to something else).
+
+\subsubsection{Wrap Statement}
+
+\begin{itemize}
+\item wrap\_statement: WRAP exp statement
+\end{itemize}
+
+Wrap statement is used to create a wrapper around the code of a party which has been has set. It is used to modify the execution steps for that party and can reference the code for the party by before and after statements. i.e. using the wrap, certain sequence of statements will be executed whenever a certain statement is seen in the code of the party it has been set to.
+
+Note that wrap statement can only be used for parties which've been set. Otherwise it'd be meaningless. (It is debatable whether it should be allowed to wrap unset parties). Also, the macro '@' can be used to denote the party which is wrapped (inside the wrapped statement).
+
+\subsubsection{Start statement}
+\begin{itemize}
+\item start\_statement: START exp ';'
+\end{itemize}
+
+Start statement is used to indicate parties to begin running the code for the parties they've been set to (can only be done for set parties). Note that this may be just the bare code for the party it has been set to or there may be some wrapper around the original code specified by the wrap statement.
+
+\subsubsection{Sequence Statements}
+\begin{itemize}
+\item seq\_statement: BEFORE opt\_each statement DO statement $|$ AFTER opt\_each statement DO statement
+\end{itemize}
+
+The before and after statements are used inside the wrap block to modify original execution steps for a set party. The before statement specifies that whenever a particular statement is seen in the original code block, a certain sequence of steps are to be executed before it. The after statement does so after executing the original statement first. The each qualifier specifies that every instance of that statement in the original code block will be preceded/succeeded by the corresponding execution steps. An unqualified statement will just modify the first occurrence.
+
+(We could also look into allowing before/after for a sequence of statements. i.e. execution steps are modified when a sequence of statements is seen)
+
+\subsubsection{Private Statement}
+\begin{itemize}
+\item pvt\_statement: IN opt\_each term '\{' statement\_list '\}'
+\end{itemize}
+
+The IN block is used to write code which is privately executed by some party. We can have nested IN block but each level of nesting can only correspond to parties within parties.
+
+\subsubsection{Send Statement}
+\begin{itemize}
+\item send\_statement: exp SEND exp ';'
+\end{itemize}
+
+Send statement is used to communicate between parties, real or virtual. Two kinds of structures can send or receive data - parties and ports.
+
+Communication between parties is also of three types - Communication with your own environment, communication with children parties and communication with other parties (Note that sessions are also counted as children parties). Communication with children parties and environment may be unqualified at the other end. i.e. you need not specify a variable at the other end. In standard party to party communication, you need to specify both the sending variable in the first party and the receiving one in the second party.
+
+In addition to that, you can simply read from or your to your own ports. This will be a port to party communication. A variable must be specified in the party side into which the information is read or from which the information is written. Port to port send operations can also happen between ports of the same party (or children party??). This will cause a variable to be written from the sending port to the receiving port.
+
+Exactly which send operations are allowed is up for discussion. (Which ports are accessible to you for sending and receiving? Parent? Children? Own?)
+
+\subsubsection{Session Call Statement}
+\begin{itemize}
+\item session\_call: opt\_partial OPEN term AS NAME '(' opt\_id\_list ')' '\{' statement\_list '\}'
+\end{itemize}
+
+Seesion call is just a shorthand for creating additional parties and setting them as some protocol's parties. Then connecting it with the real party ports. This is subsumed by the SET statements (as discussed with Rahul) but is a more commonly used construct. It is equivalent to a function call in the sense we can pass it parameters and attach parties. In the corresponding statement block, all session parties must be attached to real protocol parties (this can only be checked at runtime).
+
+Additionally, we may decide to partially open a session whereby we need not tie all the parties but then all the open ports (for parties which have not been tied) must be seperately handled. (Like currying)
+
+\subsubsection{Tying Statement}
+\begin{itemize}
+\item tying\_statement: exp ':' exp ';'
+\end{itemize}
+
+Tying statement is used inside the session call statement block to tie session parties to real protocol parties. It must be checked at runtime that all session parties are tied (multiple session parties may be tied to the same protocol party).
+
+\subsubsection{Loop Statement}
+\begin{itemize}
+\item loop\_statement: FOR EACH variable OF exp opt\_cond statement $|$ FOR EACH exp opt\_cond statement
+$|$ FOR EACH variable OF exp statement $|$ FOR EACH exp statement
+\end{itemize}
+
+Only FOR loops are permitted where index runs over some array index or list index (specified by a '\#' on the variable). The '\#' acts as an indication as well as a declaration for the index variable. An indexless array may be written which is a shorthand for a hashed index but the hashed variable is never used.
+
+We may also qualify the loop with a "variable OF" clause where the written variable takes the value of the specified expression in each iteration. If there are multiple '\#' variables, then it acts as a nested loop whereby all possible combinations of values of '\#' indices are run over in the loop in lexicographical order.
+
+The optional conditional has two flavors - WHERE and EXCEPT. WHERE will make the statements execute when the condition is true and EXCEPT will do it when the condition is false.
+
+\subsubsection{Connect Statement}
+\begin{itemize}
+\item connect\_statement: CONNECT exp to\_and exp ';'
+\end{itemize}
+
+Connect is used to permanently join two ports such that all information received in one port is forwarded to the other port. Ports across parties can be connected (exact restrictions can be debated - whether any two ports can be connected or should there be a restriction for parent-child and the like). It has two flavors - TO and AND. TO forms a one sided connection where messages are only forwarded from the left port to the right. AND creates a dual connction where messages are forwarded in both directions.
+
+
+\subsubsection{Forward Statement}
+\begin{itemize}
+\item forward\_statement: FORWARD exp TO exp ';'
+\end{itemize}
+
+Forward is a one-time connect statement where all the information is a port is forwarded to the other port.
+
+\end{document}
