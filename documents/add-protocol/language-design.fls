@@ -1,4 +1,4 @@
-PWD C:/Users/t-jipatr/OneDrive - Microsoft/Projects/ips-language-design
+PWD C:/Users/t-jipatr/OneDrive - Microsoft/Projects/ips/documents/add-protocol
 INPUT C:/Users/t-jipatr/AppData/Local/MiKTeX/2.9/miktex/data/le/pdftex/pdflatex.fmt
 INPUT language-design.tex
 OUTPUT language-design.log
@@ -118,8 +118,6 @@ INPUT C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/ams
 INPUT C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb
 INPUT C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt8.pfb
 INPUT C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt8.pfb
-INPUT C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/euler/eurm10.pfb
-INPUT C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/euler/eurm10.pfb
 INPUT C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cbgreek/grmi1000.pfb
 INPUT C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cbgreek/grmi1000.pfb
 INPUT C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/rsfs/rsfs10.pfb

@@ -1,5 +1,5 @@
 # Fdb version 3
-["pdflatex"] 1500271735 "language-design.tex" "language-design.pdf" "language-design" 1500271735
+["pdflatex"] 1500280262 "language-design.tex" "language-design.pdf" "language-design" 1500280262
   "C:/Users/t-jipatr/AppData/Local/MiKTeX/2.9/fonts/tfm/public/rsfs/rsfs10.tfm" 1500271007 688 37338d6ab346c2f1466b29e195316aa4 ""
   "C:/Users/t-jipatr/AppData/Local/MiKTeX/2.9/fonts/tfm/public/rsfs/rsfs5.tfm" 1500271008 684 3a51bd4fd9600428d5264cf25f04bb9a ""
   "C:/Users/t-jipatr/AppData/Local/MiKTeX/2.9/fonts/tfm/public/rsfs/rsfs7.tfm" 1500271008 692 1b6510779f0f05e9cbf03e0f6c8361e6 ""
@@ -38,7 +38,6 @@
   "C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmti10.pfb" 1247596667 37944 359e864bd06cde3b1cf57bb20757fb06 ""
   "C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt10.pfb" 1247596667 31099 342ef5a582aacbd3346f3cf4579679fa ""
   "C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmtt8.pfb" 1247596666 24287 6b803fa9eb1ddff9112e00519b09dd9e ""
-  "C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/amsfonts/euler/eurm10.pfb" 1335366146 22644 35cfbc2e737f53c1da991002473b4310 ""
   "C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/cbgreek/grmi1000.pfb" 1199130540 83481 336e04aa4f1b91981ff128a0bd71ee8f ""
   "C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/fonts/type1/public/rsfs/rsfs10.pfb" 893413860 16077 4737ac34f0fb5608550f3780a0202c22 ""
   "C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/tex/latex/amsmath/amsbsy.sty" 1492423149 2282 5c54ab129b848a5071554186d0168766 ""
@@ -63,15 +62,15 @@
   "C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/tex/latex/mdwtools/syntax.sty" 1214495388 20077 1cc67e61681d15dc7bfddab7602a9cd1 ""
   "C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/tex/latex/textgreek/textgreek.sty" 1318842019 9426 724c44018d4e53e78174ee5ba5fbca62 ""
   "C:/Users/t-jipatr/AppData/Local/Programs/MiKTeX 2.9/tex/latex/was/upgreek.sty" 1081488500 5928 9054e31be15d93f1e6bd28cca2b6643f ""
-  "language-design.aux" 1500271735 484 2092c1db0c4da3c197d4ad88ca3472a1 ""
-  "language-design.tex" 1500271734 909 43bff2fc9242fd5250959bbf2c75e39f ""
-  "sections/incrementalSyntax.tex" 1500267044 1005 f0dcc5394e440f7a963eea28bac28c47 ""
-  "sections/incrementalTypes.tex" 1500271677 3219 5b60afdda19b6f7b201e907d53e0632c ""
+  "language-design.aux" 1500280262 480 696f0d8c2e196ecfe708cc7a2dc7f584 ""
+  "language-design.tex" 1500271741 909 43bff2fc9242fd5250959bbf2c75e39f ""
+  "sections/incrementalSyntax.tex" 1500275944 1005 f0dcc5394e440f7a963eea28bac28c47 ""
+  "sections/incrementalTypes.tex" 1500280260 3469 24c490b77093f1bb42a333b2e9b88fe4 ""
   "sections/introduction.tex" 1500267046 196 8c3033583dfc6a3ccff7eb5b4287f00d ""
-  "sections/operationalSemantics.tex" 1500267045 398 a50e5e8d7c237b04321a35a3b700ab13 ""
+  "sections/operationalSemantics.tex" 1500279085 393 9e0c54dc8db196c4e0c95709cd280640 ""
   (generated)
-  "language-design.log"
   "language-design.aux"
   "/media/Data/Work/msr/ips-language-design/language-design.log"
-  "/media/Data/Work/msr/ips-language-design/language-design.pdf"
   "language-design.pdf"
+  "/media/Data/Work/msr/ips-language-design/language-design.pdf"
+  "language-design.log"
