@@ -1,0 +1,36 @@
+% !TeX encoding = UTF-8
+% !TeX root = ./language-design.tex
+\documentclass[]{article}
+\usepackage{syntax}
+\usepackage{amsmath}
+\usepackage{textgreek}
+\usepackage{proof}
+\usepackage{mathrsfs}
+\usepackage{upgreek}
+% \usepackage{stmaryrd}
+\usepackage{marvosym}
+\usepackage{listings}
+
+\setlength\parindent{0pt}% globally suppress indentation
+% Macros ------------
+\newcommand{\langName}{Cooler}
+\newcommand{\tenv}{A, \Gamma, s \vdash} % type environment
+\newcommand{\oenv}{S, E, s \vdash} % operational sematics environment
+
+%opening
+\title{Implementing the add() protocol}
+\author{John Doe}
+
+\begin{document}
+\maketitle
+% \begin{abstract}
+%     \ldots
+% \end{abstract}
+% \input{sections/fullSyntax}
+% \input{sections/subsetSyntax}
+% \input{sections/typeRules}
+\input{sections/introduction}
+\input{sections/incrementalSyntax}
+\input{sections/incrementalTypes}
+\input{sections/operationalSemantics}
+\end{document}

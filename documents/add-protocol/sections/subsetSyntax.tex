@@ -1,0 +1,37 @@
+% !TeX encoding = UTF-8
+% !TeX root = ../language-design.tex
+
+%  The subset of syntax
+\section{Subset of the Syntax}
+\textit{program} ::= \textit{protocolList}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em}
+The following shows a subset of the syntax introduced in the earlier section.
+
+% program
+\textit{program} ::= \textit{protocolList}\smallskip
+
+% protocol list
+\textit{protocolList} ::= \textit{protocol}\\
+						\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{protocol protocolList}\smallskip
+
+% protocol
+\textit{protocol} ::= \textit{protocolDecl} $ \{ $ \textit{optUses} \textit{statementList} $\}$\smallskip
+
+% protocol decl
+\textit{protocolDecl} ::= ID (\textit{argList}): \textit{Party} \textit{expList}\smallskip
+
+% pvt statement
+\textit{pvtStatement} ::= \textbf{in} \textit{var} \{ \textit{statementList} \}\smallskip
+
+% session call
+\textit{sessionCall} ::= \textbf{open} \textit{var} \textbf{as} \textit{protCall} \{ \textit{statementList} \}\smallskip
+
+% Types
+$\tau$ ::= \hspace{3.8em} \textit{Party} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{Int} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{Session} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{Unknown} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{Port}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{InPort}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{OutPort}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{Bool}\smallskip

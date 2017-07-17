@@ -1,0 +1,154 @@
+protocol OLE (int k, field F) : party S, R {
+	local party T;
+
+	in S
+		F x0, x1;
+
+	in R
+		F b, res;
+
+	in T
+		F x0, x1, b, res;
+
+	environ => S.(x0,x1);
+	environ => R.b;
+	S.(x0,x1) => T.(x0,x1);
+	R.b => T.b;
+
+	in T
+		res = x0*b + x1;
+
+	T.res => R.res;
+	R.res => environ;
+}
+
+
+protocol share (int n, field F, int sender) : party A[n] {
+
+	in each A[i] where int i from {0 .. n-1}
+		F out;		// A[i].out stays in the top-level scope
+
+	in A[sender] {
+		environ => a;
+		F sum = 0;
+		for public int i from {{0 .. n-1} except sender} {
+			F tmp = $;
+			sum += tmp;
+			tmp => A[i].out;	//important that i is public
+		}
+		out = a - sum;
+	}
+
+	in each A[i] where i from {0 .. n-1}
+		out => environ;
+}
+
+protocol recon (int n, field F, int rcvr) : party A[n] {
+
+	in each A[i] where i from {0 .. n-1}
+		environ => F s;
+
+	in A[rcvr] {
+		F out = s; // own share
+		for public int i from {{0 .. n-1} except rcvr} {
+			A[i].s => F tmp;	//important that i is public
+			out += tmp;
+		}
+	}
+
+	A[rcvr].out => environ;
+}
+
+
+// A takes a, B takes b; they return shares of ab
+protocol pdtshare(int k, field F) : party A, B {
+	F A.a, B.b;
+	environ => A.a; environ => B.b;
+	open session ole as OLE { k:k; F:F; S:A; R:B; }
+	F A.x, B.x;
+	A.x = $;
+	A.(a,-x) => ole;
+	B.b => ole;
+	ole => B.x;
+	A.x => environ;
+	B.x => environ;
+}
+
+
+// A[i]s output shares of (sum_i A[i].a)*(sum_i A[i].b)
+protocol sharemult(int k, int n, field F) : party A[n] {
+	in each A[i] where int i from {0 .. n-1} {
+		F a,b,out;
+		environ => (a,b);
+		out = a*b;
+	}
+	for int i from {0 .. n-1} {
+		for int j from {{0 .. n-1} except i} {
+			// share ai*bj
+			open session pdt as pdtshare { k:k; F:F; A:A[i]; B:A[j] }
+			A[i].a => pdt; A[j].b => pdt;
+			pdt => F A[i].x; pdt => F A[j].x;
+			/* optional syntax:
+			 * (A[i].a, A[j].b) => pdt;
+			 * pdt => (F A[i].x, F A[j].x);
+			 */
+			in A[i] out += x;
+			in A[j] out += x;
+		}
+	}
+	in each A[i] where int i from {0 .. n-1}
+		out => environ;
+}
+
+
+protocol GMW_mult (int k, int n, field F) : party A[n] {
+
+	in each A[_i] where int _i from {0 .. n-1}
+		F __x[n];
+
+	for int i from {0 .. n-1} {
+		in A[i] {
+			F a, p;
+			environ => a;
+		}
+		// in A[i] a => T.x[i]
+		open session S as share {
+			n:n; F:F;
+			sender:i;
+			A[_i]:A[_i] where int _i from {0 .. n-1};
+		}
+		A[i].a => S;
+		in each A[_i] where int _i from {0 .. n-1}
+			S => __x[i];
+	}
+
+	// in T F p = 1;
+	F A[0].__p = 1;
+	in each A[_i] where int _i from {1 .. n-1}
+		F A[_i].__p = 0;
+
+	// for int i from {0 .. n-1}  in T p = p * x[i];
+	for int i from {0 .. n-1} {
+		open session M as sharemult {
+			k:k; n:n; F:F;
+			A[_i]:A[_i] where int _i from {0 .. n-1};
+		}
+		in each A[_i] where int _i from {1 .. n-1}
+			A[_i].(__p,__x[i]) => M;
+		in each A[_i] where int _i from {1 .. n-1}
+			M => A[_i].__p;
+	}
+
+	for int i from {0 .. n-1} {
+		F A[i].p;
+		// T.p => A[i].p;
+		open session R as recon {
+			k:k; n:n; F:F; rcvr:i;
+			A[_i]:A[_i] where int _i from {0 .. n-1};
+		}
+		in each A[_i] where int _i from {0 .. n-1}
+			A[_i].__p => R;
+		R => A[i].p;
+		A[i].p => environ;
+
+}

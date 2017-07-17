@@ -1,0 +1,19 @@
+% !TeX encoding = UTF-8
+% !TeX root = ../language-design.tex
+
+\section{Operational Semantics}
+The following section describes the operational semantics of our language:
+The notation used is as follows.
+
+\hspace*{10em} $\dfrac{
+\vdots
+}{\oenv{}e:v,S^{\prime}}$ \bigskip
+
+% declstmt
+\hspace*{10em} $\dfrac{
+\begin{array}{l}
+    E(Id) = l \\
+    S(l) = v
+\end{array}
+}{\oenv{} Id:v,S }$[Var]\bigskip
+

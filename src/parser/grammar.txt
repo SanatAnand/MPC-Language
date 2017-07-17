@@ -1,0 +1,145 @@
+%token <integer_value> INTEGER_NUMBER
+%token <string_value> NAME
+%token INTEGER FIELD PROTOCOL
+%token ASSIGN PARTY SEND
+%token IDEAL ENV IN
+%token OPEN AS RAND
+
+%left '+' '-'
+%left '*' '/'
+%right UMINUS
+%nonassoc '('
+
+%type <symbol_entry_list> variable_declaration
+%type <decl> declaration
+%type <sequence_ast> statement_list
+%type <ast> assignment_statement
+%type <ast> variable
+%type <ast> constant
+%type <ast> arith_expression
+%type <ast> expression_term
+%type <ast> operand
+%type <n_list> n_list
+%type <ast> session_call
+%type <symbol_entry_list> varlist
+%type <symbol_entry_list> opt_varlist
+%type <var_decl> var_decl
+%type <ast> statement
+%type <ast> tying_statement
+%type <ast> pvt_statement
+%type <ast> send_statement
+%type <ast> mult_statement
+
+%start program
+
+%%
+
+program:
+	protocol_list
+	
+protocol_list:
+	protocol
+|
+	protocol protocol_list
+
+protocol:
+	PROTOCOL NAME '(' opt_varlist ')' ':' PARTY party_list '{' statement_list '}'
+	
+party_list:
+	NAME
+|
+	NAME ',' party_list
+;
+
+opt_varlist: <empty> | varlist
+
+varlist:
+	var_decl
+|
+	varlist ',' var_decl
+
+var_decl:
+	INTEGER NAME | FIELD NAME
+
+type_decl: NAME
+
+variable_declaration:	declaration ';'
+
+declaration: INTEGER n_list | type_decl n_list
+
+n_list: NAME | n_list ',' NAME
+
+statement_list: <empty> | statement_list statement
+
+statement:
+	assignment_statement
+|
+	mult_statement
+|
+	pvt_statement
+|
+	send_statement
+|
+	session_call
+|
+	tying_statement
+|
+	variable_declaration
+
+mult_statement:
+	'{' statement_list '}'
+
+pvt_statement:
+	IN party_id ':' '{' statement_list '}'
+
+tying_statement:
+	party_id ':' NAME ';'
+	
+assignment_statement:
+	variable ASSIGN arith_expression ';'
+|
+	variable ASSIGN RAND ';'
+
+session_call:
+	OPEN NAME AS NAME '{' statement_list '}' ';'
+
+send_statement:
+	party_id '.' variable SEND party_id '.' variable ';' 
+|
+	ENV SEND party_id '.' variable ';'
+|
+	party_id '.' variable SEND ENV ';'
+|
+	party_id '.' variable SEND NAME ':' NAME ';'
+
+party_id:
+	NAME
+|
+	ENV
+|
+	IDEAL
+
+arith_expression:
+	operand '+' operand
+|
+	operand '-' operand	
+|
+	operand '*' operand
+|
+	operand '/' operand
+|
+	'-' operand %prec UMINUS
+|
+	'(' operand ')'
+|
+	expression_term
+
+operand: arith_expression
+
+expression_term:
+	variable | constant
+
+variable: NAME
+
+constant: INTEGER_NUMBER
+	

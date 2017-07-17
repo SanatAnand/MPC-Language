@@ -1,0 +1,12 @@
+// a party can have a party inside it (e.g., when opening a session).
+
+session M;
+open M as p(x) { A:A; B:B; } 
+// 		---equivalent to---
+in A {party M.A; set M.A as p(x)::A; } 
+in B {party M.B; set M.B as p(x)::B; } 
+connect M.A|B and M.B|A;
+in A
+	start M.A;
+in B
+	start M.B;

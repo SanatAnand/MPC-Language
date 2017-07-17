@@ -1,0 +1,50 @@
+protocol mult (int n, field F) : party A[n] {
+
+	in ideal{
+		F x[n];
+	}
+	int i;
+	for each i of {{0 .. n-1}}
+		in A[i] {
+			F a; 
+			env => a;
+			a => ideal.x[i];
+		}					//A[i].a goes out of scope
+
+	in ideal {
+		F p;
+		p = 1;
+		int i;
+		for each i of {{0 .. n-1}}
+			p = p * x[i];
+	}
+
+	for each i of {{0 .. n-1}} {
+		in A[i] {
+			F p;
+			ideal.p => A[i].p;
+			A[i].p => env;
+		}
+	}
+}
+
+/******
+The following three pieces of code are equivalent:
+
+-------------
+in T {
+	F p = 1;
+	for public int i from {0 .. n-1}
+		p *= x[i];
+}
+-------------
+F T.p = 1;
+for int i from {0 .. n-1}
+	T.p *= T.x[i];
+-------------
+in T F p = 1;
+for int i from {0 .. n-1}
+	in T p *= x[i];
+-------------
+
+******/

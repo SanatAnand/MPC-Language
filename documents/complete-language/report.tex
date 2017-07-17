@@ -1,0 +1,39 @@
+% !TeX encoding = UTF-8
+% !TeX root = report.tex
+
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage{listings}
+\usepackage{syntax}
+\usepackage{amsmath}
+\usepackage{proof}
+\usepackage{stmaryrd}
+\usepackage{marvosym}
+
+\setlength\parindent{0pt}% globally suppress indentation
+% Macros ------------
+\newcommand{\langName}{Cooler}
+\newcommand{\tenv}{O, C \vdash } % type environment
+\lstset{
+  basicstyle=\itshape,
+  xleftmargin=3em,
+  literate={->}{$\rightarrow$}{2}
+           {α}{$\alpha$}{1}
+           {δ}{$\delta$}{1}
+}
+
+\title{Crypto Grammar}
+\author{Sanat Anand}
+\date{July 2017}
+
+\begin{document}
+
+\maketitle
+
+\setlength{\grammarparsep}{4pt plus 1pt minus 1pt} % increase separation between rules
+\setlength{\grammarindent}{12em} % increase separation between LHS/RHS
+\input{content/grammar}
+\input{content/semantics}
+\input{content/typeRules}
+\input{content/operationalsemantics}
+\end{document}

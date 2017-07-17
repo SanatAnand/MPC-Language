@@ -1,0 +1,183 @@
+% !TeX encoding = UTF-8
+% !TeX root = ../report.tex
+
+\section{Type Rules}
+This section formally defines the type rules for \langName{}.
+The types in our language are as follows:
+
+\textit{Int}, \textit{Str}, \textit{Field}
+
+\subsection{Type Environment}
+The \textit{type} environment of \langName{} consists of two parts.
+\begin{itemize}
+	\item An object environment that maps identifiers to types.\smallskip
+
+	\hspace*{10em}\textit{O(Idf)=T}
+	\item The other environment is called the context environment denoted by \textit{C}.
+\end{itemize}
+
+\subsection{Type Checking Rules}
+The notation used for each of the type checking rule is as follows :
+
+% The notation for type checking rules
+\hspace*{10em} $ \dfrac{\vdots}{\tenv{} e: T}$
+
+here \textit{O} and \textit{C} represents the two type environments respectively and
+the expression \textit{e} evaluates to type \textit{T}.
+
+% Variable declaration
+\paragraph{Variable declaration}
+The rule for variable declaration is as follows \bigskip
+
+\hspace*{10em} $ \dfrac{O(Idf)}{\tenv{} Id: T}$ [Var]
+
+% Constants & Types ==============
+\paragraph{General Types} The following are rules for general types \bigskip
+
+% Integer constant
+\hspace*{10em} $ \dfrac{\text{\textit{i} is an integer constant}}
+{\tenv{} i: Int}$ [Int]\bigskip
+
+% String
+\hspace*{10em} $ \dfrac{\text{\textit{s} is an string constant}}
+{\tenv{} s: Str}$ [String]\bigskip
+
+% True
+\hspace*{10em} $ \dfrac{\phantom{}}{\tenv{} true: Bool}$ [True]\bigskip
+
+% False
+\hspace*{10em} $ \dfrac{\phantom{}}{\tenv{} false: Bool}$ [False]\bigskip
+
+% Unknown
+\hspace*{10em} $ \dfrac{\phantom{}}{\tenv{} unknown: Unknown}$ [Unknown]\bigskip
+
+\paragraph{Port Types} consists of three types namely Port, InPort and OutPort \bigskip
+
+% Port (Two types: Inport and OutPort)
+\hspace*{10em} $ \dfrac{
+\begin{array}{l}
+	O(Id):Str \\
+	\tenv{} e_1 : Int \\
+	\vdots \\
+	\tenv{} e_n : Int \\
+\end{array}
+}
+{\tenv{} Id[e_1]\ldots[e_n]:Str}$ [Port]\bigskip
+
+
+% Inport
+
+% OutPort
+
+
+% Fields
+
+%  Statements ==============
+\paragraph{Statements}
+The following rules type check statements \bigskip
+
+% If Statement
+\hspace*{10em} $ \dfrac{\begin{array}{l}
+	{\tenv{} e_1: Bool} \\
+	{\tenv{} e_2: T} \\
+	{\tenv{} e_3: T} \\
+\end{array}}
+{\tenv{} \text{if } e_1 \text{ then } e_2 \text{ else } e_3: T}$
+[If]\bigskip
+
+% For Statement
+\hspace*{10em}
+$
+\dfrac
+{\phantom{}}
+% ----
+{\tenv{} \text{for each } e_1 }
+$
+[For-Each]\bigskip
+
+% Expressions =============
+\paragraph{Expressions}
+The following rules type check expressions \bigskip
+
+% Expression list
+\hspace*{10em}
+$
+\dfrac
+{
+\begin{array}{l}
+	{\tenv{} e_1: T_1} \\
+	{\tenv{} e_2: T_2} \\
+	\vdots \\
+	{\tenv{} e_n: T_n}
+\end{array}
+}
+% ----
+{\tenv{} \{e_1 ; e_2 ; \ldots e_n; \}: T_n}
+$
+[$Sequence$]\bigskip
+
+% Forward expression
+\hspace*{10em}
+$
+\dfrac
+{
+\begin{array}{l}
+	{\tenv{} e_1: T_1} \\
+	{\tenv{} e_2: T_2}
+\end{array}
+}
+% ----
+{\tenv{} e_1 \Longrightarrow e_2 : T_2}
+$
+[$\Longrightarrow$]
+
+% Operations ============================
+\paragraph{Operations}  Type checks for operations are as follows: \bigskip
+
+% Binary operations ---------
+\hspace*{10em}
+$
+\dfrac
+{
+\begin{array}{l}
+	{\tenv{} e_1: Bool} \\
+	{\tenv{} e_2: Bool} \\
+	op \in \{AND, OR, NOT\}
+\end{array}
+}
+% ----
+{\tenv{} e_1 \; op \; e_2 : Bool}
+$
+[Binary-operation]\bigskip
+
+% Arithmetic operations -----------
+\hspace*{10em}
+$
+\dfrac
+{
+\begin{array}{l}
+	{\tenv{} e_1: Int} \\
+	{\tenv{} e_2: Int} \\
+	op \in \{+, -, *, /\}
+\end{array}
+}
+% ----
+{\tenv{} e_1 \; op \; e_2 : Int}
+$
+[Arithmetic-operation]\bigskip
+
+% Field operations -----------
+\hspace*{10em}
+$
+\dfrac
+{
+\begin{array}{l}
+	{\tenv{} e_1: Field} \\
+	{\tenv{} e_2: Field} \\
+	op \in \{ \varodot, \varoplus \}
+\end{array}
+}
+% ----
+{\tenv{} e_1 \; op \; e_2 : Field}
+$
+[Field-operation]\bigskip

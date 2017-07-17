@@ -1,0 +1,62 @@
+protocol OLE(int k, field F) : party S,R{
+	in S: 
+	{
+		F x0, x1;
+	}
+	env => S.x0;
+	env => S.x1;
+	in R: {F b, xb;}
+	env => R.b;
+	in ideal: {F x0, x1, b, xb;}
+	S.x0 => ideal.x0;
+	S.x1 => ideal.x1;
+	R.b => ideal.b;
+	in ideal:{
+		xb = x0 + x1*b;
+	}
+	ideal.xb => R.xb;
+	R.xb => env;
+}
+
+protocol MPC(int k, field F): party A,B,C{
+	in A: {
+		F a,d;
+		F res;
+	}
+
+	in B: {
+		F b;
+		F res;
+	}
+
+	in C: {
+		F c;
+		F res;
+	}
+
+	in ideal: {
+		F a,b,c,d;
+		F res;
+	}
+
+	env => A.a;
+	env => A.d;
+	env => B.b;
+	env => C.c;
+
+	A.a => ideal.a;
+	A.d => ideal.d;
+	B.b => ideal.b;
+	C.c => ideal.c;
+
+	in ideal: {
+		res = a*b + c*d;
+	}
+
+	ideal.res => A.res; 
+	ideal.res => B.res;
+	ideal.res => C.res;
+	A.res => env; 
+	B.res => env;
+	C.res => env;
+}

@@ -1,0 +1,189 @@
+% !TeX encoding = UTF-8
+% !TeX root = ../language-design.tex
+
+\section{Complete Syntax}
+% program
+\textit{program} ::= \textit{protocolList}\smallskip
+
+% protocol list
+\textit{protocolList} ::= \textit{protocol}\\
+						\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{protocol protocolList}\smallskip
+
+% protocol
+\textit{protocol} ::= \textit{protocolDecl} $ \{ $ \textit{optUses} \textit{statementList} $\}$\smallskip
+
+% protocol decl
+\textit{protocolDecl} ::= ID (\textit{argList}): \textit{Party} \textit{expList}\smallskip
+
+% exp list
+\textit{expList} ::= \hspace{1.5em} \textit{exp}\\
+					\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{exp, expList}\smallskip
+
+% field op
+\textit{fieldop} ::= \hspace{1.7em} \textit{field} $\varodot$ \textit{field} \\
+					\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{field} $\varoplus$ \textit{field}\smallskip
+
+% Types
+$\tau$ ::= \hspace{3.8em} \textit{Party} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{Int} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{Session} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{Unknown} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{Port}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{InPort}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{OutPort}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{Bool}\smallskip
+
+% term
+\textit{term} ::= \textit{var dimList}\smallskip
+
+% dim list
+\textit{dimlist} ::= \hspace{1.7em} [\textit{exp}] \textit{dimlist}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} [\phantom{exp}] \textit{dimlist}\smallskip
+
+% exp
+\textit{exp} ::= \hspace{3.1em} \textit{exp aop exp}\\ % arithmetic operation
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{exp fop exp}\\ % field operation
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{exp bop exp}\\ % binary operation
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{aop exp}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{bop exp}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{pop exp}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} (\textit{exp})\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{expList}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{term}\smallskip
+
+% Arithmetic operation
+\textit{aop} ::= \hspace{3.1em} $+$ \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} $-$\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} $*$\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} $/$\smallskip
+
+% operation
+\textit{pop} ::= $.$ \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} $|$\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} $::$\smallskip
+
+% Binary operation
+\textit{bop} ::= \hspace{3.1em} $AND$ \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} $OR$\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} $NOT$\smallskip
+
+% Field operation
+\textit{fop} ::= \hspace{3.1em} $\varodot$ \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} $\varoplus$\smallskip
+
+% Var
+\textit{var} ::= \hspace{3.1em} ID \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \#ID\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} $\MVAt$\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \$\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{constant}\smallskip
+
+% optUses
+\textit{optUses} ::= \textbf{uses} \textit{protocolDeclList}\smallskip
+
+% protocolDeclList
+\textit{protocolDeclList} ::= \textit{protocolDecl} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{protocolDecl, protocolDeclList}\smallskip
+
+% statementList
+\textit{statementList} ::= \textit{statement}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{statementList statement}\smallskip
+
+% statement
+\textit{statement} ::= \textit{assignmentStatement}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{multStatement} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{pvtStatement} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{sendStatement} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{sessionStatement} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{tyingStatement} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{declarationStatement} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{protocol} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{loopStatement} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{condStatement} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{wrapStatement} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{connectStatement} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{abortStatement} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{seqStatement} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{startStatement} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{setStatement} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{forwardStatement}\smallskip
+
+% Abort statement
+\textit{abortStatement} ::= \textbf{abort}\smallskip
+
+% Wrap statement
+\textit{wrapStatement} ::= \textbf{wrap} \textit{exp} \textit{statement}\smallskip
+
+% Start statement
+\textit{startStatement} ::= \textbf{start} \textit{exp}; \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textbf{start} \textit{expList}\smallskip
+
+% seq statement
+\textit{seqStatement} ::= \textbf{before} \textit{optEach statement} \textbf{do} \textit{statement} \\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textbf{after} \textit{optEach statement} \textbf{do} \textit{statement}\smallskip
+
+% opt each
+\textit{optEach} ::= \textbf{each}\smallskip
+
+% cond statement
+\textit{condStatement} ::=  \textbf{if} (\textit{exp}) \textit{statement}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textbf{if} (\textit{exp}) \textit{statement} \textbf{else} \textit{statement}\smallskip
+
+% set statement
+\textit{setStatement} ::=  \textbf{set} (\textit{exp}) \textbf{as} \textit{protCall} $::$ \textit{exp;}\smallskip
+
+% connect statement
+\textit{connectStatement} ::= \textbf{connect} \textit{exp} \textit{toAnd} \textit{exp;}\smallskip
+
+% toAnd
+\textit{toAnd} ::= \hspace{2em} \textbf{to}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textbf{and}\smallskip
+
+% assignment statement
+\textit{assignmentStatement} ::= \textit{exp} \textbf{assign} \textit{exp};\smallskip
+
+% mult statement
+\textit{multStatement} ::=   \{ \textit{statementList}\};\smallskip
+
+% pvt statement
+\textit{pvtStatement} ::= \textbf{in} \textit{var} \{ \textit{statementList} \}\smallskip
+
+% send statement
+\textit{sendStatement} ::= \textit{exp} \textbf{send} \textit{exp;}\smallskip
+
+% session call
+\textit{sessionCall} ::= \textbf{open} \textit{var} \textbf{as} \textit{protCall} \{ \textit{statementList} \}\smallskip
+
+% prot call
+\textit{optIdList} ::= \textit{idList}\smallskip
+
+% id list
+\textit{idList} ::= \hspace{2.2em} \textit{var}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{idList , var}\smallskip
+
+% tying statement
+\textit{tyingStatement} ::= \textit{exp} ; \textit{exp}\smallskip
+
+% declaration statement
+\textit{declarationStatement} ::= \textit{varlist} ;\smallskip
+
+% var list
+\textit{varList} ::= \hspace{1.5em} \textit{term}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{term, varList}\smallskip
+
+% loop statement
+\textit{loopStatement} ::= \textbf{for each} \textit{optQual} \textit{exp} \textit{optCond} \textit{statement}\smallskip
+
+% opt qual
+\textit{optQual} ::= \textit{var} \textbf{of}\smallskip
+
+% opt cond
+\textit{optCond} ::= \hspace{1em} \textbf{except} \textit{exp}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textbf{where} \textit{exp}\smallskip
+
+% exp list
+\textit{expList} ::= \{ \textit{expListElem} \}\smallskip
+
+% exp list elem
+\textit{expListElem} ::= \textit{exp}\\
+\hspace*{5.3em} $ | $ \hspace{0.4em} \textit{expListElem, exp}

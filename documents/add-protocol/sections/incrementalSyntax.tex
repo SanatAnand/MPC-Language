@@ -1,0 +1,42 @@
+% !TeX encoding = UTF-8
+% !TeX root = ../language-design.tex
+
+\section{Syntax}
+% program
+
+\begin{grammar}
+
+    <program> ::= \lit{protocol (}<args>\lit{) : party} <Idlist> \lit{\{} <body> \lit{\}}
+
+    <args> ::= <arg>
+    \alt <arg>,<args>
+
+    <arg> ::= <\texttau> <Id>
+
+    <\texttau> ::= \lit{Int} \alt \lit{Field}
+
+    <Idlist> ::= <Id>
+    \alt <Id>,<Idlist>
+
+    <Id> ::= \lit{[a-z, A-Z]\textsuperscript{+}} \alt <Id>.<Id> \alt
+    \lit{environment}
+
+    <body> ::= <statement>\textsuperscript{+}
+
+    <statement> ::= <pvtstmt> \alt <fwdstmt> \alt <assgnmntstmt> \alt <declstmt>
+
+    <pvtstmt> ::= \lit{in} <Id> \lit{\{} <statment> \lit{\}}
+
+    <fwdstmt> ::= <Id> \lit{$\Rightarrow$} <Id>
+
+    <assgnmntstmt> ::= <Id> \lit{=} <exp>
+
+    <exp> ::= n \alt <Id> \alt <exp> \lit{+} <exp> \alt \lit{(}<exp>\lit{)} \alt <exp> \lit{*} <exp>
+
+    <declstmt> ::= <\texttau> <Id>
+
+    <\textGamma> ::= <Id> $\rightarrow$ (<\texttau>, <partyScope>)
+
+    <partyScope> ::= <\textzeta> \alt <Id>
+
+\end{grammar}

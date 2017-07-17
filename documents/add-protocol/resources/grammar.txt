@@ -1,0 +1,294 @@
+program:
+	protocol_list
+;
+
+protocol_list:
+	protocol
+|
+	protocol
+	protocol_list
+;
+
+
+protocol:
+	proc_decl '{' opt_uses statement_list '}'
+;
+
+proc_decl:
+	PROTOCOL NAME '(' arg_list ')' ':' PARTY exp_list
+;
+
+exp_list:
+	exp
+|
+	exp ',' exp_list
+;
+
+term:
+	var dimlist
+;
+
+dimlist: 
+|
+	'[' exp ']' dimlist
+|
+	'[' ']' dimlist
+;
+
+exp:
+	exp a_op exp
+|
+	exp p_op exp
+|
+	exp b_op exp
+|
+	a_op exp
+|
+	p_op exp
+|
+	b_op exp
+|
+	'(' exp ')'
+|
+	exp_list
+|
+	term
+;
+
+a_op:
+	'+'
+|
+	'-'
+|
+	'*'
+|
+	'/'
+;
+
+p_op:
+	'.'
+|
+	'|'
+|
+	DOUBLE_COLON
+;
+
+b_op:
+	AND
+|
+	OR
+|
+	NOT
+;
+
+var:
+	NAME
+|
+	'#' NAME
+|
+	'@'
+|
+	'$'
+|
+	constant
+;
+
+opt_uses:
+|
+	USES prot_decl_list ';'
+;
+
+prot_decl_list:
+	prot_decl
+|
+	prot_decl ',' prot_decl_list
+;
+
+statement_list:
+	statement
+|
+	statement_list statement
+;
+
+statement:
+	assignment_statement
+|
+	mult_statement
+|
+	pvt_statement
+|
+	send_statement
+|
+	session_call
+|
+	tying_statement
+|
+	declaration_statement
+|
+	protocol
+|
+	loop_statement
+|
+	cond_statment
+|
+	wrap_statement
+|
+	connect_statement
+|
+	abort_statement
+|
+	seq_statement
+|
+	start_statement
+|
+	set_statement
+|
+	forward_statement
+;
+
+abort_statement:
+	ABORT
+;
+
+wrap_statement:
+	WRAP exp statement
+;
+
+start_statement:
+	START exp ';'
+|
+	START exp_list ';'
+;
+
+seq_statement:
+	BEFORE opt_each statement DO statement
+|
+	AFTER opt_each statement DO statement	
+;
+
+opt_each:
+|
+	EACH
+;
+
+assignment_statement:
+	exp ASSIGN exp ';'
+;
+
+mult_statement:
+	'{' statement_list '}'
+;
+
+pvt_statement:
+	IN variable '{' statement_list '}'
+;
+
+send_statement:
+	exp SEND exp ';'
+;
+
+session_call:
+	OPEN variable AS prot_call '{' statement_list '}'
+;
+
+prot_call:
+	NAME '(' opt_id_list ')'
+;
+
+opt_id_list:
+|
+	id_list
+;
+
+id_list::
+	variable
+|
+	id_list ',' variable
+;
+
+tying_statement:
+	exp ';' exp ';'
+;
+
+declaration_statement:
+	type varlist ';'
+;
+
+type:
+	PARTY
+|
+	INTEGER
+|
+	SESSION
+|
+	UNKNOWN
+|
+	PORT
+|
+	INPORT
+|
+	OUTPORT
+;
+
+varlist:
+	term
+|
+	term ',' varlist
+;
+
+loop_statement:
+	FOR EACH opt_qual exp opt_cond stmt
+;
+
+opt_qual:
+|
+	variable OF 
+;
+
+opt_cond:
+	EXCEPT exp
+|
+	WHERE exp
+;
+
+cond_statment:
+	IF '(' exp ')' statement
+|
+	IF '(' exp ')' statement ELSE statement
+;
+
+set_statement:
+	SET exp AS prot_call DOUBLE_COLON exp ';'
+;
+
+connect_statement:
+	CONNECT exp to_and exp ';'
+;
+
+to_and:
+	TO
+|
+	AND
+;
+
+exp_list:
+	'{' exp_list_elem '}'
+;
+
+exp_list_elem:
+	exp
+|
+	exp_list_elem ',' exp
+;
+
+forward_statement:
+	FORWARD exp TO exp ';'
+;
+
+variable:
+	NAME
+;
+
+constant:
+	INTEGER_NUMBER
+;

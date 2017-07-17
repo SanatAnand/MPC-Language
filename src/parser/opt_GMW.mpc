@@ -1,0 +1,81 @@
+protocol MPC(int k, field F): party A,B,C{
+	in A: {
+		F a,c;
+		F res;
+		F a1,b1,c1,d1,e1;
+		F a_temp, c_temp;
+	}
+
+	in B: {
+		F b;
+		F res;
+		F a2,b2,c2,d2,e2;
+		F b_temp;
+	}
+
+	env => A.a;
+	env => A.c;
+	env => B.b;
+
+	// Input sharing
+	in A: {
+		a1 = $; a_temp = a - a1;
+		c1 = $; c_temp = c - c1;
+	} 
+
+	in B: {
+		b_temp = $; b2 = b - b_temp;
+	}
+
+	A.a_temp => B.a2;
+	A.c_temp => B.c2;
+	B.b_temp => A.b1;
+
+	//The AND gate
+	in A: {
+		F y1, z1;
+		y1 = $; z1 =$;
+	}
+
+	in B: {
+		F y2, z2;
+	}
+
+	Open and_1_1 as OLE{k:k; F:F; S:A; R:B;};
+	A.a1 => and_1_1.S;
+	A.y1 => and_1_1.S;
+	B.b2 => and_1_1.R;
+	and_1_1.R => B.y2;
+
+	Open and_1_2 as OLE{k:k; F:F; S:A; R:B;};
+	A.b1 => and_1_2.S;
+	A.z1 => and_1_2.S;
+	B.a2 => and_1_2.R;
+	and_1_2.R => B.z2;
+
+	in A: {
+		d1 = a1*b1 - y1 - z1;
+	}
+
+	in B: {
+		d2 = a2*b2 + y2 + z2;
+	}
+
+	//The XOR gate
+	in A: {
+		e1 = d1 + c1;
+	}
+
+	in B: {
+		e2 = d2 + c2;
+	}
+
+	//Final Output
+	A.e1 => B.res;
+	B.e2 => A.res;
+
+	in A: {res = res + e1;}
+	in B: {res = res + e2;}
+
+	A.res => env; B.res => env;
+}
