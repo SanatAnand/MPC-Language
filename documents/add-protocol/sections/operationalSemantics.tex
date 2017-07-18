@@ -9,10 +9,52 @@ The notation used is as follows.
 \vdots
 }{\oenv{}e:v,S^{\prime}}$ \bigskip
 
-% declstmt
+The notation $M \leadsto_S C_N, env_N$ means compiling in the scope 
+of S leads M to adding `code' to the code-object of N and its corresponding 
+environment $env_N$.\bigskip
+
+\hspace*{5em} $\dfrac{
+\begin{array}{l}
+    args:v\\
+    \{body\} \leadsto_A C_A, env_A\\
+    \{body\} \leadsto_B C_B, env_B
+\end{array}
+}{\text{protocol ( } args \text{ )  party A, B \{ body \} } \leadsto_\mathscr{G} C_A, env_A, C_B, env_B  }$\bigskip
+
+This means if \textit{args} evaluates to value \textit{v} 
+
+%ktf
 \hspace*{10em} $\dfrac{
 \begin{array}{l}
-    E(Id) = l \\
-    S(l) = v
+    \phantom{}
 \end{array}
-}{\oenv{} Id:v,S }$[Var]\bigskip
+}{\text{in A } \{body\} \leadsto_B \text{\textit{skip, skip}}}$\bigskip
+
+%ktf
+\hspace*{10em} $\dfrac{
+\begin{array}{l}
+    \phantom{}
+\end{array}
+}{\text{in B } \{body\} \leadsto_A \text{\textit{skip, skip}}}$\bigskip
+
+
+%ktf
+\hspace*{10em} $\dfrac{
+\begin{array}{l}
+    \phantom{}
+\end{array}
+}{env \rightarrow x \leadsto_P \text{Rcv } x \text{ env}, \text{Snd } x \text{ to } P}$\bigskip
+
+%ktf
+\hspace*{10em} $\dfrac{
+\begin{array}{l}
+    \phantom{}
+\end{array}
+}{A.a \Rightarrow B.b \leadsto_A \text{ Snd } a \text{ to } \text{ B}, \text{\textit{skip}}}$\bigskip
+
+%ktf
+\hspace*{10em} $\dfrac{
+\begin{array}{l}
+    \phantom{}
+\end{array}
+}{A.a \Rightarrow B.b \leadsto_B \text{ Snd } a \text{ to } \text{ B}, \text{\textit{skip}}}$\bigskip

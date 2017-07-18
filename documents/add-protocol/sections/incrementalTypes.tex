@@ -68,8 +68,8 @@ $ \dfrac{\tenv{}e_1:Int}{\tenv{} (e_1): Int}$ [(exp)]\bigskip
 \hspace*{10em}
 $ \dfrac{
 \begin{array}{l}
-\Gamma, s \vdash e : T\\
-\Gamma (x) = (T,s)
+    \Gamma, s \vdash e : T\\
+    \Gamma (x) = (T,s)
 \end{array}}
 {\tenv{} x=e:~(~)} $[assgnmntstmt]\bigskip
 
@@ -113,6 +113,6 @@ $ \dfrac{
 \hspace*{10em}
 $ \dfrac{
 \begin{array}{l}
-\{\mathscr{G}, scopelist\}, f(args), \zeta \vdash B : ()
+    \{\mathscr{G}, scopelist\}, f(args), \zeta \vdash B : ()
 \end{array}
 }{\{\mathscr{G}\}, \phi \vdash protocol(args): \text{party } scopelist \{B\} : ()}$ [protocol]\bigskip
