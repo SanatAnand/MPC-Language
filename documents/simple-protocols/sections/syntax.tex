@@ -1,0 +1,40 @@
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../language-design"
+%%% End:
+
+\section{Syntax of test protocol}
+\label{sec:syntax-test}
+
+The following are the few notations used in our syntax:
+
+\begin{itemize}                 
+\item Capital letters for parties. Eg. \textit{P} 
+\item Protocol names are small case and always start with an underscore. Eg. \textit{_g}
+  \item Variable names are alwys single small case character
+  \end{itemize}
+  
+\subsection{Keywords}
+The keywords used are as follows:
+\textit{environ, protocol, party, session, open, connect, and, to, forward, set, as, in,
+before, after, do, start, inport, outport}
+
+\subsection{Grammar}
+The grammar for our language is as follows:
+
+\begin{grammar}
+  <program> ::= [protocol]\textsuperscript{+}
+
+  <x> ::= [a-z] 
+
+  <P> ::= [A-Z]
+
+  <_g> ::= _[a-z]
+  
+  <protocol> ::= <_g>\lit{(}(<\texttau > <x>)\textsuperscript{+}\lit{)}\lit{: party} <P>\textsuperscript{+} \lit{\{} <statement>\textsuperscript{+} \lit{\}}
+
+  <\texttau > ::= \textit{Party}, \textit{Int}, \textit{Session}, \textit{Port}
+
+\end{grammar}
+
+Hello

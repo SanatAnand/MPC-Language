@@ -1,5 +1,7 @@
-% !TeX encoding = UTF-8
-% !TeX root = ../language-design.tex
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../language-design"
+%%% End:
 
 \section{Type checking}
 The following rules states how the types checks are going to be performed
@@ -53,22 +55,22 @@ $ \dfrac{\Gamma(x)=Int}{\tenv{} x: Int}$ [x]\bigskip
 \hspace*{10em}
 $\dfrac{
 \begin{array}{l}
-    \tenv{} e_1 : Int\\
-    \tenv{} e_2 : Int\\
+    \tenv{} e_1 : int\\
+    \tenv{} e_2 : int\\
     \text{\textit{op}} \in \{+,*\}
 \end{array}}
-{\tenv{} e_1 \text{\textit{ op }} e_2: Int}$
+{\tenv{} e_1 \text{\textit{ op }} e_2: int}$
 [exp op exp]\bigskip
 
 
 \hspace*{10em}
-$ \dfrac{\tenv{}e_1:Int}{\tenv{} (e_1): Int}$ [(exp)]\bigskip
+$ \dfrac{\tenv{}e_1:int}{\tenv{} (e_1): int}$ [(exp)]\bigskip
 
 
 \hspace*{10em}
 $ \dfrac{
 \begin{array}{l}
-    \Gamma, s \vdash e : T\\
+    \gamma, s \vdash e : T\\
     \Gamma (x) = (T,s)
 \end{array}}
 {\tenv{} x=e:~(~)} $[assgnmntstmt]\bigskip

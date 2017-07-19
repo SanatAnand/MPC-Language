@@ -1,0 +1,120 @@
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../language-design"
+%%% End:
+
+\section{Type checking}
+The following rules states how the types checks are going to be performed
+\subsection{Type Environment} The \textit{type} environment of \langName{} consists of three parts.
+
+\begin{itemize}
+    \item A type environment that contains all possible scopes denoted by $A$
+
+    \item $\Gamma$ that maps Identifier to a tuple \textit{(type, partyScope)}. Here \textit{type}
+        denotes the type of the Identifier while \textit{partyScope} denotes a scope the Identifier
+        belongs to.  A \textit{partyScope} is the scope local to each party.
+        \\$\Gamma(\text{\textit{Id}}) \rightarrow (\text{\textit{type, partyScope}})$
+
+    \item $s$ denotes the current scope
+\end{itemize}
+
+\subsection{Type Checking Rules}
+The notation used for each of the type checking rule is as follows:
+
+% The notation for type checking rules
+\hspace*{10em} $ \dfrac{\vdots}{\tenv{} e: T}$ \smallskip
+
+here \textit{A}, $\Gamma$ and $s$ represents the three
+type environments respectively as introduced above and
+the expression \textit{e} evaluates to type \textit{T}.\bigskip
+
+% Variable declaration
+%\paragraph{Variable declaration}
+%The rule for variable declaration is as follows \bigskip
+
+%\hspace*{10em} $ \dfrac{A(Id)}{\tenv{} Id: T}$ [Var] \bigskip
+
+% Constants & Types ==============
+%\paragraph{Constants} The following are rules for constants \bigskip
+
+\hspace*{10em}
+$ \dfrac{(Id, s)\notin \Gamma}{\tenv{} \tau Id : \tau}$ [declstmt]\bigskip
+
+% Integer constant
+\hspace*{10em}
+$ \dfrac{\phantom{}} {\tenv{} n: Int}$ [Int]\bigskip
+
+Here \textit{x} is a special Int that is not of the form
+\textit{Id.Id}\bigskip
+
+% Treating x as a special integer that is not of the form A.a
+\hspace*{10em}
+$ \dfrac{\Gamma(x)=Int}{\tenv{} x: Int}$ [x]\bigskip
+
+%op
+\hspace*{10em}
+$\dfrac{
+\begin{array}{l}
+    \tenv{} e_1 : int\\
+    \tenv{} e_2 : int\\
+    \text{\textit{op}} \in \{+,*\}
+\end{array}}
+{\tenv{} e_1 \text{\textit{ op }} e_2: int}$
+[exp op exp]\bigskip
+
+
+\hspace*{10em}
+$ \dfrac{\tenv{}e_1:int}{\tenv{} (e_1): int}$ [(exp)]\bigskip
+
+
+\hspace*{10em}
+$ \dfrac{
+\begin{array}{l}
+    \gamma, s \vdash e : T\\
+    \Gamma (x) = (T,s)
+\end{array}}
+{\tenv{} x=e:~(~)} $[assgnmntstmt]\bigskip
+
+\textit{x} and \textit{environment} is always well typed\bigskip
+
+\hspace*{10em}
+$ \dfrac{A(x)}{A,\_,\_ \vdash x:()}$ [x]\bigskip
+
+% Showing that the environment is always well typed
+\hspace*{10em}
+$ \dfrac{\phantom{}}{\_,\_,\_ \vdash environment: ()}$ [environment]\bigskip
+
+% forward statement
+\hspace*{10em}
+$ \dfrac{
+\begin{array}{l}
+    \tenv{} Id_1 : T\\
+    \tenv{} Id_2 : T\\
+\end{array}
+}{\tenv{} Id_1 \Rightarrow Id_2 : ()}$ [fwdstmt Id to Id]\bigskip
+
+\hspace*{10em}
+$ \dfrac{\tenv{} Id:T}{\tenv{} Id \Rightarrow environment : ()}$[fwdstmt Id to env]\bigskip
+
+\hspace*{10em}
+$ \dfrac{\tenv{} Id:T}{\tenv{} environment \Rightarrow Id : ()}$[fwdstmt env to Id]\bigskip
+
+% pvtstmt statement
+\hspace*{10em}
+$ \dfrac{A, \Gamma, x \vdash B : ()}{A, \Gamma, \zeta \vdash \text{in } x\{ B \} : ()}$ [pvtstmt]\bigskip
+
+% a.a statement
+\hspace*{10em}
+$ \dfrac{
+\begin{array}{l}
+    A,\_,\_ \vdash x:()\\
+    A,\Gamma,x \vdash y : T\\
+\end{array}
+}{A, \Gamma, \zeta \vdash x.y : T}$ [x.y]\bigskip
+
+\hspace*{10em}
+$ \dfrac{
+\begin{array}{l}
+    \{\mathscr{G}, scopelist\}, f(args), \zeta \vdash B : ()
+\end{array}
+}{\{\mathscr{G}\}, \phi \vdash protocol(args): \text{party } scopelist \{B\} : ()}$ [protocol]\bigskip
