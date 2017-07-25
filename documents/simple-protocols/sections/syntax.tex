@@ -1,6 +1,8 @@
+% !TeX encoding = UTF-8
+% !TeX root = ../language-design.tex
 %%% Local Variables:
 %%% mode: latex
-%%% TeX-master: "../language-design"
+%%% TeX-master: ../language-design.tex
 %%% End:
 
 \section{Syntax of test protocol}
@@ -9,11 +11,11 @@
 The following are the few notations used in our syntax:
 
 \begin{itemize}                 
-\item Capital letters for parties. Eg. \textit{P} 
-\item Protocol names are small case and always start with an underscore. Eg. \textit{_g}
-  \item Variable names are alwys single small case character
-  \end{itemize}
-  
+    \item Capital letters for parties. Eg. \textit{P} 
+    \item Protocol names are small case and always start with an underscore. Eg. \textit{_g}
+    \item Variable names are alwys single small case character
+\end{itemize}
+
 \subsection{Keywords}
 The keywords used are as follows:
 \textit{environ, protocol, party, session, open, connect, and, to, forward, set, as, in,
@@ -23,18 +25,24 @@ before, after, do, start, inport, outport}
 The grammar for our language is as follows:
 
 \begin{grammar}
-  <program> ::= [protocol]\textsuperscript{+}
+    <program> ::= [protocol]\textsuperscript{+}
 
-  <x> ::= [a-z] 
+    <x> ::= [a-z] 
 
-  <P> ::= [A-Z]
+    <P> ::= [A-Z]
 
-  <_g> ::= _[a-z]
-  
-  <protocol> ::= <_g>\lit{(}(<\texttau > <x>)\textsuperscript{+}\lit{)}\lit{: party} <P>\textsuperscript{+} \lit{\{} <statement>\textsuperscript{+} \lit{\}}
+    <_g> ::= _[a-z]
 
-  <\texttau > ::= \textit{Party}, \textit{Int}, \textit{Session}, \textit{Port}
+    <protocol> ::= <_g>\lit{(}(<\texttau > <x>)\textsuperscript{+}\lit{)}\lit{: party} <P>\textsuperscript{+} \lit{\{} <statement>\textsuperscript{+} \lit{\}}
+
+    <\texttau > ::= \textit{Party}, \textit{Int}, \textit{Session}, \textit{Port}
+
+    <statement> ::= \lit{in} <P>\{ <statement>\textsuperscript{+} \} \alt
+    <\texttau > <x> \alt
+    <environ> $\Rightarrow$ <x> \alt
+    <x> $\Rightarrow$ <environ> \alt
+    <exp> $\Rightarrow$ <exp> 
+    <x> $\Rightarrow$ <exp> \alt
+    \lit{open} <x> \lit{as} <_g>(<x>\textsuperscript{*})\{ (<P>:<P>)\textsuperscript{+} \}
 
 \end{grammar}
-
-Hello
