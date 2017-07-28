@@ -1,25 +1,26 @@
 % Grammar rules ----------------------------------------------
 % Comma separted variables are treated aliases
-% embed
-% {{ tex
-% \makeatletter
-% \makeatother
-% \title{Implementing the add() protocol}
-% \author{John Doe}
-% \maketitle
-
-% \section{Introduction}
-% In the following we 
-
-% }}
-metavar A, B ::=
-	{{ com Names of parties A, B }}
+metavar A , B ::=
+	{{ com Names of parties A , B }}
 metavar P ::=
-	{{ com Protocol name [[P]] }} {{ tex \wp }}
+	{{ com Protocol name [[P]] }} 
 metavar x, y, s ::=
-	{{ com Variables Eg. Session or Integer variables. }}
+	{{ com Variables Eg. Session, Party,  Integer variables. }}
 metavar env ::=
 	{{ com Special environment variable [[env]] }}
+metavar O ::=
+	{{ com Port name [[O]] }}
+metavar G ::= 
+	
+metavar M ::= {{ tex \mathcal{M} }}
+
+metavar rho ::= {{ tex \rho }}
+
+metavar S ::= 
+
+indexvar n , m , k ::=
+	 {{ com Index variables }}
+
 
 grammar
 tau {{ tex \tau }} :: 'type_' ::= {{ com Types }}
@@ -31,48 +32,51 @@ tau {{ tex \tau }} :: 'type_' ::= {{ com Types }}
     | Field :: :: field
     | Protocol :: :: protocol
     | () :: :: wellTyped {{ com Well typed }}
-    
-program :: 'prog_' ::=
-	| prtcl :: :: Program
-	{{ tex [[prtcl]]^+ }}
-	{{ com One or more protocols }}
-
-prtcl :: 'prtcl_' ::=
-	 | protocol P ( tau   x ) : party A { statement } :: :: dec
-	 {{ tex \textbf{protocol} \ [[P]] ( ([[tau]] \ [[x]])^{+} ) \ \textbf{: party } [[A]]^+
-	    \{ \ [[statement]]^+ \ \} }}
-
-terminals :: 'terminals_' ::=
-	  | => :: :: leadsto {{ tex \Rightarrow }}
-	  | I :: :: I {{ tex \Vert }}
-	  | |-              :: :: turnstile    {{ tex \vdash }}
-	  | in :: :: in {{ tex \in }}
-	  | notin :: :: notin {{ tex \notin }}
 
 constant, c :: CONST_ ::=
 	  | integer_literal :: :: int
 	  | true :: ::  bool_t
 	  | false :: :: bool_f
 	  
+program :: 'prog_' ::=
+	| prtcl :: :: Program
+	{{ tex [[prtcl]]^+ }}
+	{{ com One or more protocols }}
+
+prtcl :: 'prtcl_' ::=
+       | protocol P ( tau1   x1 , .. , taun xn ) : party A1 , .. , Am { stmt1 , .. , stmtk } :: :: dec
+	 % {{ tex \textbf{protocol} \ [[P]] ( ([[tau]] \ [[x]])^{+} ) \ \textbf{: party } [[A]]^+
+	    % \{ \ [[statement]]^+ \ \} }}
+
+terminals :: 'terminals_' ::=
+	  | => :: :: leadsto {{ tex \Rightarrow }}
+	  | -> :: :: longrightarrow {{ tex \longrightarrow }}
+	  | I :: :: I {{ tex \Vert }}
+	  | |-              :: :: turnstile    {{ tex \vdash }}
+	  | in :: :: in {{ tex \in }}
+	  | notin :: :: notin {{ tex \notin }}
+	  
 statement, stmt :: 'statement_' ::= {{ com Statements }}
 	  | in A { statement } :: :: pvtstmt
 	  {{ tex \textbf{in } [[A]] \ \{ \ [[statement]]^+ \ \} }} {{ com Private statement }}
 	  | tau  x ; :: :: declstmt
 	  {{ com Declare a variable }}
-	  | env => x ; :: :: env_protocol_frwdstmt
-	  {{ com Forward from env to var }}
-	  | x => env ; :: :: protocol_env_frwdstmt
-	  {{ com Forward from var to env}}
+	  | statement; statement'; :: :: seq
+	  {{ com Sequence }}
+	  | env => x ; :: :: env_protocol_sendstmt
+	  {{ com Send from env to var }}
+	  | x => env ; :: :: protocol_env_sendstmt
+	  {{ com Send from var to env}}
+  	  | exp => exp' :: :: exp_exp_sendstmt
+	  {{ com Send from a exp to exp }}
 	  | x = exp ; :: :: assignsttm
 	  {{ com Assignment }}
-	  | open  s  as  P ( x ) { ( A : B ) } :: :: opensessionstmt
-	  {{ tex \textbf{open} \ [[s]] \ \textbf{as } [[P]] ( [[x]] ) \ \{ \ ([[A]]:[[B]])^+ \ \} }}
+	  | open  s  as  P ( x1 , .. , xn ) { A1 : B1 , .. , Am : Bm } :: :: opensessionstmt
+	  % {{ tex \textbf{open} \ [[s]] \ \textbf{as } [[P]] ( [[x]] ) \ \{ \ ([[A]]:[[B]])^+ \ \} }}
 	  {{ com Open session [[s]] }}
-	  | set A as P ( x ) B :: :: setstmt
-	  {{ tex \textbf{set} \ [[A]] \ \textbf{as} \ [[P]] ( [[x]]^* ) \ \textbf{::} \ [[B]] }}
+	  | set A as P ( x1 , .. , xn )::B :: :: setstmt
+	  % {{ tex \textbf{set} \ [[A]] \ \textbf{as} \ [[P]] ( [[x]]^* ) \ \textbf{::} \ [[B]] }}
 	  {{ com Set party as another party of another protocol }}
-  	  | exp => exp' :: :: exp_exp_frwdstmt
-	  {{ com Forward from a exp to exp }}
 	  | wrap { wstmt } :: :: wrapstmt
 	  {{ tex \textbf{wrap} \ \{ [[wstmt]]^+ \} }}
 	  {{ com Wrap statement }}
@@ -85,163 +89,233 @@ statement, stmt :: 'statement_' ::= {{ com Statements }}
 	  {{ tex \textbf{connect} \ [[pexp]] \ \textbf{to} \ [[pexp']] }}
   	  {{ com One way connection }}
 
-wstmt {{ tex \mathcal{W}_{stmt} }} :: 'wstmt_' ::= {{ com Statements inside wrap  }}
-	  | before pexp_w do { statement } :: :: bef
-	  {{ tex \textbf{before} \ [[pexp_w]] \ \textbf{do} \ \{ [[statement]]^+ \} }}
-  	  | after pexp_w do { statement } :: :: after
-	  {{ tex \textbf{after} \ [[pexp_w]] \ \textbf{do} \ \{ [[statement]]^+ \} }}
 
-pexp_w {{ tex pexp_{w} }} :: 'pexp_w_' ::=
-	  % | env I A :: :: env_to_party
-	  | A I env :: :: party_to_env 
+wstmt {{ tex \mathcal{W}_{stmt} }} :: 'wstmt_' ::= {{ com Statements inside wrap  }}
+	  | before pexp do { statement1 , .. , statementn } :: :: bef
+	  % {{ tex \textbf{before} \ [[pexp_w]] \ \textbf{do} \ \{ [[statement]]^+ \} }}
+  	  | after pexp do { statement1 , .. , statementn } :: :: after
+	  % {{ tex \textbf{after} \ [[pexp_w]] \ \textbf{do} \ \{ [[statement]]^+ \} }}
+
+% pexp_w {{ tex pexp_{w} }} :: 'pexp_w_' ::=
+% 	  % | env I A :: :: env_to_party
+% 	  | A I env :: :: party_to_env 
 
 pexp {{ tex \mathcal{P}_{exp} }} :: 'pexp_' ::=
-     | env :: :: env {{ com environment }}
+     | A I env :: :: env {{ com environment }}
      | A I B :: :: twoparties {{ com Two parties }}
-     | s.A I env :: :: sessionParty_env {{ com env of Party of session }} 
-     | pexp_w :: :: pexp_w
-     | A :: :: party {{ com Party }}
+     | exp I env :: :: sessionParty_env {{ com env of Party of session }} 
+     % | A :: :: party {{ com Party }}
      % | x :: :: var {{ com Variable }}
      % | A I env :: :: partys_env {{ com env port of a party called A }}
 
 exp :: 'expr_' ::=
     | exp + exp' :: :: addition {{ com Addition of two Int }}
-    | A.x :: :: party_var {{ com Variable of a party A }}
+    | A . x :: :: party_var {{ com Variable [[x]] of a party [[A]] }}
+    | s . A :: :: vart_party {{ com Party [[A]] of a variable [[s]] }}
+    | x :: :: statement {{ com Expression statement }}
 
+scope :: 'scope_' ::=
+     | C :: ::  current_scop {{ com Current Scope }} {{ tex \mathcal{C} }}
+     | _ :: :: dont_care_scop {{ com Do not care }}
+     | L :: :: global_scop {{ com Global Scope }} {{ tex \mathcal{G} }}
 
-Tenv {{ tex T }} :: 'TypeEnv' ::= {{ com Type environment }}
+Tenv {{ tex \mathcal{E} }} :: 'TypeEnv' ::= {{ com Type environment }}
   | empty :: :: em {{ tex \epsilon }} {{ com Empty }}
-  | Tenv , G : tau  :: ::  global_scope
-  % | M :: :: protocol_scope  {{ tex \mathcal{M} }} {{ com Protocol Scope }}
-  % | rho :: :: party_scope {{ tex \rho }} {{ com Protocl, Party Scope }}
+  % | G ( A ) = ( tau , scope )  :: :: PartyNm_TypeScope
+  % | G ( x ) = ( tau , scope )  :: :: Var_TypeScope
+  | G ( Tenv ) = ( tau , scope )  :: :: PrtckNm_TypeScope
+  | M ( P ) = ( argsig , { A1 , .. , Am } ) :: :: PrtclNm_ArgsigPartyNms
+  | rho ( P , A ) = { O1 , .. , On } :: :: party_Scope
+  | S ( s ) =  P :: :: sessionNm_PrtclNm {{ com Open as protocol [[P]] }}
+  | Tenv , Tenv' :: :: tenv_and_tenv_prime
+  | G :: :: id_to_type_scope
+  % {{ tex \Gamma }}
+  | M :: :: prtcl_to_arglist_partynmlist
+  | rho :: :: prtcl_to_portlist
+  | S :: :: sessn_to_prtcl
+  | scope :: :: current_scope
+  % | G , M , rho , S , scope :: :: all_env
+  | A :: :: party_env
+  | x :: :: var_env
+  | P :: :: prtcl_env
+  
+    % | M :: :: Protocol_Scexp :: 'expr_' ::=ope {{ tex \mathcal{M} }} {{ com Protocol Scope }}
+
   % | sesn :: :: session_scope {{ tex \mathcal{S} }} {{ com Session Scope }}
   % | G , M , rho , S : tau  :: :: typ {{ tex G, \  M, \ \rho, \ \mathcal{S} : [[tau]] }}
+argsig :: 'argsig_' ::=
+       | { tau1 , .. , taun } :: :: type_signature
 
 formula :: 'formula_' ::=
 	| judgement :: :: judgement
+	| formula1 .. formulan :: :: dots
 	| env : tau :: :: env_type
-	| Tenv |- P : tau :: :: protcol_type
-	| pexp : tau :: :: party_type
-	| pexp : tau in Tenv :: :: pexp_in_tenv
-	| Tenv |- pexp : tau :: :: pexptype
-	| x : tau in Tenv :: :: exists
-	| x : tau notin Tenv :: :: doesnotexist
-	| Tenv |- x : tau :: :: x_type
-	% | Tenv |- protocol : tau :: :: protocol
+	| Tenv :: :: type_env
+	| x notin scope :: :: var_not_inscope
+	| x in scope :: :: var_inscope
+	| P notin scope :: :: prtcl_not_inscope
+	| tau in { tau1 , .. , taun } :: :: type_notin_type
+	| A in scope :: :: party_inscope
+	| Tenv |- stmt : tau :: :: stmt_tenv
+	| Tenv |- x : tau :: :: var_type
+	| Tenv = Tenv' :: :: assign_newenv
+	| [ tau1 , .. , taun ] = argsig :: :: types_in_argsig
+	| Tenv in { Tenv1 , .. , Tenvn } :: :: tenv_in_tenv
+	% | Tenv = { Tenv1 , .. , Tenvn } :: :: tenv_eq_tenv
+	| Tenv |- pexp : tau :: :: pexp_tenv_tenv
 
+% embed
+% {{ tex
+% \makeatletter
+% % \makeatother
+% \title{Implementing the add() protocol}
+% \author{John Doe}
+% \maketitle
 
+% \section{Introduction}
+% In the following we 
+
+% }}
 % Type Checking rules ----------------------------------------------
 defns
   Jtype :: '' ::=
-
+  
+  % Type checking constants
   defn
 	Tenv |- constant : tau :: ::  Constant :: Constant_ by
 
 	------------------------------ :: Int
-	Tenv |- integer_literal : Int
+	G , M , rho , S , C  |- integer_literal : Int
 
 	------------------------------ :: true
-	Tenv |- true : Bool
+	G , M , rho , S , C  |- true : Bool
 
 	------------------------------ :: false
-	Tenv |- false : Bool
+	G , M , rho , S , C  |- false : Bool
+	
+ % Type checking Statements
+  defn 	Tenv |- stmt : tau , Tenv' :: :: Stmt :: Stmt_ by
 
- defn 	
-	Tenv |- stmt : tau :: :: Stmt :: Stmt_ by
+		x notin C
+  	     	G ( x ) = ( tau , C )
+	------------------------------- :: decl
+	G , M , rho , S , C |- tau x ; : tau , G' , M , rho , S , C 
 
-	       A : Party in Tenv
-             Tenv |- statement : ()
-	------------------------------- :: pvt
-	Tenv , G |- in A { statement } : ()
-
-	      x : tau notin Tenv
-	------------------------------------- :: decl
-		Tenv |- tau x ; : tau
+	G , M , rho , S , C |- statement : tau
+	G , M , rho , S , C |- statement' : tau'
+	----------------------------------------------------- :: seq
+	G , M , rho , S , C |- statement; statement'; : tau' , G , M , rho , S , C
 		
-	     Tenv |- env : ()
-	     Tenv |- x : tau
-	 ------------------------------- :: fwd
-	    Tenv |- env => x; : tau
+	     G ( A ) = ( Party , _ )
+             G , M , rho , S , A |- statement : ()
+	------------------------------- :: pvt
+	G , M , rho , S , C |- in A { statement } : () , G , M , rho , S , C 
 
-	       Tenv |- x : tau
-	      Tenv |- exp : tau
-	 ------------------------------ ::  assignmnt
-	 Tenv |- x = exp; : tau
+	     G ( x ) = ( Int , C )
+	 ------------------------------- :: sendEnvToVar
+	    G , M , rho , S , C |- env => x; : () , G , M , rho , S , C 
 
-	     Tenv |- x : tau 
-	     Tenv |- s : Session
-	     Tenv |- P : Protocol
-	     Tenv |- A : Party
-	     Tenv |- B : Party
-	 ------------------------------ :: opensession
-	 Tenv |- open s as P ( x ) { ( A : B ) } : ()
+	     G ( x ) = ( Int , C )
+	 ------------------------------- :: sendVarToEnv
+	    G , M , rho , S , C |- x => env; : () , G , M , rho , S , C 
 
-	      Tenv |- A : Party
-	      Tenv |- B : Party
-	      Tenv |- P : Protocol
-	      Tenv |- x : tau
+	      G , M , rho , S , C  |- exp : tau
+	      G , M , rho , S , C  |- exp' : tau'
+	      tau in { Port , Int }
+	      tau' in { Port , Int }
+	 ---------------------------------------------------------------- :: sendExprToExpr
+	      G , M , rho , S , C  |- exp => exp' : () , G , M , rho , S , C 
+
+	       G ( x ) = ( tau , C )
+	       G , M , rho , S , C |- exp : tau
+	 ---------------------------------------------------------------- ::  assignmnt
+	     G , M , rho , S , C  |- x = exp; : tau , G , M , rho , S , C 
+
+	 G ( s ) = ( Session , C )
+	 G ( P ) = ( Protocol , _ )
+ 	 M ( P ) = ( argsig , { A1 , .. , Am } )
+	 G ( x1 ) = ( tau1 , C)
+	 G ( xn ) = ( taun , C)
+	 [ tau1 , .. , taun ] = argsig
+	 G ( B1 ) = ( Party , C )
+	 G ( Bm ) = ( Party , C )
+	 A1 = B1
+	 Am = Bm
+	 S = S'
+	 S' ( s ) = P
+------------------------------------------------------------------------------------- :: opensession
+ G , M , rho , S , C  |- open  s  as  P ( x1 , .. , xn ) { A1 : B1 , .. , Am : Bm } : () , G , M , rho , S' , C 
+
+	   G ( A ) = ( Party , C )
+	   G ( P ) = ( Protocol , _ )
+	   G ( x1 ) = ( tau1 , C )
+	   G ( xn ) = ( taun , C )
+	   M ( P ) = ( argsig , { A1 , .. , Am } )
+	   B in { A1 , .. , Am }
+	    [ tau1 , .. , taun ] = argsig
 	 ------------------------------- :: set
-	 Tenv |- set A as P ( x ) B : ()
+	 C |- set A as P ( x1 , .. , xn )::B : () , G , M , rho , S , C 
 
-	      Tenv |- exp : tau
-	      Tenv |- exp' : tau
-	 ------------------------------- :: fwdExprToExpr
-	  Tenv |- exp => exp' : tau
 
- 
+
+          G , M , rho , S , C |- wstmt : ()
 	 -------------------------------- :: wrap
-	       Tenv |- wrap { wstmt } : ()
+	  G , M , rho , S , C  |- wrap { wstmt } : () , G , M , rho , S , C 
 
-	%      	Tenv |- pexp : tau
-	% 	Tenv |- pexp' : tau
-	% ---------------------------------------------- :: fwdto
-	% Tenv |- forward pexp to pexp' : tau
-
-	     	Tenv |- pexp : tau
-		Tenv |- pexp' : tau
+	     	G , M , rho , S , C  |- pexp : Port
+		G , M , rho , S , C  |- pexp' : Port
 	---------------------------------------------- :: connectTo
-	Tenv |- connect pexp to pexp' : tau
+        G , M , rho , S , C  |- connect pexp to pexp' : () , G , M , rho , S , C 
 
-	     	Tenv |- pexp : tau
-		Tenv |- pexp' : tau
+	     	G , M , rho , S , C  |- pexp : Port
+		G , M , rho , S , C  |- pexp' : Port
 	---------------------------------------------- :: connectAnd
-	Tenv |- connect pexp and pexp' : tau
+        G , M , rho , S , C  |- connect pexp and pexp' : () , G , M , rho , S , C
 
+	
 defn Tenv |- wstmt : tau :: :: Wrapstmt :: Wrapstmt_ by
 
-     	       Tenv |- pexp_w : Port
-	       Tenv |- statement : tau
+     	       G , M , rho , S , C  |- pexp : Port
+	       G , M , rho , S , C  |- statement1 : ()
+	       G , M , rho , S , C  |- statementn : ()
 	---------------------------------------------- :: before
-	Tenv |- before pexp_w do { statement } : tau
+	G , M , rho , S , C  |- before pexp do { statement1 , .. , statementn } : ()
 
-       	       Tenv |- pexp_w : Port	
-	       Tenv |- statement : tau
+       	       G , M , rho , S , C  |- pexp : Port	
+	       G , M , rho , S , C  |- statement1 : ()
+	       G , M , rho , S , C  |- statementn : ()
 	---------------------------------------------- :: after
-	Tenv |- after pexp_w do { statement } : tau
+	G , M , rho , S , C  |- after pexp do { statement1 , .. , statementn } : ()
 
-defn   Tenv |- prtcl : tau :: :: Protocol :: Protocol_  by
-
-       	       Tenv |- P : Protocol
-	       Tenv |- x_1 : tau_1
-	       Tenv |- x_2 : tau_2
-	       Tenv |- x_3 : tau_3
-	       Tenv |- A : Party
-	       Tenv |- statement : tau
+defn   Tenv |- prtcl : tau , Tenv' :: :: Protocol :: Prtcl_  by
+       	       	     P notin L
+       	       G ( P ) = ( Protocol , L )
+	       G ( x1 ) = ( tau1 , C )
+	       G ( xn ) = ( taun , C )
+	       G ( A1 ) = ( Party , C )
+	       G ( Am ) = ( Party , C )
+	       G , M , rho , S , P |- stmt1 : ()
+	       G , M , rho , S , P |- stmtk : ()
 	----------------------------------------------- :: decl
-	Tenv |- protocol P ( tau   x ) : party A { statement } : tau
-defn
-	Tenv |- exp : tau :: :: Exp :: Exp_ by
+	G , M , rho , S , L  |- protocol P ( tau1 x1 , .. , taun xn ) : party A1 , .. , Am { stmt1 , .. , stmtk } : () , G' , M , rho , S , L
+	
+defn	Tenv |- exp : tau :: :: Exp :: Exp_ by
 
-	Tenv |- exp : Int
-	Tenv |- exp' : Int
-	-------------------------------- :: Addition
-	Tenv |- exp + exp' : Int
+		G , M , rho , S , C  |- exp : tau
+		G , M , rho , S , C  |- exp' : tau
+	--------------------------------------------- :: Addition
+		G , M , rho , S , C  |- exp + exp' : tau
 
-		x : tau in Tenv
-		Tenv |- A : Party 
-	------------------------------ :: PartyVar
-		Tenv |- A.x : tau
 
+		G ( x ) = ( tau , C )
+		G ( A ) = ( Party , C )
+		tau in { Port , Int}
+	--------------------------------------------- :: PartyVar
+		G , M , rho , S , C  |- A . x : tau
+
+		G ( x ) = ( Int , C )
+	--------------------------------------------- :: Statement
+		G , M , rho , S , C |- x : Int 
 % Opertional Semantics rules ----------------------------------------------
 defns
   Jop :: '' ::=

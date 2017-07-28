@@ -35,10 +35,16 @@
 \newcommand{\ottafterlastrule}{\\}
 \newcommand{\ottmetavars}{
 \ottmetavartabular{
- $ \ottmv{A} ,\, \ottmv{B} $ & \ottcom{Names of parties A, B} \\
- $ \wp $ & \ottcom{Protocol name $\wp$} \\
- $ \ottmv{x} ,\, \ottmv{y} ,\, \ottmv{s} $ & \ottcom{Variables Eg. Session or Integer variables.} \\
+ $ \ottmv{A} ,\, \ottmv{B} $ & \ottcom{Names of parties A , B} \\
+ $ \ottmv{P} $ & \ottcom{Protocol name $\ottmv{P}$} \\
+ $ \ottmv{x} ,\, \ottmv{y} ,\, \ottmv{s} $ & \ottcom{Variables Eg. Session, Party,  Integer variables.} \\
  $ \ottmv{env} $ & \ottcom{Special environment variable $\ottmv{env}$} \\
+ $ \ottmv{O} $ & \ottcom{Port name $\ottmv{O}$} \\
+ $ \ottmv{G} $ &  \\
+ $ \mathcal{M} $ &  \\
+ $ \rho $ &  \\
+ $ \ottmv{S} $ &  \\
+ $ \ottmv{n} ,\, \ottmv{m} ,\, \ottmv{k} $ & \ottcom{Index variables} \\
 }}
 
 \newcommand{\otttau}{
@@ -52,73 +58,92 @@
 \ottprodline{|}{\ottkw{Protocol}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottsym{()}}{}{}{}{\ottcom{Well typed}}}
 
-\newcommand{\ottprogram}{
-\ottrulehead{\ottnt{program}}{::=}{}\ottprodnewline
-\ottfirstprodline{|}{ \ottnt{prtcl} ^+ }{}{}{}{\ottcom{One or more protocols}}}
-
-\newcommand{\ottprtcl}{
-\ottrulehead{\ottnt{prtcl}}{::=}{}\ottprodnewline
-\ottfirstprodline{|}{ \textbf{protocol} \  \wp  ( ( \tau  \  \ottmv{x} )^{+} ) \ \textbf{: party }  \ottmv{A} ^+
-	    \{ \  \ottnt{statement} ^+ \ \} }{}{}{}{}}
-
 \newcommand{\ottconstant}{
 \ottrulehead{\ottnt{constant}  ,\ \ottnt{c}}{::=}{}\ottprodnewline
 \ottfirstprodline{|}{\ottsym{integer\_literal}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottkw{true}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottkw{false}}{}{}{}{}}
 
+\newcommand{\ottprogram}{
+\ottrulehead{\ottnt{program}}{::=}{}\ottprodnewline
+\ottfirstprodline{|}{ \ottnt{prtcl} ^+ }{}{}{}{\ottcom{One or more protocols}}}
+
+\newcommand{\ottprtcl}{
+\ottrulehead{\ottnt{prtcl}}{::=}{}\ottprodnewline
+\ottfirstprodline{|}{\ottkw{protocol} \, \ottmv{P}  \ottsym{(}  \tau_{{\mathrm{1}}} \, \ottmv{x_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \tau_{\ottmv{n}} \, \ottmv{x_{\ottmv{n}}}  \ottsym{)}  \ottsym{:} \, \ottkw{party} \, \ottmv{A_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{A_{\ottmv{m}}}  \ottsym{\{}  \ottnt{stmt_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottnt{stmt_{\ottmv{k}}}  \ottsym{\}}}{}{}{}{}}
+
 \newcommand{\ottstatement}{
 \ottrulehead{\ottnt{statement}  ,\ \ottnt{stmt}}{::=}{\ottcom{Statements}}\ottprodnewline
 \ottfirstprodline{|}{ \textbf{in }  \ottmv{A}  \ \{ \  \ottnt{statement} ^+ \ \} }{}{}{}{\ottcom{Private statement}}\ottprodnewline
 \ottprodline{|}{\tau \, \ottmv{x}  \ottsym{;}}{}{}{}{\ottcom{Declare a variable}}\ottprodnewline
-\ottprodline{|}{\ottmv{env}  \Rightarrow  \ottmv{x}  \ottsym{;}}{}{}{}{\ottcom{Forward from env to var}}\ottprodnewline
-\ottprodline{|}{\ottmv{x}  \Rightarrow  \ottmv{env}  \ottsym{;}}{}{}{}{\ottcom{Forward from var to env}}\ottprodnewline
+\ottprodline{|}{\ottsym{statement;}  \ottsym{statement';}}{}{}{}{\ottcom{Sequence}}\ottprodnewline
+\ottprodline{|}{\ottmv{env}  \Rightarrow  \ottmv{x}  \ottsym{;}}{}{}{}{\ottcom{Send from env to var}}\ottprodnewline
+\ottprodline{|}{\ottmv{x}  \Rightarrow  \ottmv{env}  \ottsym{;}}{}{}{}{\ottcom{Send from var to env}}\ottprodnewline
+\ottprodline{|}{\ottnt{exp}  \Rightarrow  \ottnt{exp'}}{}{}{}{\ottcom{Send from a exp to exp}}\ottprodnewline
 \ottprodline{|}{\ottmv{x}  \ottsym{=}  \ottnt{exp}  \ottsym{;}}{}{}{}{\ottcom{Assignment}}\ottprodnewline
-\ottprodline{|}{ \textbf{open} \  \ottmv{s}  \ \textbf{as }  \wp  (  \ottmv{x}  ) \ \{ \ ( \ottmv{A} : \ottmv{B} )^+ \ \} }{}{}{}{\ottcom{Open session $\ottmv{s}$}}\ottprodnewline
-\ottprodline{|}{ \textbf{set} \  \ottmv{A}  \ \textbf{as} \  \wp  (  \ottmv{x} ^* ) \ \textbf{::} \  \ottmv{B} }{}{}{}{\ottcom{Set party as another party of another protocol}}\ottprodnewline
-\ottprodline{|}{\ottnt{exp}  \Rightarrow  \ottnt{exp'}}{}{}{}{\ottcom{Forward from a exp to exp}}\ottprodnewline
+\ottprodline{|}{\ottkw{open} \, \ottmv{s} \, \ottkw{as} \, \ottmv{P}  \ottsym{(}  \ottmv{x_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{x_{\ottmv{n}}}  \ottsym{)}  \ottsym{\{}  \ottmv{A_{{\mathrm{1}}}}  \ottsym{:}  \ottmv{B_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{A_{\ottmv{m}}}  \ottsym{:}  \ottmv{B_{\ottmv{m}}}  \ottsym{\}}}{}{}{}{\ottcom{Open session $\ottmv{s}$}}\ottprodnewline
+\ottprodline{|}{\ottkw{set} \, \ottmv{A} \, \ottkw{as} \, \ottmv{P}  \ottsym{(}  \ottmv{x_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{x_{\ottmv{n}}}  \ottsym{)::B}}{}{}{}{\ottcom{Set party as another party of another protocol}}\ottprodnewline
 \ottprodline{|}{ \textbf{wrap} \ \{  \mathcal{W}_{stmt} ^+ \} }{}{}{}{\ottcom{Wrap statement}}\ottprodnewline
 \ottprodline{|}{ \textbf{connect} \  \mathcal{P}_{exp}  \ \textbf{and} \  \mathcal{P}_{exp}' }{}{}{}{\ottcom{Duplex connection}}\ottprodnewline
 \ottprodline{|}{ \textbf{connect} \  \mathcal{P}_{exp}  \ \textbf{to} \  \mathcal{P}_{exp}' }{}{}{}{\ottcom{One way connection}}}
 
 \newcommand{\ottwstmt}{
 \ottrulehead{\mathcal{W}_{stmt}}{::=}{\ottcom{Statements inside wrap}}\ottprodnewline
-\ottfirstprodline{|}{ \textbf{before} \  pexp_{w}  \ \textbf{do} \ \{  \ottnt{statement} ^+ \} }{}{}{}{}\ottprodnewline
-\ottprodline{|}{ \textbf{after} \  pexp_{w}  \ \textbf{do} \ \{  \ottnt{statement} ^+ \} }{}{}{}{}}
-
-\newcommand{\ottpexpXXw}{
-\ottrulehead{pexp_{w}}{::=}{}\ottprodnewline
-\ottfirstprodline{|}{\ottmv{A} \, \Vert \, \ottmv{env}}{}{}{}{}}
+\ottfirstprodline{|}{\ottkw{before} \, \mathcal{P}_{exp} \, \ottkw{do} \, \ottsym{\{}  \ottnt{statement_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottnt{statement_{\ottmv{n}}}  \ottsym{\}}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottkw{after} \, \mathcal{P}_{exp} \, \ottkw{do} \, \ottsym{\{}  \ottnt{statement_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottnt{statement_{\ottmv{n}}}  \ottsym{\}}}{}{}{}{}}
 
 \newcommand{\ottpexp}{
 \ottrulehead{\mathcal{P}_{exp}}{::=}{}\ottprodnewline
-\ottfirstprodline{|}{\ottmv{env}}{}{}{}{\ottcom{environment}}\ottprodnewline
+\ottfirstprodline{|}{\ottmv{A} \, \Vert \, \ottmv{env}}{}{}{}{\ottcom{environment}}\ottprodnewline
 \ottprodline{|}{\ottmv{A} \, \Vert \, \ottmv{B}}{}{}{}{\ottcom{Two parties}}\ottprodnewline
-\ottprodline{|}{\ottsym{s.A} \, \Vert \, \ottmv{env}}{}{}{}{\ottcom{env of Party of session}}\ottprodnewline
-\ottprodline{|}{pexp_{w}}{}{}{}{}\ottprodnewline
-\ottprodline{|}{\ottmv{A}}{}{}{}{\ottcom{Party}}}
+\ottprodline{|}{\ottnt{exp} \, \Vert \, \ottmv{env}}{}{}{}{\ottcom{env of Party of session}}}
 
 \newcommand{\ottexp}{
 \ottrulehead{\ottnt{exp}}{::=}{}\ottprodnewline
 \ottfirstprodline{|}{\ottnt{exp}  \ottsym{+}  \ottnt{exp'}}{}{}{}{\ottcom{Addition of two Int}}\ottprodnewline
-\ottprodline{|}{\ottsym{A.x}}{}{}{}{\ottcom{Variable of a party A}}}
+\ottprodline{|}{\ottmv{A}  \ottsym{.}  \ottmv{x}}{}{}{}{\ottcom{Variable $\ottmv{x}$ of a party $\ottmv{A}$}}\ottprodnewline
+\ottprodline{|}{\ottmv{s}  \ottsym{.}  \ottmv{A}}{}{}{}{\ottcom{Party $\ottmv{A}$ of a variable $\ottmv{s}$}}\ottprodnewline
+\ottprodline{|}{\ottmv{x}}{}{}{}{\ottcom{Expression statement}}}
+
+\newcommand{\ottscope}{
+\ottrulehead{\ottnt{scope}}{::=}{}\ottprodnewline
+\ottfirstprodline{|}{ \mathcal{C} }{}{}{}{\ottcom{Current Scope}}\ottprodnewline
+\ottprodline{|}{\ottsym{\_}}{}{}{}{\ottcom{Do not care}}\ottprodnewline
+\ottprodline{|}{ \mathcal{G} }{}{}{}{\ottcom{Global Scope}}}
 
 \newcommand{\ottTenv}{
-\ottrulehead{T}{::=}{\ottcom{Type environment}}\ottprodnewline
+\ottrulehead{\mathcal{E}}{::=}{\ottcom{Type environment}}\ottprodnewline
 \ottfirstprodline{|}{ \epsilon }{}{}{}{\ottcom{Empty}}\ottprodnewline
-\ottprodline{|}{T  \ottsym{,} \, \ottkw{G} \, \ottsym{:}  \tau}{}{}{}{}}
+\ottprodline{|}{\ottmv{G}  \ottsym{(}  \mathcal{E}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \tau  \ottsym{,}  \ottnt{scope}  \ottsym{)}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\mathcal{M}  \ottsym{(}  \ottmv{P}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottnt{argsig}  \ottsym{,}  \ottsym{\{}  \ottmv{A_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{A_{\ottmv{m}}}  \ottsym{\}}  \ottsym{)}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\rho  \ottsym{(}  \ottmv{P}  \ottsym{,}  \ottmv{A}  \ottsym{)}  \ottsym{=}  \ottsym{\{}  \ottmv{O_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{O_{\ottmv{n}}}  \ottsym{\}}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottmv{S}  \ottsym{(}  \ottmv{s}  \ottsym{)}  \ottsym{=}  \ottmv{P}}{}{}{}{\ottcom{Open as protocol $\ottmv{P}$}}\ottprodnewline
+\ottprodline{|}{\mathcal{E}  \ottsym{,}  \mathcal{E}'}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottmv{G}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\mathcal{M}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\rho}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottmv{S}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottnt{scope}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottmv{A}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottmv{x}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottmv{P}}{}{}{}{}}
+
+\newcommand{\ottargsig}{
+\ottrulehead{\ottnt{argsig}}{::=}{}\ottprodnewline
+\ottfirstprodline{|}{\ottsym{\{}  \tau_{{\mathrm{1}}}  \ottsym{,} \, .. \, \ottsym{,}  \tau_{\ottmv{n}}  \ottsym{\}}}{}{}{}{}}
 
 \newcommand{\ottgrammar}{\ottgrammartabular{
 \otttau\ottinterrule
+\ottconstant\ottinterrule
 \ottprogram\ottinterrule
 \ottprtcl\ottinterrule
-\ottconstant\ottinterrule
 \ottstatement\ottinterrule
 \ottwstmt\ottinterrule
-\ottpexpXXw\ottinterrule
 \ottpexp\ottinterrule
 \ottexp\ottinterrule
-\ottTenv\ottafterlastrule
+\ottscope\ottinterrule
+\ottTenv\ottinterrule
+\ottargsig\ottafterlastrule
 }}
 
 % defnss
@@ -126,130 +151,162 @@
 %% defn Constant
 \newcommand{\ottdruleConstantXXInt}[1]{\ottdrule[#1]{%
 }{
-T  \vdash  \ottsym{integer\_literal}  \ottsym{:}  \ottkw{Int}}{%
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottsym{integer\_literal}  \ottsym{:}  \ottkw{Int}}{%
 {\ottdrulename{Constant\_Int}}{}%
 }}
 
 
 \newcommand{\ottdruleConstantXXtrue}[1]{\ottdrule[#1]{%
 }{
-T  \vdash  \ottkw{true}  \ottsym{:}  \ottkw{Bool}}{%
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottkw{true}  \ottsym{:}  \ottkw{Bool}}{%
 {\ottdrulename{Constant\_true}}{}%
 }}
 
 
 \newcommand{\ottdruleConstantXXfalse}[1]{\ottdrule[#1]{%
 }{
-T  \vdash  \ottkw{false}  \ottsym{:}  \ottkw{Bool}}{%
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottkw{false}  \ottsym{:}  \ottkw{Bool}}{%
 {\ottdrulename{Constant\_false}}{}%
 }}
 
-\newcommand{\ottdefnConstant}[1]{\begin{ottdefnblock}[#1]{$T  \vdash  \ottnt{constant}  \ottsym{:}  \tau$}{}
+\newcommand{\ottdefnConstant}[1]{\begin{ottdefnblock}[#1]{$\mathcal{E}  \vdash  \ottnt{constant}  \ottsym{:}  \tau$}{}
 \ottusedrule{\ottdruleConstantXXInt{}}
 \ottusedrule{\ottdruleConstantXXtrue{}}
 \ottusedrule{\ottdruleConstantXXfalse{}}
 \end{ottdefnblock}}
 
 %% defn Stmt
-\newcommand{\ottdruleStmtXXpvt}[1]{\ottdrule[#1]{%
-\ottpremise{\ottmv{A}  \ottsym{:}  \ottkw{Party} \, \in \, T}%
-\ottpremise{T  \vdash  \ottnt{statement}  \ottsym{:}  \ottsym{()}}%
-}{
-\texttt{\textcolor{red}{<<no parses (char 11): 	Tenv , G \mbox{$\mid$}***- in A \{ statement \} : () >>}}}{%
-{\ottdrulename{Stmt\_pvt}}{}%
-}}
-
-
 \newcommand{\ottdruleStmtXXdecl}[1]{\ottdrule[#1]{%
-\ottpremise{\ottmv{x}  \ottsym{:}  \tau \, \notin \, T}%
+\ottpremise{\ottmv{x} \, \notin \,  \mathcal{C} }%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{x}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \tau  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
 }{
-T  \vdash  \tau \, \ottmv{x}  \ottsym{;}  \ottsym{:}  \tau}{%
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \tau \, \ottmv{x}  \ottsym{;}  \ottsym{:}  \tau  \ottsym{,}  \ottmv{G'}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C} }{%
 {\ottdrulename{Stmt\_decl}}{}%
 }}
 
 
-\newcommand{\ottdruleStmtXXfwd}[1]{\ottdrule[#1]{%
-\ottpremise{T  \vdash  \ottmv{env}  \ottsym{:}  \ottsym{()}}%
-\ottpremise{T  \vdash  \ottmv{x}  \ottsym{:}  \tau}%
+\newcommand{\ottdruleStmtXXseq}[1]{\ottdrule[#1]{%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottnt{statement}  \ottsym{:}  \tau}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottnt{statement'}  \ottsym{:}  \tau'}%
 }{
-T  \vdash  \ottmv{env}  \Rightarrow  \ottmv{x}  \ottsym{;}  \ottsym{:}  \tau}{%
-{\ottdrulename{Stmt\_fwd}}{}%
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottsym{statement;}  \ottsym{statement';}  \ottsym{:}  \tau'  \ottsym{,}  \ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C} }{%
+{\ottdrulename{Stmt\_seq}}{}%
+}}
+
+
+\newcommand{\ottdruleStmtXXpvt}[1]{\ottdrule[#1]{%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{A}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Party}  \ottsym{,}  \ottsym{\_}  \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}  \ottmv{A}  \vdash  \ottnt{statement}  \ottsym{:}  \ottsym{()}}%
+}{
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash   \textbf{in }  \ottmv{A}  \ \{ \  \ottnt{statement} ^+ \ \}   \ottsym{:}  \ottsym{()}  \ottsym{,}  \ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C} }{%
+{\ottdrulename{Stmt\_pvt}}{}%
+}}
+
+
+\newcommand{\ottdruleStmtXXsendEnvToVar}[1]{\ottdrule[#1]{%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{x}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Int}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+}{
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottmv{env}  \Rightarrow  \ottmv{x}  \ottsym{;}  \ottsym{:}  \ottsym{()}  \ottsym{,}  \ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C} }{%
+{\ottdrulename{Stmt\_sendEnvToVar}}{}%
+}}
+
+
+\newcommand{\ottdruleStmtXXsendVarToEnv}[1]{\ottdrule[#1]{%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{x}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Int}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+}{
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottmv{x}  \Rightarrow  \ottmv{env}  \ottsym{;}  \ottsym{:}  \ottsym{()}  \ottsym{,}  \ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C} }{%
+{\ottdrulename{Stmt\_sendVarToEnv}}{}%
+}}
+
+
+\newcommand{\ottdruleStmtXXsendExprToExpr}[1]{\ottdrule[#1]{%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottnt{exp}  \ottsym{:}  \tau}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottnt{exp'}  \ottsym{:}  \tau'}%
+\ottpremise{\tau \, \in \, \ottsym{\{}  \ottkw{Port}  \ottsym{,}  \ottkw{Int}  \ottsym{\}}}%
+\ottpremise{\tau' \, \in \, \ottsym{\{}  \ottkw{Port}  \ottsym{,}  \ottkw{Int}  \ottsym{\}}}%
+}{
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottnt{exp}  \Rightarrow  \ottnt{exp'}  \ottsym{:}  \ottsym{()}  \ottsym{,}  \ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C} }{%
+{\ottdrulename{Stmt\_sendExprToExpr}}{}%
 }}
 
 
 \newcommand{\ottdruleStmtXXassignmnt}[1]{\ottdrule[#1]{%
-\ottpremise{T  \vdash  \ottmv{x}  \ottsym{:}  \tau}%
-\ottpremise{T  \vdash  \ottnt{exp}  \ottsym{:}  \tau}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{x}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \tau  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottnt{exp}  \ottsym{:}  \tau}%
 }{
-T  \vdash  \ottmv{x}  \ottsym{=}  \ottnt{exp}  \ottsym{;}  \ottsym{:}  \tau}{%
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottmv{x}  \ottsym{=}  \ottnt{exp}  \ottsym{;}  \ottsym{:}  \tau  \ottsym{,}  \ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C} }{%
 {\ottdrulename{Stmt\_assignmnt}}{}%
 }}
 
 
 \newcommand{\ottdruleStmtXXopensession}[1]{\ottdrule[#1]{%
-\ottpremise{T  \vdash  \ottmv{x}  \ottsym{:}  \tau}%
-\ottpremise{T  \vdash  \ottmv{s}  \ottsym{:}  \ottkw{Session}}%
-\ottpremise{T  \vdash  \wp  \ottsym{:}  \ottkw{Protocol}}%
-\ottpremise{T  \vdash  \ottmv{A}  \ottsym{:}  \ottkw{Party}}%
-\ottpremise{T  \vdash  \ottmv{B}  \ottsym{:}  \ottkw{Party}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{s}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Session}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{P}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Protocol}  \ottsym{,}  \ottsym{\_}  \ottsym{)}}%
+\ottpremise{\mathcal{M}  \ottsym{(}  \ottmv{P}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottnt{argsig}  \ottsym{,}  \ottsym{\{}  \ottmv{A_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{A_{\ottmv{m}}}  \ottsym{\}}  \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{x_{{\mathrm{1}}}}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \tau_{{\mathrm{1}}}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{x_{\ottmv{n}}}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \tau_{\ottmv{n}}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\ottsym{[}  \tau_{{\mathrm{1}}}  \ottsym{,} \, .. \, \ottsym{,}  \tau_{\ottmv{n}}  \ottsym{]}  \ottsym{=}  \ottnt{argsig}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{B_{{\mathrm{1}}}}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Party}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{B_{\ottmv{m}}}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Party}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\ottmv{A_{{\mathrm{1}}}}  \ottsym{=}  \ottmv{B_{{\mathrm{1}}}}}%
+\ottpremise{\ottmv{A_{\ottmv{m}}}  \ottsym{=}  \ottmv{B_{\ottmv{m}}}}%
+\ottpremise{\ottmv{S}  \ottsym{=}  \ottmv{S'}}%
+\ottpremise{\ottmv{S'}  \ottsym{(}  \ottmv{s}  \ottsym{)}  \ottsym{=}  \ottmv{P}}%
 }{
-T  \vdash   \textbf{open} \  \ottmv{s}  \ \textbf{as }  \wp  (  \ottmv{x}  ) \ \{ \ ( \ottmv{A} : \ottmv{B} )^+ \ \}   \ottsym{:}  \ottsym{()}}{%
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottkw{open} \, \ottmv{s} \, \ottkw{as} \, \ottmv{P}  \ottsym{(}  \ottmv{x_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{x_{\ottmv{n}}}  \ottsym{)}  \ottsym{\{}  \ottmv{A_{{\mathrm{1}}}}  \ottsym{:}  \ottmv{B_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{A_{\ottmv{m}}}  \ottsym{:}  \ottmv{B_{\ottmv{m}}}  \ottsym{\}}  \ottsym{:}  \ottsym{()}  \ottsym{,}  \ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S'}  \ottsym{,}   \mathcal{C} }{%
 {\ottdrulename{Stmt\_opensession}}{}%
 }}
 
 
 \newcommand{\ottdruleStmtXXset}[1]{\ottdrule[#1]{%
-\ottpremise{T  \vdash  \ottmv{A}  \ottsym{:}  \ottkw{Party}}%
-\ottpremise{T  \vdash  \ottmv{B}  \ottsym{:}  \ottkw{Party}}%
-\ottpremise{T  \vdash  \wp  \ottsym{:}  \ottkw{Protocol}}%
-\ottpremise{T  \vdash  \ottmv{x}  \ottsym{:}  \tau}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{A}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Party}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{P}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Protocol}  \ottsym{,}  \ottsym{\_}  \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{x_{{\mathrm{1}}}}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \tau_{{\mathrm{1}}}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{x_{\ottmv{n}}}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \tau_{\ottmv{n}}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\mathcal{M}  \ottsym{(}  \ottmv{P}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottnt{argsig}  \ottsym{,}  \ottsym{\{}  \ottmv{A_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{A_{\ottmv{m}}}  \ottsym{\}}  \ottsym{)}}%
+\ottpremise{\ottmv{B} \, \in \, \ottsym{\{}  \ottmv{A_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{A_{\ottmv{m}}}  \ottsym{\}}}%
+\ottpremise{\ottsym{[}  \tau_{{\mathrm{1}}}  \ottsym{,} \, .. \, \ottsym{,}  \tau_{\ottmv{n}}  \ottsym{]}  \ottsym{=}  \ottnt{argsig}}%
 }{
-T  \vdash   \textbf{set} \  \ottmv{A}  \ \textbf{as} \  \wp  (  \ottmv{x} ^* ) \ \textbf{::} \  \ottmv{B}   \ottsym{:}  \ottsym{()}}{%
+ \mathcal{C}   \vdash  \ottkw{set} \, \ottmv{A} \, \ottkw{as} \, \ottmv{P}  \ottsym{(}  \ottmv{x_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{x_{\ottmv{n}}}  \ottsym{)::B}  \ottsym{:}  \ottsym{()}  \ottsym{,}  \ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C} }{%
 {\ottdrulename{Stmt\_set}}{}%
 }}
 
 
-\newcommand{\ottdruleStmtXXfwdExprToExpr}[1]{\ottdrule[#1]{%
-\ottpremise{T  \vdash  \ottnt{exp}  \ottsym{:}  \tau}%
-\ottpremise{T  \vdash  \ottnt{exp'}  \ottsym{:}  \tau}%
-}{
-T  \vdash  \ottnt{exp}  \Rightarrow  \ottnt{exp'}  \ottsym{:}  \tau}{%
-{\ottdrulename{Stmt\_fwdExprToExpr}}{}%
-}}
-
-
 \newcommand{\ottdruleStmtXXwrap}[1]{\ottdrule[#1]{%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \mathcal{W}_{stmt}  \ottsym{:}  \ottsym{()}}%
 }{
-T  \vdash   \textbf{wrap} \ \{  \mathcal{W}_{stmt} ^+ \}   \ottsym{:}  \ottsym{()}}{%
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash   \textbf{wrap} \ \{  \mathcal{W}_{stmt} ^+ \}   \ottsym{:}  \ottsym{()}  \ottsym{,}  \ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C} }{%
 {\ottdrulename{Stmt\_wrap}}{}%
 }}
 
 
 \newcommand{\ottdruleStmtXXconnectTo}[1]{\ottdrule[#1]{%
-\ottpremise{T  \vdash  \mathcal{P}_{exp}  \ottsym{:}  \tau}%
-\ottpremise{T  \vdash  \mathcal{P}_{exp}'  \ottsym{:}  \tau}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \mathcal{P}_{exp}  \ottsym{:}  \ottkw{Port}}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \mathcal{P}_{exp}'  \ottsym{:}  \ottkw{Port}}%
 }{
-T  \vdash   \textbf{connect} \  \mathcal{P}_{exp}  \ \textbf{to} \  \mathcal{P}_{exp}'   \ottsym{:}  \tau}{%
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash   \textbf{connect} \  \mathcal{P}_{exp}  \ \textbf{to} \  \mathcal{P}_{exp}'   \ottsym{:}  \ottsym{()}  \ottsym{,}  \ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C} }{%
 {\ottdrulename{Stmt\_connectTo}}{}%
 }}
 
 
 \newcommand{\ottdruleStmtXXconnectAnd}[1]{\ottdrule[#1]{%
-\ottpremise{T  \vdash  \mathcal{P}_{exp}  \ottsym{:}  \tau}%
-\ottpremise{T  \vdash  \mathcal{P}_{exp}'  \ottsym{:}  \tau}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \mathcal{P}_{exp}  \ottsym{:}  \ottkw{Port}}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \mathcal{P}_{exp}'  \ottsym{:}  \ottkw{Port}}%
 }{
-T  \vdash   \textbf{connect} \  \mathcal{P}_{exp}  \ \textbf{and} \  \mathcal{P}_{exp}'   \ottsym{:}  \tau}{%
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash   \textbf{connect} \  \mathcal{P}_{exp}  \ \textbf{and} \  \mathcal{P}_{exp}'   \ottsym{:}  \ottsym{()}  \ottsym{,}  \ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C} }{%
 {\ottdrulename{Stmt\_connectAnd}}{}%
 }}
 
-\newcommand{\ottdefnStmt}[1]{\begin{ottdefnblock}[#1]{$T  \vdash  \ottnt{stmt}  \ottsym{:}  \tau$}{}
-\ottusedrule{\ottdruleStmtXXpvt{}}
+\newcommand{\ottdefnStmt}[1]{\begin{ottdefnblock}[#1]{$\mathcal{E}  \vdash  \ottnt{stmt}  \ottsym{:}  \tau  \ottsym{,}  \mathcal{E}'$}{}
 \ottusedrule{\ottdruleStmtXXdecl{}}
-\ottusedrule{\ottdruleStmtXXfwd{}}
+\ottusedrule{\ottdruleStmtXXseq{}}
+\ottusedrule{\ottdruleStmtXXpvt{}}
+\ottusedrule{\ottdruleStmtXXsendEnvToVar{}}
+\ottusedrule{\ottdruleStmtXXsendVarToEnv{}}
+\ottusedrule{\ottdruleStmtXXsendExprToExpr{}}
 \ottusedrule{\ottdruleStmtXXassignmnt{}}
 \ottusedrule{\ottdruleStmtXXopensession{}}
 \ottusedrule{\ottdruleStmtXXset{}}
-\ottusedrule{\ottdruleStmtXXfwdExprToExpr{}}
 \ottusedrule{\ottdruleStmtXXwrap{}}
 \ottusedrule{\ottdruleStmtXXconnectTo{}}
 \ottusedrule{\ottdruleStmtXXconnectAnd{}}
@@ -257,66 +314,79 @@ T  \vdash   \textbf{connect} \  \mathcal{P}_{exp}  \ \textbf{and} \  \mathcal{P}
 
 %% defn Wrapstmt
 \newcommand{\ottdruleWrapstmtXXbefore}[1]{\ottdrule[#1]{%
-\ottpremise{T  \vdash  pexp_{w}  \ottsym{:}  \ottkw{Port}}%
-\ottpremise{T  \vdash  \ottnt{statement}  \ottsym{:}  \tau}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \mathcal{P}_{exp}  \ottsym{:}  \ottkw{Port}}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottnt{statement_{{\mathrm{1}}}}  \ottsym{:}  \ottsym{()}}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottnt{statement_{\ottmv{n}}}  \ottsym{:}  \ottsym{()}}%
 }{
-T  \vdash   \textbf{before} \  pexp_{w}  \ \textbf{do} \ \{  \ottnt{statement} ^+ \}   \ottsym{:}  \tau}{%
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottkw{before} \, \mathcal{P}_{exp} \, \ottkw{do} \, \ottsym{\{}  \ottnt{statement_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottnt{statement_{\ottmv{n}}}  \ottsym{\}}  \ottsym{:}  \ottsym{()}}{%
 {\ottdrulename{Wrapstmt\_before}}{}%
 }}
 
 
 \newcommand{\ottdruleWrapstmtXXafter}[1]{\ottdrule[#1]{%
-\ottpremise{T  \vdash  pexp_{w}  \ottsym{:}  \ottkw{Port}}%
-\ottpremise{T  \vdash  \ottnt{statement}  \ottsym{:}  \tau}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \mathcal{P}_{exp}  \ottsym{:}  \ottkw{Port}}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottnt{statement_{{\mathrm{1}}}}  \ottsym{:}  \ottsym{()}}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottnt{statement_{\ottmv{n}}}  \ottsym{:}  \ottsym{()}}%
 }{
-T  \vdash   \textbf{after} \  pexp_{w}  \ \textbf{do} \ \{  \ottnt{statement} ^+ \}   \ottsym{:}  \tau}{%
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottkw{after} \, \mathcal{P}_{exp} \, \ottkw{do} \, \ottsym{\{}  \ottnt{statement_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottnt{statement_{\ottmv{n}}}  \ottsym{\}}  \ottsym{:}  \ottsym{()}}{%
 {\ottdrulename{Wrapstmt\_after}}{}%
 }}
 
-\newcommand{\ottdefnWrapstmt}[1]{\begin{ottdefnblock}[#1]{$T  \vdash  \mathcal{W}_{stmt}  \ottsym{:}  \tau$}{}
+\newcommand{\ottdefnWrapstmt}[1]{\begin{ottdefnblock}[#1]{$\mathcal{E}  \vdash  \mathcal{W}_{stmt}  \ottsym{:}  \tau$}{}
 \ottusedrule{\ottdruleWrapstmtXXbefore{}}
 \ottusedrule{\ottdruleWrapstmtXXafter{}}
 \end{ottdefnblock}}
 
 %% defn Protocol
-\newcommand{\ottdruleProtocolXXdecl}[1]{\ottdrule[#1]{%
-\ottpremise{T  \vdash  \wp  \ottsym{:}  \ottkw{Protocol}}%
-\ottpremise{T  \vdash  \ottmv{x_{{\mathrm{1}}}}  \ottsym{:}  \tau_{{\mathrm{1}}}}%
-\ottpremise{T  \vdash  \ottmv{x_{{\mathrm{2}}}}  \ottsym{:}  \tau_{{\mathrm{2}}}}%
-\ottpremise{T  \vdash  \ottmv{x_{{\mathrm{3}}}}  \ottsym{:}  \tau_{{\mathrm{3}}}}%
-\ottpremise{T  \vdash  \ottmv{A}  \ottsym{:}  \ottkw{Party}}%
-\ottpremise{T  \vdash  \ottnt{statement}  \ottsym{:}  \tau}%
+\newcommand{\ottdrulePrtclXXdecl}[1]{\ottdrule[#1]{%
+\ottpremise{\ottmv{P} \, \notin \,  \mathcal{G} }%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{P}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Protocol}  \ottsym{,}   \mathcal{G}   \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{x_{{\mathrm{1}}}}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \tau_{{\mathrm{1}}}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{x_{\ottmv{n}}}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \tau_{\ottmv{n}}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{A_{{\mathrm{1}}}}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Party}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{A_{\ottmv{m}}}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Party}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}  \ottmv{P}  \vdash  \ottnt{stmt_{{\mathrm{1}}}}  \ottsym{:}  \ottsym{()}}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}  \ottmv{P}  \vdash  \ottnt{stmt_{\ottmv{k}}}  \ottsym{:}  \ottsym{()}}%
 }{
-T  \vdash   \textbf{protocol} \  \wp  ( ( \tau  \  \ottmv{x} )^{+} ) \ \textbf{: party }  \ottmv{A} ^+
-	    \{ \  \ottnt{statement} ^+ \ \}   \ottsym{:}  \tau}{%
-{\ottdrulename{Protocol\_decl}}{}%
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{G}   \vdash  \ottkw{protocol} \, \ottmv{P}  \ottsym{(}  \tau_{{\mathrm{1}}} \, \ottmv{x_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \tau_{\ottmv{n}} \, \ottmv{x_{\ottmv{n}}}  \ottsym{)}  \ottsym{:} \, \ottkw{party} \, \ottmv{A_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{A_{\ottmv{m}}}  \ottsym{\{}  \ottnt{stmt_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottnt{stmt_{\ottmv{k}}}  \ottsym{\}}  \ottsym{:}  \ottsym{()}  \ottsym{,}  \ottmv{G'}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{G} }{%
+{\ottdrulename{Prtcl\_decl}}{}%
 }}
 
-\newcommand{\ottdefnProtocol}[1]{\begin{ottdefnblock}[#1]{$T  \vdash  \ottnt{prtcl}  \ottsym{:}  \tau$}{}
-\ottusedrule{\ottdruleProtocolXXdecl{}}
+\newcommand{\ottdefnProtocol}[1]{\begin{ottdefnblock}[#1]{$\mathcal{E}  \vdash  \ottnt{prtcl}  \ottsym{:}  \tau  \ottsym{,}  \mathcal{E}'$}{}
+\ottusedrule{\ottdrulePrtclXXdecl{}}
 \end{ottdefnblock}}
 
 %% defn Exp
 \newcommand{\ottdruleExpXXAddition}[1]{\ottdrule[#1]{%
-\ottpremise{T  \vdash  \ottnt{exp}  \ottsym{:}  \ottkw{Int}}%
-\ottpremise{T  \vdash  \ottnt{exp'}  \ottsym{:}  \ottkw{Int}}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottnt{exp}  \ottsym{:}  \tau}%
+\ottpremise{\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottnt{exp'}  \ottsym{:}  \tau}%
 }{
-T  \vdash  \ottnt{exp}  \ottsym{+}  \ottnt{exp'}  \ottsym{:}  \ottkw{Int}}{%
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottnt{exp}  \ottsym{+}  \ottnt{exp'}  \ottsym{:}  \tau}{%
 {\ottdrulename{Exp\_Addition}}{}%
 }}
 
 
 \newcommand{\ottdruleExpXXPartyVar}[1]{\ottdrule[#1]{%
-\ottpremise{\ottmv{x}  \ottsym{:}  \tau \, \in \, T}%
-\ottpremise{T  \vdash  \ottmv{A}  \ottsym{:}  \ottkw{Party}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{x}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \tau  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{A}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Party}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\tau \, \in \, \ottsym{\{}  \ottkw{Port}  \ottsym{,}  \ottkw{Int}  \ottsym{\}}}%
 }{
-T  \vdash  \ottsym{A.x}  \ottsym{:}  \tau}{%
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottmv{A}  \ottsym{.}  \ottmv{x}  \ottsym{:}  \tau}{%
 {\ottdrulename{Exp\_PartyVar}}{}%
 }}
 
-\newcommand{\ottdefnExp}[1]{\begin{ottdefnblock}[#1]{$T  \vdash  \ottnt{exp}  \ottsym{:}  \tau$}{}
+
+\newcommand{\ottdruleExpXXStatement}[1]{\ottdrule[#1]{%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{x}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Int}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+}{
+\ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottmv{x}  \ottsym{:}  \ottkw{Int}}{%
+{\ottdrulename{Exp\_Statement}}{}%
+}}
+
+\newcommand{\ottdefnExp}[1]{\begin{ottdefnblock}[#1]{$\mathcal{E}  \vdash  \ottnt{exp}  \ottsym{:}  \tau$}{}
 \ottusedrule{\ottdruleExpXXAddition{}}
 \ottusedrule{\ottdruleExpXXPartyVar{}}
+\ottusedrule{\ottdruleExpXXStatement{}}
 \end{ottdefnblock}}
 
 
@@ -341,7 +411,7 @@ T  \vdash  \ottsym{A.x}  \ottsym{:}  \tau}{%
 \ottall
 
 \begin{verbatim}
-Definition rules:        17 good    1 bad
-Definition rule clauses: 53 good    1 bad
+Definition rules:        21 good    0 bad
+Definition rule clauses: 79 good    0 bad
 \end{verbatim}
 \end{document}
