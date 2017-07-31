@@ -120,6 +120,7 @@ scope :: 'scope_' ::=
      | C :: ::  current_scop {{ com Current Scope }} {{ tex \mathcal{C} }}
      | _ :: :: dont_care_scop {{ com Do not care }}
      | L :: :: global_scop {{ com Global Scope }} {{ tex \mathcal{G} }}
+     | A :: :: party_scop {{ com Party Scope }}
 
 Tenv {{ tex \mathcal{E} }} :: 'TypeEnv' ::= {{ com Type environment }}
   | empty :: :: em {{ tex \phi }} {{ com Empty }}
@@ -301,7 +302,7 @@ defn   Tenv |- prtcl : tau , Tenv' :: :: Protocol :: Prtcl_  by
 	       G , M , R , S , P |- stmt1 : ()
 	       G , M , R , S , P |- stmtk : ()
 	----------------------------------------------- :: decl
-	G , M , R , S , L  |- protocol P ( tau1 x1 , .. , taun xn ) : party A1 , .. , Am { stmt1 , .. , stmtk } : () , G' , M , R , S , L
+	G , M , R , S , C  |- protocol P ( tau1 x1 , .. , taun xn ) : party A1 , .. , Am { stmt1 , .. , stmtk } : () , G' , M , R , S , C
 	
 defn	Tenv |- exp : tau :: :: Exp :: Exp_ by
 
@@ -311,11 +312,11 @@ defn	Tenv |- exp : tau :: :: Exp :: Exp_ by
 		G , M , R , S , C  |- exp + exp' : tau
 
 
-		G ( x ) = ( tau , C )
 		G ( A ) = ( Party , C )
-		tau in { Port , Int}
+        G ( x ) = ( Int , A )
+		%tau in { Int}
 	--------------------------------------------- :: PartyVar
-		G , M , R , S , C  |- A . x : tau
+		G , M , R , S , C  |- A . x : Int
 
 		G ( x ) = ( Int , C )
 	--------------------------------------------- :: Statement

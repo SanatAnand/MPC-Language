@@ -110,7 +110,8 @@
 \ottrulehead{\ottnt{scope}}{::=}{}\ottprodnewline
 \ottfirstprodline{|}{ \mathcal{C} }{}{}{}{\ottcom{Current Scope}}\ottprodnewline
 \ottprodline{|}{\ottsym{\_}}{}{}{}{\ottcom{Do not care}}\ottprodnewline
-\ottprodline{|}{ \mathcal{G} }{}{}{}{\ottcom{Global Scope}}}
+\ottprodline{|}{ \mathcal{G} }{}{}{}{\ottcom{Global Scope}}\ottprodnewline
+\ottprodline{|}{\ottmv{A}}{}{}{}{\ottcom{Party Scope}}}
 
 \newcommand{\ottTenv}{
 \ottrulehead{\mathcal{E}}{::=}{\ottcom{Type environment}}\ottprodnewline
@@ -351,7 +352,7 @@
 \ottpremise{\ottmv{G}  \ottsym{,}  \ottmv{M}  \ottsym{,}  \ottmv{R}  \ottsym{,}  \ottmv{S}  \ottsym{,}  \ottmv{P}  \vdash  \ottnt{stmt_{{\mathrm{1}}}}  \ottsym{:}  \ottsym{()}}%
 \ottpremise{\ottmv{G}  \ottsym{,}  \ottmv{M}  \ottsym{,}  \ottmv{R}  \ottsym{,}  \ottmv{S}  \ottsym{,}  \ottmv{P}  \vdash  \ottnt{stmt_{\ottmv{k}}}  \ottsym{:}  \ottsym{()}}%
 }{
-\ottmv{G}  \ottsym{,}  \ottmv{M}  \ottsym{,}  \ottmv{R}  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{G}   \vdash  \ottkw{protocol} \, \ottmv{P}  \ottsym{(}  \tau_{{\mathrm{1}}} \, \ottmv{x_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \tau_{\ottmv{n}} \, \ottmv{x_{\ottmv{n}}}  \ottsym{)}  \ottsym{:} \, \ottkw{party} \, \ottmv{A_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{A_{\ottmv{m}}}  \ottsym{\{}  \ottnt{stmt_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottnt{stmt_{\ottmv{k}}}  \ottsym{\}}  \ottsym{:}  \ottsym{()}  \ottsym{,}  \ottmv{G'}  \ottsym{,}  \ottmv{M}  \ottsym{,}  \ottmv{R}  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{G} }{%
+\ottmv{G}  \ottsym{,}  \ottmv{M}  \ottsym{,}  \ottmv{R}  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottkw{protocol} \, \ottmv{P}  \ottsym{(}  \tau_{{\mathrm{1}}} \, \ottmv{x_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \tau_{\ottmv{n}} \, \ottmv{x_{\ottmv{n}}}  \ottsym{)}  \ottsym{:} \, \ottkw{party} \, \ottmv{A_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{A_{\ottmv{m}}}  \ottsym{\{}  \ottnt{stmt_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottnt{stmt_{\ottmv{k}}}  \ottsym{\}}  \ottsym{:}  \ottsym{()}  \ottsym{,}  \ottmv{G'}  \ottsym{,}  \ottmv{M}  \ottsym{,}  \ottmv{R}  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C} }{%
 {\ottdrulename{Prtcl\_decl}}{}%
 }}
 
@@ -370,11 +371,10 @@
 
 
 \newcommand{\ottdruleExpXXPartyVar}[1]{\ottdrule[#1]{%
-\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{x}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \tau  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
 \ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{A}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Party}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
-\ottpremise{\tau \, \in \, \ottsym{\{}  \ottkw{Port}  \ottsym{,}  \ottkw{Int}  \ottsym{\}}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{x}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Int}  \ottsym{,}  \ottmv{A}  \ottsym{)}}%
 }{
-\ottmv{G}  \ottsym{,}  \ottmv{M}  \ottsym{,}  \ottmv{R}  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottmv{A}  \ottsym{.}  \ottmv{x}  \ottsym{:}  \tau}{%
+\ottmv{G}  \ottsym{,}  \ottmv{M}  \ottsym{,}  \ottmv{R}  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottmv{A}  \ottsym{.}  \ottmv{x}  \ottsym{:}  \ottkw{Int}}{%
 {\ottdrulename{Exp\_PartyVar}}{}%
 }}
 
@@ -415,6 +415,6 @@
 
 \begin{verbatim}
 Definition rules:        21 good    0 bad
-Definition rule clauses: 79 good    0 bad
+Definition rule clauses: 78 good    0 bad
 \end{verbatim}
 \end{document}
