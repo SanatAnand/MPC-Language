@@ -56,7 +56,8 @@
 \ottprodline{|}{\ottkw{Port}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottkw{Field}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottkw{Protocol}}{}{}{}{}\ottprodnewline
-\ottprodline{|}{\ottsym{()}}{}{}{}{\ottcom{Well typed}}}
+\ottprodline{|}{\ottsym{()}}{}{}{}{\ottcom{Well typed}}\ottprodnewline
+\ottprodline{|}{\ottsym{\_}}{}{}{}{\ottcom{Do not care}}}
 
 \newcommand{\ottconstant}{
 \ottrulehead{\ottnt{constant}  ,\ \ottnt{c}}{::=}{}\ottprodnewline
@@ -115,6 +116,8 @@
 \ottrulehead{\mathcal{E}}{::=}{\ottcom{Type environment}}\ottprodnewline
 \ottfirstprodline{|}{ \epsilon }{}{}{}{\ottcom{Empty}}\ottprodnewline
 \ottprodline{|}{\ottmv{G}  \ottsym{(}  \mathcal{E}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \tau  \ottsym{,}  \ottnt{scope}  \ottsym{)}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottmv{G}  \ottsym{(}  \mathcal{E}  \ottsym{)}  \neq  \ottsym{(}  \tau  \ottsym{,}  \ottnt{scope}  \ottsym{)}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottmv{G}  \ottsym{(}  \mathcal{E}  \ottsym{)}  \ottsym{=}  \ottmv{G'}  \ottsym{[}  \ottmv{x}  \longrightarrow  \ottsym{(}  \tau  \ottsym{,}  \ottnt{scope}  \ottsym{)}  \ottsym{]}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\mathcal{M}  \ottsym{(}  \ottmv{P}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottnt{argsig}  \ottsym{,}  \ottsym{\{}  \ottmv{A_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{A_{\ottmv{m}}}  \ottsym{\}}  \ottsym{)}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\rho  \ottsym{(}  \ottmv{P}  \ottsym{,}  \ottmv{A}  \ottsym{)}  \ottsym{=}  \ottsym{\{}  \ottmv{O_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{O_{\ottmv{n}}}  \ottsym{\}}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottmv{S}  \ottsym{(}  \ottmv{s}  \ottsym{)}  \ottsym{=}  \ottmv{P}}{}{}{}{\ottcom{Open as protocol $\ottmv{P}$}}\ottprodnewline
@@ -177,8 +180,8 @@
 
 %% defn Stmt
 \newcommand{\ottdruleStmtXXdecl}[1]{\ottdrule[#1]{%
-\ottpremise{\ottmv{x} \, \notin \,  \mathcal{C} }%
-\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{x}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \tau  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{x}  \ottsym{)}  \neq  \ottsym{(}  \ottsym{\_}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\ottmv{G'}  \ottsym{(}  \ottmv{x}  \ottsym{)}  \ottsym{=}  \ottmv{G}  \ottsym{[}  \ottmv{x}  \longrightarrow  \ottsym{(}  \tau  \ottsym{,}   \mathcal{C}   \ottsym{)}  \ottsym{]}}%
 }{
 \ottmv{G}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \tau \, \ottmv{x}  \ottsym{;}  \ottsym{:}  \tau  \ottsym{,}  \ottmv{G'}  \ottsym{,}  \mathcal{M}  \ottsym{,}  \rho  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C} }{%
 {\ottdrulename{Stmt\_decl}}{}%

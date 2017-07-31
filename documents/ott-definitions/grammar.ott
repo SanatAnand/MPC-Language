@@ -32,6 +32,7 @@ tau {{ tex \tau }} :: 'type_' ::= {{ com Types }}
     | Field :: :: field
     | Protocol :: :: protocol
     | () :: :: wellTyped {{ com Well typed }}
+    | _ :: :: donotcare {{ com Do not care }}
 
 constant, c :: CONST_ ::=
 	  | integer_literal :: :: int
@@ -55,6 +56,7 @@ terminals :: 'terminals_' ::=
 	  | |-              :: :: turnstile    {{ tex \vdash }}
 	  | in :: :: in {{ tex \in }}
 	  | notin :: :: notin {{ tex \notin }}
+	  | != :: :: noteq {{ tex \neq }}
 	  
 statement, stmt :: 'statement_' ::= {{ com Statements }}
 	  | in A { statement } :: :: pvtstmt
@@ -124,6 +126,8 @@ Tenv {{ tex \mathcal{E} }} :: 'TypeEnv' ::= {{ com Type environment }}
   % | G ( A ) = ( tau , scope )  :: :: PartyNm_TypeScope
   % | G ( x ) = ( tau , scope )  :: :: Var_TypeScope
   | G ( Tenv ) = ( tau , scope )  :: :: PrtckNm_TypeScope
+  | G ( Tenv ) != ( tau , scope ) :: :: PrtckNm_not_TypeScope
+  | G ( Tenv ) = G' [ x -> ( tau , scope ) ] :: :: introduce_new_var
   | M ( P ) = ( argsig , { A1 , .. , Am } ) :: :: PrtclNm_ArgsigPartyNms
   | rho ( P , A ) = { O1 , .. , On } :: :: party_Scope
   | S ( s ) =  P :: :: sessionNm_PrtclNm {{ com Open as protocol [[P]] }}
@@ -196,8 +200,8 @@ defns
  % Type checking Statements
   defn 	Tenv |- stmt : tau , Tenv' :: :: Stmt :: Stmt_ by
 
-		x notin C
-  	     	G ( x ) = ( tau , C )
+  	     	G ( x ) != ( _ , C )
+		G' ( x ) = G [ x -> ( tau , C ) ]
 	------------------------------- :: decl
 	G , M , rho , S , C |- tau x ; : tau , G' , M , rho , S , C 
 

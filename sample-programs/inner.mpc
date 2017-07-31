@@ -1,0 +1,41 @@
+protocol inner(int n, int index, int sp, field F) : party P[n] {
+
+	in each P[#i] {
+		F x, z = 0, out = 0;
+		F s = 0, t;
+		environ => x;
+	}
+
+	for each P[#i] {
+		for each P[#j] except j in {i} {
+			in P[i] {
+				F tmp = $;
+				s += tmp;
+			}
+			P[i].tmp => P[j].t;
+			in P[j]
+				z += t;
+		}
+		in P[i]
+			z += (x-s);
+	}
+
+
+	
+	for each P[#i] {
+		in P[i]
+			out = z;
+		for each P[#j] except j in {i} {
+			P[j].z => P[i].t;
+			in P[i]
+				out += t;
+		}
+		in P[i]
+			out => environ;
+	}
+}
+
+
+
+
+
