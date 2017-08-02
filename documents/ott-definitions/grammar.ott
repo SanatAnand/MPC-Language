@@ -318,9 +318,27 @@ defn	Tenv |- exp : tau :: :: Exp :: Exp_ by
 	--------------------------------------------- :: PartyVar
 		G , M , R , S , C  |- A . x : Int
 
+		G ( s ) = ( Session , _ )
+		S ( s ) = P
+                M ( P ) = ( argsig , { A1 , .. , Am } )	
+		A in { A1 , .. , Am }
+	--------------------------------------------- :: VarParty
+		G , M , R , S , C |- s . A : Party
+		
 		G ( x ) = ( Int , C )
 	--------------------------------------------- :: Statement
-		G , M , R , S , C |- x : Int 
+		G , M , R , S , C |- x : Int
+
+defn Tenv |- pexp : tau :: :: Pexp :: Pexp_ by
+
+     	       G , M , R , S , C |- exp : Party
+        ----------------------------------------------- :: ExpToEnv
+     	  G , M , R , S , C |-  exp I env : Port
+
+	  ---------------------------------------------- :: PortOfParty
+	  G , M , R , S , C |- A I B : Port
+	  
+		% G , M , R , S , C |- 
 % Opertional Semantics rules ----------------------------------------------
 defns
   Jop :: '' ::=
