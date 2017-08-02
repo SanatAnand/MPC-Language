@@ -335,7 +335,7 @@ defn Tenv |- pexp : tau :: :: Pexp :: Pexp_ by
         ----------------------------------------------- :: ExpToEnv
      	  G , M , R , S , C |-  exp I env : Port
 
-                portlist = G , M , R , S , C
+                portlist = 
 	  ---------------------------------------------- :: PortOfParty
 	  G , M , R , S , C |- A I B : Port
 	  

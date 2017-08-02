@@ -380,7 +380,7 @@
 
 
 \newcommand{\ottdruleExpXXVarParty}[1]{\ottdrule[#1]{%
-\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{s}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Session}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{s}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Session}  \ottsym{,}  \ottsym{\_}  \ottsym{)}}%
 \ottpremise{\ottmv{S}  \ottsym{(}  \ottmv{s}  \ottsym{)}  \ottsym{=}  \ottmv{P}}%
 \ottpremise{\ottmv{M}  \ottsym{(}  \ottmv{P}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottnt{argsig}  \ottsym{,}  \ottsym{\{}  \ottmv{A_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{A_{\ottmv{m}}}  \ottsym{\}}  \ottsym{)}}%
 \ottpremise{\ottmv{A} \, \in \, \ottsym{\{}  \ottmv{A_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{A_{\ottmv{m}}}  \ottsym{\}}}%
@@ -412,8 +412,16 @@
 {\ottdrulename{Pexp\_ExpToEnv}}{}%
 }}
 
+
+\newcommand{\ottdrulePexpXXPortOfParty}[1]{\ottdrule[#1]{%
+}{
+\ottmv{G}  \ottsym{,}  \ottmv{M}  \ottsym{,}  \ottmv{R}  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottmv{A} \, \Vert \, \ottmv{B}  \ottsym{:}  \ottkw{Port}}{%
+{\ottdrulename{Pexp\_PortOfParty}}{}%
+}}
+
 \newcommand{\ottdefnPexp}[1]{\begin{ottdefnblock}[#1]{$\mathcal{E}  \vdash  \mathcal{P}_{exp}  \ottsym{:}  \tau$}{}
 \ottusedrule{\ottdrulePexpXXExpToEnv{}}
+\ottusedrule{\ottdrulePexpXXPortOfParty{}}
 \end{ottdefnblock}}
 
 
@@ -438,7 +446,7 @@
 \ottall
 
 \begin{verbatim}
-Definition rules:        23 good    0 bad
-Definition rule clauses: 85 good    0 bad
+Definition rules:        24 good    0 bad
+Definition rule clauses: 86 good    0 bad
 \end{verbatim}
 \end{document}
