@@ -71,10 +71,9 @@ protocol test(field F) : party Alice, Bob {
 		party P, Q;
 		set P as add(F)::A;
 		set Q as add(F)::B;
-		connect P|Q and Q|P;
+		connect P|B and Q|A;
 		connect Q|environ to S.B|environ;
-		
-		
+				
 		wrap {
 			before P|environ {
 				x => P|environ;

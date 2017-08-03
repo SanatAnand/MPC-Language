@@ -2,7 +2,7 @@
 % Comma separted variables are treated aliases
 metavar A , B ::=
 	{{ com Names of parties A , B }}
-metavar P ::=
+metavar P , Q ::=
 	{{ com Protocol name [[P]] }} 
 metavar x, y, s ::=
 	{{ com Variables Eg. Session, Party,  Integer variables. }}
@@ -20,7 +20,6 @@ metavar S ::=
 
 indexvar n , m , k ::=
 	 {{ com Index variables }}
-
 
 grammar
 tau {{ tex \tau }} :: 'type_' ::= {{ com Types }}
@@ -293,7 +292,7 @@ defn Tenv |- wstmt : tau :: :: Wrapstmt :: Wrapstmt_ by
 	G , M , R , S , C  |- after pexp do { statement1 , .. , statementn } : ()
 
 defn   Tenv |- prtcl : tau , Tenv' :: :: Protocol :: Prtcl_  by
-       	       	     P notin L
+  	       P notin L
        	       G ( P ) = ( Protocol , L )
 	       G ( x1 ) = ( tau1 , C )
 	       G ( xn ) = ( taun , C )
@@ -313,7 +312,7 @@ defn	Tenv |- exp : tau :: :: Exp :: Exp_ by
 
 
 		G ( A ) = ( Party , C )
-        G ( x ) = ( Int , A )
+	        G ( x ) = ( Int , A )
 		%tau in { Int}
 	--------------------------------------------- :: PartyVar
 		G , M , R , S , C  |- A . x : Int
@@ -335,9 +334,9 @@ defn Tenv |- pexp : tau :: :: Pexp :: Pexp_ by
         ----------------------------------------------- :: ExpToEnv
      	  G , M , R , S , C |-  exp I env : Port
 
-                portlist = G , M , R , S , C
+                G ( A ) = ( Party , C )
 	  ---------------------------------------------- :: PortOfParty
-	  G , M , R , S , C |- A I B : Port
+	  G , M , R , S , C |- A I env : Port
 	  
 		% G , M , R , S , C |- 
 % Opertional Semantics rules ----------------------------------------------
