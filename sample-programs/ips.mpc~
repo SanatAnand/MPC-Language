@@ -1,6 +1,7 @@
 // Assumes that inner protocol is in the plain model,
 // and is secure even if random-tapes can be maliciously chosen. 
 
+
 protocol IPS (int nClnts, int nSrvrs, int sp, field F, 
 				(protocol outer(int nC, int nS, int sp, field F) : party Clnt[nC], Srvr[nS]),
 				(protocol inner(int n, int index, int sp, field F) : party P[n]) )
