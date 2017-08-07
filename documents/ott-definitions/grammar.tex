@@ -35,16 +35,17 @@
 \newcommand{\ottafterlastrule}{\\}
 \newcommand{\ottmetavars}{
 \ottmetavartabular{
+ $ \ottmv{n} ,\, \ottmv{m} ,\, \ottmv{k} ,\, \ottmv{i} ,\, \ottmv{j} $ & \ottcom{Index variables} \\
  $ \ottmv{A} ,\, \ottmv{B} $ & \ottcom{Names of parties A , B} \\
- $ \ottmv{P} $ & \ottcom{Protocol name $\ottmv{P}$} \\
+ $ \ottmv{P} ,\, \ottmv{Q} $ & \ottcom{Protocol name $\ottmv{P}$} \\
  $ \ottmv{x} ,\, \ottmv{y} ,\, \ottmv{s} $ & \ottcom{Variables Eg. Session, Party,  Integer variables.} \\
- $ \ottmv{env} $ & \ottcom{Special environment variable $\ottmv{env}$} \\
+ $ \pi $ & \ottcom{Port type} \\
+ $ \ottmv{env} $ & \ottcom{Special environment variable $\ottmv{env}$ denoting a port type} \\
  $ \ottmv{O} $ & \ottcom{Port name $\ottmv{O}$} \\
  $ \ottmv{G} $ &  \\
  $ \ottmv{M} $ &  \\
  $ \ottmv{R} $ &  \\
  $ \ottmv{S} $ &  \\
- $ \ottmv{n} ,\, \ottmv{m} ,\, \ottmv{k} $ & \ottcom{Index variables} \\
 }}
 
 \newcommand{\otttau}{
@@ -56,6 +57,7 @@
 \ottprodline{|}{\ottkw{Port}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottkw{Field}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottkw{Protocol}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottkw{unknown}}{}{}{}{\ottcom{Unknown}}\ottprodnewline
 \ottprodline{|}{\ottsym{()}}{}{}{}{\ottcom{Well typed}}\ottprodnewline
 \ottprodline{|}{\ottsym{\_}}{}{}{}{\ottcom{Do not care}}}
 
@@ -63,15 +65,16 @@
 \ottrulehead{\ottnt{constant}  ,\ \ottnt{c}}{::=}{}\ottprodnewline
 \ottfirstprodline{|}{\ottsym{integer\_literal}}{}{}{}{}\ottprodnewline
 \ottprodline{|}{\ottkw{true}}{}{}{}{}\ottprodnewline
-\ottprodline{|}{\ottkw{false}}{}{}{}{}}
+\ottprodline{|}{\ottkw{false}}{}{}{}{}\ottprodnewline
+\ottprodline{|}{\ottmv{env}}{}{}{}{}}
 
 \newcommand{\ottprogram}{
 \ottrulehead{\ottnt{program}}{::=}{}\ottprodnewline
-\ottfirstprodline{|}{ \ottnt{prtcl} ^+ }{}{}{}{\ottcom{One or more protocols}}}
+\ottfirstprodline{|}{\ottnt{prtcl_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottnt{prtcl_{\ottmv{n}}}}{}{}{}{\ottcom{One or more protocols}}}
 
 \newcommand{\ottprtcl}{
 \ottrulehead{\ottnt{prtcl}}{::=}{}\ottprodnewline
-\ottfirstprodline{|}{\ottkw{protocol} \, \ottmv{P}  \ottsym{(}  \tau_{{\mathrm{1}}} \, \ottmv{x_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \tau_{\ottmv{n}} \, \ottmv{x_{\ottmv{n}}}  \ottsym{)}  \ottsym{:} \, \ottkw{party} \, \ottmv{A_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{A_{\ottmv{m}}}  \ottsym{\{}  \ottnt{stmt_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottnt{stmt_{\ottmv{k}}}  \ottsym{\}}}{}{}{}{}}
+\ottfirstprodline{|}{\ottkw{protocol} \, \ottmv{P}  \ottsym{(}  \tau_{{\mathrm{1}}} \, \ottmv{x_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \tau_{\ottmv{n}} \, \ottmv{x_{\ottmv{n}}}  \ottsym{(} \, \ottkw{protocol} \, \ottmv{P'}  \ottsym{(}  \tau_{{\mathrm{1}}} \, \ottmv{x_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \tau_{\ottmv{i}} \, \ottmv{x_{\ottmv{i}}}  \ottsym{)}  \ottsym{)}  \ottsym{:} \, \ottkw{party} \, \ottmv{A_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{A_{\ottmv{m}}} \, \ottkw{each} \, \ottkw{with} \, \ottsym{\{}  \tau_{{\mathrm{1}}} \, \ottmv{x_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \tau_{\ottmv{j}} \, \ottmv{x_{\ottmv{j}}}  \ottsym{\}}  \ottsym{\{}  \ottnt{stmt_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottnt{stmt_{\ottmv{k}}}  \ottsym{\}}}{}{}{}{}}
 
 \newcommand{\ottstatement}{
 \ottrulehead{\ottnt{statement}  ,\ \ottnt{stmt}}{::=}{\ottcom{Statements}}\ottprodnewline
@@ -352,7 +355,7 @@
 \ottpremise{\ottmv{G}  \ottsym{,}  \ottmv{M}  \ottsym{,}  \ottmv{R}  \ottsym{,}  \ottmv{S}  \ottsym{,}  \ottmv{P}  \vdash  \ottnt{stmt_{{\mathrm{1}}}}  \ottsym{:}  \ottsym{()}}%
 \ottpremise{\ottmv{G}  \ottsym{,}  \ottmv{M}  \ottsym{,}  \ottmv{R}  \ottsym{,}  \ottmv{S}  \ottsym{,}  \ottmv{P}  \vdash  \ottnt{stmt_{\ottmv{k}}}  \ottsym{:}  \ottsym{()}}%
 }{
-\ottmv{G}  \ottsym{,}  \ottmv{M}  \ottsym{,}  \ottmv{R}  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottkw{protocol} \, \ottmv{P}  \ottsym{(}  \tau_{{\mathrm{1}}} \, \ottmv{x_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \tau_{\ottmv{n}} \, \ottmv{x_{\ottmv{n}}}  \ottsym{)}  \ottsym{:} \, \ottkw{party} \, \ottmv{A_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottmv{A_{\ottmv{m}}}  \ottsym{\{}  \ottnt{stmt_{{\mathrm{1}}}}  \ottsym{,} \, .. \, \ottsym{,}  \ottnt{stmt_{\ottmv{k}}}  \ottsym{\}}  \ottsym{:}  \ottsym{()}  \ottsym{,}  \ottmv{G'}  \ottsym{,}  \ottmv{M}  \ottsym{,}  \ottmv{R}  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C} }{%
+\texttt{\textcolor{red}{<<no parses (char 60): 	G , M , R , S , C  \mbox{$\mid$}- protocol P ( tau1 x1 , .. , taun xn )*** : party A1 , .. , Am \{ stmt1 , .. , stmtk \} : () , G' , M , R , S , C >>}}}{%
 {\ottdrulename{Prtcl\_decl}}{}%
 }}
 
@@ -414,8 +417,9 @@
 
 
 \newcommand{\ottdrulePexpXXPortOfParty}[1]{\ottdrule[#1]{%
+\ottpremise{\ottmv{G}  \ottsym{(}  \ottmv{A}  \ottsym{)}  \ottsym{=}  \ottsym{(}  \ottkw{Party}  \ottsym{,}   \mathcal{C}   \ottsym{)}}%
 }{
-\ottmv{G}  \ottsym{,}  \ottmv{M}  \ottsym{,}  \ottmv{R}  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottmv{A} \, \Vert \, \ottmv{B}  \ottsym{:}  \ottkw{Port}}{%
+\ottmv{G}  \ottsym{,}  \ottmv{M}  \ottsym{,}  \ottmv{R}  \ottsym{,}  \ottmv{S}  \ottsym{,}   \mathcal{C}   \vdash  \ottmv{A} \, \Vert \, \ottmv{env}  \ottsym{:}  \ottkw{Port}}{%
 {\ottdrulename{Pexp\_PortOfParty}}{}%
 }}
 
@@ -446,7 +450,7 @@
 \ottall
 
 \begin{verbatim}
-Definition rules:        24 good    0 bad
-Definition rule clauses: 86 good    0 bad
+Definition rules:        23 good    1 bad
+Definition rule clauses: 86 good    1 bad
 \end{verbatim}
 \end{document}

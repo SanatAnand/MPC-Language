@@ -1,6 +1,13 @@
 % !TeX encoding = UTF-8
 % !TeX root = ./language-design.tex
-\documentclass[]{article}
+\documentclass[9pt]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{supertabular}
+\usepackage{geometry}
+\usepackage{ifthen}
+\usepackage{alltt}%hack
+\geometry{a4paper,dvips,twoside,left=22.5mm,right=22.5mm,top=20mm,bottom=30mm}
+\usepackage{color}
 \usepackage{syntax}
 \usepackage{amssymb}
 \usepackage{amsmath}
@@ -11,31 +18,39 @@
 % \usepackage{stmaryrd}
 \usepackage{marvosym}
 \usepackage{listings}
+% Adding the ott commands
+\input{grammar.tex}
+\renewcommand{\ottdrulename}[1]{\texttt{#1}}
 
-\setlength\parindent{0pt}% globally suppress indentation
+\renewcommand{\ottprodline}[6]{& & $#1$ & $#2$ & $#3 #4$ & $#5$ &
+  \def\ottprodlinetmp{#6}\ifx\ottprodlinetmp\empty\else\def\ottprodlinetmp{\\ & & & \multicolumn{3}{l}{$~~#6$}}\fi\ottprodlinetmp}
+
+\newcommand\ottmaybebreakline{}
+\newcommand{\ottconclusion}[1]{%
+  \ifottbreakconclusionline%
+    \def\ottmaybebreakline{\qquad$\\$\hfill\qquad}%
+    \begin{tabular}{l}$#1$\end{tabular}%
+  \else%
+    #1%
+  \fi%
+}
+
+% \input{ott-spec.ltx}
+%\setlength\parindent{0pt}% globally suppress indentation
 % Macros ------------
 \newcommand{\langName}{Cooler}
-\newcommand{\tenv}{A, \Gamma, s \vdash} % type environment
-\newcommand{\oenv}{S, E, s \vdash} % operational sematics environment
 
-%opening
-\title{Implementing the add() protocol}
+\title{Implementing IPS}
 \author{John Doe}
 
 \begin{document}
 \maketitle
-% \input{sections/subsetSyntax}
-% \input{sections/typeRules}
-% \input{sections/introduction}
-% \input{sections/syntax}
-% \input{sections/incrementalSyntax}
-% \input{sections/grammar}
-% \input{sections/incrementalTypes}
-% \input{sections/operationalSemantics}
-\input{sections/ottTypes}
+\input{sections/syntax.tex}
+\input{sections/types.tex}
+
 \end{document}
 
-%%% Local Variables:
+%%% Lll Variables:
 %%% mode: latex
 %%% TeX-master: language-design.tex
 %%% End:
