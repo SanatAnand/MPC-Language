@@ -7,69 +7,69 @@
 
 \section{Operational Rules}
 The following section describes the operational semantics of our language:
-The notation used is as follows.
+% The notation used is as follows.
+
+% % \hspace*{10em} $\dfrac{
+% % \vdots
+% % }{\oenv{}e:v,S^{\prime}}$ \bigskip
+
+
+% \hspace*{5em} $\dfrac{
+%   \begin{array}{l}
+%     T(Id_1) \rightarrow v_1\\
+%     T(Id_2) \rightarrow v_2\\    
+%     \vdots\\
+%     T(Id_n) \rightarrow v_n\\    
+%      args \in \{Id_1:v_1,Id_1:v_2, \ldots Id_n:v_n\}\\
+%     \{body\} \leadsto_A C_A, env_A\\
+%     \{body\} \leadsto_B C_B, env_B
+% \end{array}
+% }{\text{protocol ( } args \text{ )  party A, B \{ body \} } \leadsto_\mathscr{G} C_A, env_A, C_B, env_B  }$\bigskip
+
+% The notation $M \leadsto_S C_N, env_N$ means compiling in the scope 
+% of S leads M to adding `code' to the code-object of N and its corresponding 
+% environment $env_N$. We also have a notion of a state \textit{T}, that maps 
+% variable names (identifiers) to values.
+% $T(Id) \rightarrow v$
+
+% This means if every identifier in \textit{args} evaluate to $\{v_1, v_2, \ldots v_n\}$
+% and compiling \textit{body} in the scope of \textit{A} adds some code to the code object
+% of \textit{A} and its environment while compiling \textit{body} in the scope of \textit{B}
+% adds some code to the code object of \textit{B} and its environment.\bigskip
 
 % \hspace*{10em} $\dfrac{
-% \vdots
-% }{\oenv{}e:v,S^{\prime}}$ \bigskip
+% \begin{array}{l}
+%     \phantom{}
+% \end{array}
+% }{\text{in A } \{body\} \leadsto_B \text{\textit{skip, skip}}}$\bigskip
 
+% %ktf
+% \hspace*{10em} $\dfrac{
+% \begin{array}{l}
+%     \phantom{}
+% \end{array}
+% }{\text{in B } \{body\} \leadsto_A \text{\textit{skip, skip}}}$\bigskip
 
-\hspace*{5em} $\dfrac{
-  \begin{array}{l}
-    T(Id_1) \rightarrow v_1\\
-    T(Id_2) \rightarrow v_2\\    
-    \vdots\\
-    T(Id_n) \rightarrow v_n\\    
-     args \in \{Id_1:v_1,Id_1:v_2, \ldots Id_n:v_n\}\\
-    \{body\} \leadsto_A C_A, env_A\\
-    \{body\} \leadsto_B C_B, env_B
-\end{array}
-}{\text{protocol ( } args \text{ )  party A, B \{ body \} } \leadsto_\mathscr{G} C_A, env_A, C_B, env_B  }$\bigskip
+% The previous two rules state that if the body of \textit{A/B} is
+% compiled in the scope of one another then do nothing.\bigskip
 
-The notation $M \leadsto_S C_N, env_N$ means compiling in the scope 
-of S leads M to adding `code' to the code-object of N and its corresponding 
-environment $env_N$. We also have a notion of a state \textit{T}, that maps 
-variable names (identifiers) to values.
-$T(Id) \rightarrow v$
+% %ktf
+% \hspace*{10em} $\dfrac{
+% \begin{array}{l}
+%     \phantom{}
+% \end{array}
+% }{env \rightarrow x \leadsto_P \text{Rcv } x \text{ env}, \text{Snd } x \text{ to } P}$\bigskip
 
-This means if every identifier in \textit{args} evaluate to $\{v_1, v_2, \ldots v_n\}$
-and compiling \textit{body} in the scope of \textit{A} adds some code to the code object
-of \textit{A} and its environment while compiling \textit{body} in the scope of \textit{B}
-adds some code to the code object of \textit{B} and its environment.\bigskip
+% %ktf
+% \hspace*{10em} $\dfrac{
+% \begin{array}{l}
+%     \phantom{}
+% \end{array}
+% }{A.a \Rightarrow B.b \leadsto_A \text{ Snd } a \text{ to } \text{ B}, \text{\textit{skip}}}$\bigskip
 
-\hspace*{10em} $\dfrac{
-\begin{array}{l}
-    \phantom{}
-\end{array}
-}{\text{in A } \{body\} \leadsto_B \text{\textit{skip, skip}}}$\bigskip
-
-%ktf
-\hspace*{10em} $\dfrac{
-\begin{array}{l}
-    \phantom{}
-\end{array}
-}{\text{in B } \{body\} \leadsto_A \text{\textit{skip, skip}}}$\bigskip
-
-The previous two rules state that if the body of \textit{A/B} is
-compiled in the scope of one another then do nothing.\bigskip
-
-%ktf
-\hspace*{10em} $\dfrac{
-\begin{array}{l}
-    \phantom{}
-\end{array}
-}{env \rightarrow x \leadsto_P \text{Rcv } x \text{ env}, \text{Snd } x \text{ to } P}$\bigskip
-
-%ktf
-\hspace*{10em} $\dfrac{
-\begin{array}{l}
-    \phantom{}
-\end{array}
-}{A.a \Rightarrow B.b \leadsto_A \text{ Snd } a \text{ to } \text{ B}, \text{\textit{skip}}}$\bigskip
-
-%ktf
-\hspace*{10em} $\dfrac{
-\begin{array}{l}
-    \phantom{}
-\end{array}
-}{A.a \Rightarrow B.b \leadsto_B \text{ Snd } a \text{ to } \text{ B}, \text{\textit{skip}}}$\bigskip
+% %ktf
+% \hspace*{10em} $\dfrac{
+% \begin{array}{l}
+%     \phantom{}
+% \end{array}
+% }{A.a \Rightarrow B.b \leadsto_B \text{ Snd } a \text{ to } \text{ B}, \text{\textit{skip}}}$\bigskip
