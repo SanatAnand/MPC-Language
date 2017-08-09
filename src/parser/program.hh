@@ -15,17 +15,17 @@ extern Program program_object;
 //map<string,string> global_strings;
 class Program
 {
-	// Symbol_Table global_symbol_table;
-	
+	// Symbol_Table global_symbol_table;	
 
 public:
 	Program();
 	~Program();
 	
-	map<string, Procedure*> *local_procedures;
+	map<string, Protocol_Ast*> *protocols;
 
-	void add_proc(Procedure * proc, string proc_name, int line);
+	void add_protocol(Protocol_Ast * protocol, string protocol_name, int line);
 	void print(ostream & file_buffer);
+	void print_xml(ostream & file_buffer);
 };
 
 #endif

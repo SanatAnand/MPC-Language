@@ -9,13 +9,12 @@
 #include "error-display.hh"
 #include "user-options.hh"
 #include "ast.hh"
-#include "procedure.hh"
 #include "program.hh"
 #include "parser.h"
 
 ////////////////////// sclp Parser functions ///////////////////////
 
-Procedure * current_procedure = NULL;
+// Procedure * current_procedure = NULL;
 
 bool currently_in_block = false;
 

@@ -1,0 +1,119 @@
+// Assumes that inner protocol is in the plain model,
+// and is secure even if random-tapes can be maliciously chosen. 
+
+
+protocol IPS (int nClnts, int nSrvrs, int sp, field F, 
+				(protocol outer(int nC, int nS, int sp, field F) : party Clnt[nC], Srvr[nS]),
+				(protocol inner(int n, int index, int sp, field F) : party P[n]) )
+				: party C[nClnts] {
+	// sp is the security parameter.
+	// protocol inner implements (i.e., has a local party for)
+	// index-th server in protocol outer
+
+	// watchlist protocol: to be used only to transmit initialization and env inputs
+	uses protocol watchlist (int nC, int nS, int sp, field F) 
+			: party P[nC] each with {inport WLrandreport[nS], inport WLreport[nS], 
+								 outport WLrandread[nS][nC], outport WLread[nS][nC]}; 
+	// P[i] in wrapinner for server s:
+	// 	reports randomness on WLrandreport[s] & inputs on WLreport[s].
+	// 	reads reports from P[j] on WLread[s][j] (status of WL on WLread[s][i]).
+
+
+	// ports declared in a protocol are in addition to the default (duplex) ports
+	// environ and random for every party
+	protocol wrapinner (int nC, int nS, int index) 
+		: party R[nC] each with {outport Wrandout, outport Wout, inport Wrandin[nC], inport Win[nC]} {
+
+		// R[i] reports randomness and environment messages on Wout, and
+		// reads P[j]'s random-tape and its messages from env on Win[j] (if channel is open)
+		// Status of channel is read from Win[i].
+
+		in each R[#i] {
+
+			bool status;
+			Win[i] => status;
+
+			party QP[nC];
+			for each QP[#j]
+				set QP[j] as inner(n,index,sp,F)::P[j];
+			for each QP[#j] except j from {i} {
+				for each QP[#k] except k from {i,j}
+					connect QP[j]|P[k] to QP[k]|P[j];
+			}
+			// No connections made to QP[i] yet
+
+
+			QP[i]|random => Wrandout;
+
+			for each QP[#j] except j from {i} {
+				Wrandin[j] => QP[j]|random;
+				connect Win[j] to QP[j];
+			}
+
+
+			connect QP[i] to environ;
+			connect environ to { Wout, QP[i] };
+			for each QP[i]|P[#j] except j from {i}
+				connect QP[i]|P[j] to { R[j], QP[j]|P[i] };
+			
+			// now starting QP[]. OK that some messages will be
+			// to/from ports of R[i] that will be wrapped
+			start QP[i];
+			if (status) {
+				for each QP[#j] except j from {i} {
+					start QP[j];
+				}
+			}
+
+			wrap {
+				before each QP[i]|P[#j] except j from {i} {
+					unknown y;
+					R[j] => y;
+					if (status) {
+						unknown x;
+						QP[j]|P[i] => x;
+						if (x!=y)
+							abort;
+					}
+					y => QP[i]|P[j];
+				}
+			}	
+		}
+	}
+	
+
+	session In[nSrvrs];
+	for each In[#s]
+		open In[s] as wrapinner(nClnts,s,sp,F) {
+			R[]:C[];
+		}
+	
+
+	//watchlist
+	session W;
+	open W as watchlist(nClnts,nSrvrs,sp,F) {
+		P[]:C[];
+	}
+
+	// connect wrapinner ports to watchlist
+	for each In[#s]
+		in each C[#i] {
+			connect In[s].R[i]|Wout to W.P[i]|WLreport[s];
+			connect In[s].R[i]|Wrandout to W.P[i]|WLrandreport[s];
+			for each win of In[s].R[i]|Win[#j]
+				connect W.P[i]|WLread[s][j] to win;
+			for each wirandn of In[s].R[i]|Wrandin[#j]
+				connect W.P[i]|WLrandread[s][j] to wrandin;
+		}
+
+	session Out;
+	partial open Out as outer(nClnts,nSrvrs,sp,F) {
+		Clnt[]:C[];
+	}
+
+	in each C[#i] {
+		for each o of Out.Clnt[i]|Srvr[#s]
+			connect o and In[s].R[i];
+		connect environ and Out.Clnt[i];
+	}
+}

@@ -19,7 +19,6 @@ using namespace std;
 #include "error-display.hh"
 #include "user-options.hh"
 #include "ast.hh"
-#include "procedure.hh"
 #include "program.hh"
 
 ////////////////////////////////////////////////////////////////////////////

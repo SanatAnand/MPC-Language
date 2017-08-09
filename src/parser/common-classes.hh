@@ -6,4 +6,3 @@
 class Ast;
 
 class Program;
-class Procedure;

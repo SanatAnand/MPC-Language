@@ -1,25 +1,27 @@
+#include "ast.hh"
 #include "common-classes.hh"
 #include "program.hh"
-#include "procedure.hh"
+// #include "procedure.hh"
 //extern map<string,string> global_strings;
 Program::Program(){
-	local_procedures = new map<string, Procedure*>();
+	protocols = new map<string, Protocol_Ast*>();
 }
 Program::~Program(){ 
-	delete local_procedures;
+	delete protocols;
 }
 
-void Program::add_proc(Procedure * proc, string proc_name, int line){
-	(*local_procedures)[proc_name] = proc;
+void Program::add_protocol(Protocol_Ast * proc, string protocol_name, int line){
+	(*protocols)[protocol_name] = proc;
 }
 
 void Program::print(ostream & file_buffer){
-	map<string, Procedure*>::iterator it = local_procedures->begin();
-	for(;it!=local_procedures->end();it++)
-	{
-		it->second->print(std::cout);
-	}
+	for(auto ele : *protocols)
+		ele.second->print(file_buffer);
 }
 
+void Program::print_xml(ostream & file_buffer){
+	for(auto ele : *protocols)
+		ele.second->print_xml(file_buffer);
+}
 
 Program program_object;

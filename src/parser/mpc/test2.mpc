@@ -1,0 +1,94 @@
+
+/* Runtime configuration (for test on Alice's side, using stdin/stdout):
+ * session-identifier: <e.g., a (64*n)-bit string> where n=2 is the # parties
+ * localhost-port: 672
+ * field FF: primefield(37) 
+ * protocol: test(FF)
+ * party Alice: localhost
+ * party Bob: remotehostaddress:672
+ */
+
+// environment expected by the test protocol:
+// Alice's local environment: 
+//  give an F value z to Alice, and obtain an output from Alice.
+// Bob's local environment: 
+//  give an F value pair (x,y) to Bob, and obtain an output from Bob.
+
+
+
+
+/* a subprotocol, that will be used in test below, in two ways */
+protocol add(field F) : party A, B {
+	in A {
+		F a;
+		environ => a;
+	}
+
+	in B {
+		F b, c;
+		environ => b;
+	}
+
+	A.a => B.c;
+
+	in B {
+		c = b+c;
+	}
+
+	B.c => A.a;
+
+	in A{
+		a => environ;
+	}
+
+	in B{
+		c => environ;
+	}
+}
+
+protocol test(field F) : party Alice, Bob {
+
+	// Alice and Bob open an add session.
+
+	session S;
+	open S as add(F) {A:Alice; B:Bob;}
+
+	// Alice reads (a value z) from environment and feeds it to add,
+	// and outputs the output from add (expected to be (x+y)+z).
+	in Alice{
+		connect environ and S.A|environ;
+	}
+
+	in Bob {
+	
+		connect S.B|environ to environ;
+		
+		// Bob reads (x,y) from environment
+		F x,y;
+		environ => x;
+		environ => y;
+		// Bob runs a session of add in his head to compute x+y
+		party P, Q;
+		set P as add(F)::A;
+		set Q as add(F)::B;
+		connect P|Q and Q|P;
+		connect Q|environ to S.B|environ;
+		
+		
+		wrap {
+			before P|environ {
+				x => P|environ;
+			}
+			
+			
+			before Q|environ {
+				y => Q|environ;
+			}
+			
+		}
+		
+	}
+}
+
+
+			

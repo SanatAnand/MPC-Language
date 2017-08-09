@@ -1,10 +1,9 @@
-AST_OBJ = ast.o
+AST_OBJ = ast.o ast-print.o
 PROG_OBJ = program.o
-PROC_OBJ = procedure.o
 OBJ_CORE = error-display.o main.o user-options.o
 OBJ_GEN = scanner.o parser.o
 
-HEADERS_CORE = error-display.hh user-options.hh ast.hh program.hh procedure.hh common-classes.hh
+HEADERS_CORE = error-display.hh user-options.hh ast.hh program.hh common-classes.hh
 HEADERS_GEN = parser.h parser.ih parserbase.h scanner.h scanner.ih scannerbase.h
 
 HEADERS = $(HEADERS_CORE) $(HEADERS_GEN)
@@ -34,3 +33,4 @@ clean :
 	rm -f *.o scannerbase.h parserbase.h scanner.cc parser.cc parser.yy.output
 	rm -f sclp
 	rm -f cscope.out tags a.out
+	rm -f mpc/*.s mpc/*.asm mpc/*.toks mpc/*.xml mpc/*.ser mpc/*.ast

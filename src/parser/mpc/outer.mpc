@@ -1,0 +1,50 @@
+protocol outer (int nClnts, int nSrvrs, int sp, field F) : party C[nClnts], S[nSrvrs] {
+
+	in each S[#j]{
+		F share[nClnts];
+	}
+
+	in each C[#i] {
+		F x;
+		environ => x;
+		F sum;
+		sum = 0;
+	}
+
+	for each C[#i] {
+		for each S[#j] except j in {0} {
+			in C[i] {
+				F tmp;
+				tmp = $;
+				sum = sum + tmp;
+			}
+			C[i].tmp => S[j].share[i];
+		}
+		C[i].(x-sum) => S[0].share[i];
+	}
+
+	in each S[#j] {
+		F sum;
+		sum = 0;
+		for each share[#i] {
+			sum = sum + share[i];
+		}
+	}
+
+	in each C[#i] {
+		F z,t;
+		z = 0;
+	}
+	for each S[#j] {
+		for each C[#i] {
+			S[j].sum => C[i].t;
+			in C[i]{
+				z = z + t;
+			}
+		}
+	}
+	
+	in each C[#i]{
+		C[i].z => environ;
+	}
+}

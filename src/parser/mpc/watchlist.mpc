@@ -1,0 +1,67 @@
+protocol watchlist (int nC, int nS, int sp, field F) : 
+	party P[nC] each with {
+		inport WLrandreport[nS], inport WLreport[nS], 
+		outport WLrandread[nS][nC], outport WLread[nS][nC]
+	} 
+{
+	party T with {
+		inport WLreport[nC][nS],	// P[i] reports about server j to WLreport[i][j]
+		inport WLrandreport[nC][nS],
+		outport WLread[nC][nS][nC],	// P[k] reads P[i]'s reports about server j from WLread[i][j][k]
+		outport WLrandread[nC][nS][nC]
+	};
+
+	in T {
+		bool status[nS][nC]; // status[j][k], whether client k can read server j
+		for each status[#j][#k]{
+			status[j][k] = $;	// TODO: use a function which outputs a biased bit (TODO: support functions)
+		}
+	}
+
+	with each P[] {
+		outport TWLrandreport[nS],
+		outport TWLreport[nS],
+		inport TWLread[nS][nC],
+		inport TWLrandread[nS][nC]
+	};
+
+	in each P[] {
+		for each p of WLreport[#j]
+			connect p to TWLreport[j];
+		for each p of WLrandreport[#j]
+			connect p to TWLrandreport[j];
+		for each p of WLread[#j][#k]
+			connect TWLread[j][k] to p;
+		for each p of WLrandread[#j][#k]
+			connect TWLrandread[j][k] to p;
+	}
+
+	for each p of P[#i]|TWLreport[#j]
+		connect p to T|WLreport[i][j];
+	for each p of P[#i]|TWLrandreport[#j]
+		connect p to T|WLrandreport[i][j];
+	for each p of P[#i]|TWLread[#j][#k]
+		connect T|WLread[i][j][k] to p;
+	for each p of P[#i]|TWLrandread[#j][#k]
+		connect T|WLrandread[i][j][k] to p;
+
+	in T {
+		for each p of WLread[#k][#j][k] {
+			status[j][k] => p;
+			if (status[j][k]) {
+					for each q of WLrandread[#i][j][k] except i from {k}
+							forward WLrandreport[i][j] to WLrandread[i][j][k];
+			}
+		}
+
+		wrap {
+			after each p of WLreport[#i][#j] {
+				for each q of WLread[i][j][#k] {
+					if (status[j][k]) {
+						forward p to q;
+					}
+				}
+			}
+		}
+	}
+}

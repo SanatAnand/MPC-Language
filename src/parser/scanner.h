@@ -15,7 +15,6 @@ using namespace std;
 #include "user-options.hh"
 #include "error-display.hh"
 #include "ast.hh"
-#include "procedure.hh"
 #include "program.hh"
 
 ///////////////////////////////////////////////////////////////////////
