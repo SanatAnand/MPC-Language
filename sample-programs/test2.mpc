@@ -46,7 +46,9 @@ protocol add(field F) : party A, B {
 	}
 }
 
-protocol test(field F) : party Alice, Bob {
+protocol test(field F,
+	 	  (protocol add(field F) : party A, B)
+		  ) : party Alice, Bob {
 
 	// Alice and Bob open an add session.
 

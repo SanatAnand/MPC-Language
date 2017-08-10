@@ -25,7 +25,6 @@ metavar L ::=
 metavar S ::= 
 
 
-
 grammar
 tau {{ tex \tau }} :: 'type_' ::= {{ com Types }}
     | Party :: :: party 

@@ -3,7 +3,7 @@
 
 protocol IPS (int nClnts, int nSrvrs, int sp, field F, 
 				(protocol outer(int nC, int nS, int sp, field F) : party Clnt[nC], Srvr[nS]),
-				(protocol inner(int n, int index, int sp, field F) : party P[n]) /** FIXME adding the following  **/
+				(protocol inner(int n, int index, int sp, field F) : party P[n]), /** FIXME adding the following  **/
 				(protocol wrapinner (int nC, int nS, int index) :  party R[nC]) each with {outport Wrandout, outport Wout, inport Wrandin[nC], inport Win[nC]} 
 				)
 				: party C[nClnts] {
