@@ -1,71 +1,94 @@
 % Grammar rules ----------------------------------------------
 % Comma separted variables are treated aliases
-indexvar n , m , k , i , j ::=
+indexvar n , m , k , i , j  , o , e , c ::=
 	 {{ com Index variables }}
-metavar A , B ::=
+metavar A , B , D , Z ::=
 	{{ com Names of parties A , B }}
 metavar P , Q ::=
 	{{ com Protocol name [[P]] }} 
 metavar x, y, s ::=
 	{{ com Variables Eg. Session, Party,  Integer variables. }}
 metavar r ::=
-	{{ com Port types }} {{ tex \pi }}
+	{{ com Port types }}
+metavar w ::=
+	{{ com Wire variable }}
 metavar env ::=
 	{{ com Special environment variable [[env]] denoting a port type}}
+metavar T ::=
+	{{ com Port names [[T]] }}
 metavar O ::=
-	{{ com Port names [[O]] }}
+	{{ com Code Object [[O]] }}
 metavar G ::= 
-	
+	{{ com explained later }}	
 metavar M ::= 
-
+	{{ com explained later }}	
 metavar R ::=
-
+	{{ com explained later }}	
 metavar L ::=
-
+	{{ com explained later }}	
 metavar S ::= 
+	{{ com explained later }}
+metavar E ::= 
+	{{ com explained later }}
+metavar K ::= 
+	{{ com explained later }}
 
 
 grammar
 tau {{ tex \tau }} :: 'type_' ::= {{ com Types }}
     | Party :: :: party 
-    | Int :: :: int
+    | Int :: :: itn
     | Bool :: :: bool
     | Session ::  :: session
-    | Port :: :: port
+    | Port :: :: port {{ com subsumes inport and outport }}
     | Field :: :: field
     | Protocol :: :: protocol
     | unknown :: :: unknwn 
     | () :: :: wellTyped {{ com unit type }}
     | _ :: :: donotcare {{ com don't care }}
 
-constant, c :: CONST_ ::=
+% Port :: 'prt_' ::=
+%      	| Inport :: :: in_port
+% 	| Outport :: :: out_port
+	
+constant :: CONST_ ::=
 	  | integer_literal :: :: int
 	  | true :: ::  bool_t
 	  | false :: :: bool_f
 	  | env :: :: port_type
 	  
 program :: 'prog_' ::=
-	| prtcl1 , .. , prtcln :: :: Program
+	 | prtcl1 , .. , prtcln :: :: Program
 	% {{ tex [[prtcl]]^+ }}
 	{{ com one or more protocols }}
 
 prtcl :: 'prtcl_' ::=
-       |protocol P ( tau1 x1 , .. , taun xn ( prtcl' ) ) : party A1 , .. , Am each with { Port x1' , .. , Port xi' } { stmt } :: :: prtcldec
+       | protocol P ( tau1 x1 , .. , taun xn ( prtcl' ) ) : party A1 , .. , Am each with { Port x1' , .. , Port xi' } { stmt } :: :: prtcldec
 	 % {{ tex \textbf{protocol} \ [[P]] ( ([[tau]] \ [[x]])^{+} ) \ \textbf{: party } [[A]]^+
 	    % \{ \ [[statement]]^+ \ \} }}
-	{{ com Protocol }}
 
 terminals :: 'terminals_' ::=
 	  | => :: :: leadsto {{ tex \Rightarrow }}
 	  | -> :: :: longrightarrow {{ tex \longrightarrow }}
+	  | <-> :: :: lonlgleftrightarrow {{ tex \longleftrightarrow }}
 	  | I :: :: I {{ tex \Vert }}
 	  | |-              :: :: turnstile    {{ tex \vdash }}
 	  | belongsto :: :: in {{ tex \in }}
 	  | notin :: :: notin {{ tex \notin }}
 	  | != :: :: noteq {{ tex \neq }}
+	  | crt :: :: create {{ tex \underrightarrow{create} }}
+	  | apnd :: :: append {{ tex \underrightarrow{append} }}
+	  | atch :: :: attach {{ tex \underrightarrow{attach} }}
+	  | copy :: :: cpy {{ tex \xLongrightarrow{copycode} }}
+	  | replace :: :: replace {{ tex \underrightarrow{replace} }}
+	  | < :: :: brack_l {{ tex \langle }}
+	  | > :: :: brack_r {{ tex \rangle }}
+
 	  
 statement, stmt :: 'statement_' ::= {{ com Statements }}
-	  | in each A1 , .. , Am { stmt1 , .. , stmtn } :: :: pvtstmt % TODO: bind stmt to in A
+	  | in each A1 , .. , Am { stmt1 , .. , stmtn } :: :: pvtstmt
+	   {{ com Do something in the context of parties }}
+	  % TODO: bind stmt to in A
 	  | tau  x ; :: :: declstmt
 	  {{ com Declare a variable }}
 	  | statement ; statement' ; :: :: seq
@@ -122,6 +145,8 @@ scope :: 'scope_' ::=
      | _ :: :: dont_care_scop {{ com Do not care }}
      | W :: :: global_scop {{ com Global Scope }} {{ tex \mathcal{G} }}
      | A :: :: party_scop {{ com Party Scope for statements like in A \{ .. \} }}
+     | P :: :: protocol_scop {{ com Protocol Scope }}
+     | s . A :: :: sessions_party_scp {{ com Sessions Party Scope }}
     
 
 Tenv {{ tex \mathcal{E} }} :: 'TypeEnv' ::= {{ com Type environment }}
@@ -131,7 +156,7 @@ Tenv {{ tex \mathcal{E} }} :: 'TypeEnv' ::= {{ com Type environment }}
   | M :: :: prtcl_to_arglist_partynmlist
   {{ com A function that takes a protocol name and returns a tuple ( argsig , Party list ) }}
   | R :: :: prtcl_to_portlist
-    {{ com A function that takes a tuple (Protocol name , Party name) and returns list of Ports the party has }} 
+    {{ com Mapping of (Protocol name , Party name) to the list of Ports the party has }} 
   | S :: :: sessn_to_prtcl
   {{ com Maps a session name to the name of a protocol }}
   | L :: :: party_scope_to_portlist
@@ -139,10 +164,24 @@ Tenv {{ tex \mathcal{E} }} :: 'TypeEnv' ::= {{ com Type environment }}
   | scope :: :: current_scope
   {{ com The current scope of execution }}
   | Tenv , Tenv' :: :: tenv_and_tenv_prime
-  {{ com A sequence of Type environments }}
-  
+  {{ com Sequence of Type environments }}
 
-  
+% Compilation environment ------ 
+Cenv {{ tex \mathcal{M} }} :: 'CompEnv' ::= {{ com Compilation environment }}
+     | empty :: :: emt
+     | E :: :: prtcl_party_to_codeObj
+     {{ com Maps ( Protocol, Party, PartyScope ) to Code Object }}
+     | O < scope > :: :: codeObj
+     {{ com Represents code object }}
+     | O_c :: :: current_codeObj
+     {{ com Represents the current code object }}
+     | P :: :: current_prtcl
+     {{ com Represents protcol }}
+     | K :: :: codeObj_to_ports
+     {{ com Maps code objects to list of ports }}
+     | Cenv , Cenv' :: :: compenv_seq
+     {{ com Sequence of Compilation Environments }}
+     
     % | M :: :: Protocol_Scexp :: 'expr_' ::=ope {{ tex \mathcal{M} }} {{ com Protocol Scope }}
 
   % | sesn :: :: session_scope {{ tex \mathcal{S} }} {{ com Session Scope }}
@@ -151,11 +190,12 @@ argsig :: 'argsig_' ::=
        | { tau1 , .. , taun } :: :: type_signature
 
 portlist :: 'prtlist_' ::=
-	 | { O1 , .. , On } :: :: port_list
+	 | { T1 , .. , Tn } :: :: port_list
 
 
 formula :: 'formula_' ::=
-	| judgement :: :: judgement
+       	| judgement :: :: judgement
+% ----- For writing type checking rules
 	| formula1 .. formulan :: :: dots
 	| env : tau :: :: env_type
 	| Tenv :: :: type_env
@@ -168,7 +208,6 @@ formula :: 'formula_' ::=
 	| tau belongsto { tau1 , .. , taun } :: :: type_notin_type
 	| A belongsto scope :: :: party_inscope
 	| Tenv |- stmt : tau :: :: stmt_tenv
-	% | Tenv |- wstmt : tau :: :: wstmt_tenv
 	| Tenv |- x : tau :: :: var_type
 	| Tenv = Tenv' :: :: assign_newenv
 	| [ tau1 , .. , taun ] == argsig :: :: types_in_argsig
@@ -196,7 +235,55 @@ formula :: 'formula_' ::=
 	| x :: :: var_env
 	| P :: :: prtcl_env
 	| scope :: :: scop
+%------- Formulae for writing compilation semantics
+  	| Cenv ( P , A , scope ) = O < scope' > :: :: prtcl_party_code_objectv
+	| Cenv |- stmt , Cenv' :: :: comp_stmt
+	| O < scope > comp_instr ( stmt ) :: :: crtstmt_in_codeObj 
+	| O comp_instr ( stmt ) :: :: crtstm_in_currentcodeobj 
+	| Cenv < scope > comp_instr ( comp_types1 portname1 , .. , comp_typesn portnamen ) : Cenv' :: :: crtcomptypePort_in_currentcodeobj 
+	| Cenv < scope > comp_instr ( comp_types1 w1 , .. , comp_typesn wn )  : Cenv' :: :: crtcomptypeWire_in_currentcodeobj
+	| Cenv < scope > comp_instr ( portname1 <-> w1 , .. , portnamen <-> wn ) :: :: atch_wire
+	| Cenv < scope > comp_instr ( impl_instr )  : Cenv' :: :: writing_impl_inst
+	| Cenv < scope > replace ( /* str */ ,  wstmt )  : Cenv' :: :: replace_str_with_code
+	| Cenv < scope > replace ( /* str */ ,  O < A > )  : Cenv' :: :: replace_str_with_codeObj
+	| P crt ( comp_types1 w1 , .. , comp_typesn wn ) :: :: createWire_inProtocol
+	| E' = E [ ( scope , scope' , scope'' ) -> O < scope''' > ] :: :: populating_E
+	| K' = K [ O < A >  -> { portname1 , .. , portnamen } ] :: :: populating_K
+	| O < scope > copy O' < scope' > :: :: copy_code
+	| K ( O < A > ) = { r_i , .. , r_j } :: :: get_portsFjromCodeObj
+	| pexp = ( A , [ portname1 , portname2 ] ) :: :: portexpt_to_party_and_portlist
 
+portname :: 'prtname' ::= {{ com Name of a port }}
+	 | r :: :: port_r
+	 | environ :: :: port_environ {{ tex \varepsilon }}
+	 | A . portname :: :: port_party_r
+
+comp_instr :: 'CompInstr' ::= {{ com Compilation Instructions }}
+     | crt :: :: create_something
+     | apnd :: :: append_something
+     | atch :: :: attach_wire_to_codeObject
+     | copy :: :: copy_codeObject
+     | impl_instr :: :: implemnt_instructions
+     | replace :: :: replace_string {{ com Replace a temporary string with code }}
+
+comp_types :: 'CompTypes' ::=
+{{ com Compilation Types }}
+     | inport :: :: in_port {{ tex \textcircled{$\downarrow$} }}
+       	      {{ com Inport }}
+     | outport :: :: out_port  {{ tex \textcircled{$\uparrow$} }}
+       	       {{ com outport }}
+     | wire :: :: wire {{ tex \rhookrightarrow }}
+       	    {{ com wire }}
+
+impl_instr :: 'ImplInstr' ::= {{ com Instructions from the implementation language }}
+	    | while ( impl_expr ) { /* str */ } :: :: whilestmt {{ com While statement }}
+	    | if ( impl_expr ) { /* str */ } :: :: ifstmt {{ com If Statement }}
+	    
+impl_expr :: 'ImplExpr' ::= {{ com Expressions for the implementation language }}
+	    | constant :: :: cnstnt {{ com Booleans like true or false }}
+	    | portname :: :: prtname {{ com Portname }}
+	    | portname . ITR :: :: prtintentToread {{ com Port intent to read }}
+	    
 % Type Checking rules ----------------------------------------------
 defns
   Jtype :: '' ::= 
@@ -323,7 +410,7 @@ defn   Tenv |- prtcl : tau , Tenv' :: :: Protocol :: Prtcl_  by
 	       G''' , M' , R' , S , L |- prtcl' : () , G''' , M'' , R'' , S , L 
 	       G''' , M'' , R'' , S , L , C |- stmt : () , G'''' , M'' , R''' , S''' , L'''
 	----------------------------------------------- :: decl
-	M , R |- protocol P ( tau1 x1 , .. , taun xn ( prtcl' ) ) : party A each with { Port x1' , .. , Port xi' } { stmt } : () , M' , R'
+	M , R |- protocol P ( tau1 x1 , .. , taun xn ( prtcl' ) ) : party A each with { Port x1' , .. , Port xi' } { stmt } : () , M'' , R''
 	
 defn	Tenv |- exp : tau :: :: Exp :: Exp_ by
 
@@ -367,13 +454,117 @@ defn Tenv |- pexp : tau :: :: Pexp :: Pexp_ by
 	  ---------------------------------------------- :: PortOfParty
 	  G , M , R , S , L , C |- A I r : Port
 
-G ( A ) = ( Party , C )
-L ( A , C ) = portlist
-B belongsto portlist
----------------------------------------------- :: PortOfAnotherParty
-G , M , R , S , L , C |- A I B : Port
+	    G ( A ) = ( Party , C )
+	    L ( A , C ) = portlist
+	    B belongsto portlist
+	 ---------------------------------------------- :: PortOfAnotherParty
+	 G , M , R , S , L , C |- A I B : Port
 	  
-		% G , M , R , S , L , C |- 
+
+
+{{ com
+\section{Compilation Semantics}
+\label{sec.comp}
+The following rules define the compilation sematics of our language. Our language
+first gets compiled to the following representation.
+}}
+% G , M , R , S , L , C |- 
 % Opertional Semantics rules ----------------------------------------------
 defns
   Jop :: '' ::=
+
+  defn
+	Cenv |- stmt : Cenv' :: ::  stmt_com :: Compl_
+	{{ com Compiling Statements }} by
+
+	     E ( P_c , A_1 , _ ) = O < A_1 >
+	     E ( P_c , A_m , _ ) = O < A_m >
+	     P_c , O < A_1 > |- stmt , O' < A_1 >
+	     P_c , O < A_m > |- stmt , O' < A_m >
+	-------------------------------------- :: inStmt
+	E , P_c |- in each A_1 , .. , A_m { stmt } : E
+
+	    O < D > crt ( tau x ; )
+	------------------------------- :: decl
+	O < D > |- tau x ; : O' < D >
+
+	O < D > apnd ( 
+	------------------------------- :: PortToExp
+	O < D > |- exp => exp' : O' < D >
+
+	    E ( P , B , _ ) = O < B >
+	    E' = E [ ( P_c , A_c , D ) -> O < A_c > ]
+	    O < B > copy O < A_c >
+	    K_i ( O < B > ) = { r_1 , .. , r_j }
+	    K_o ( O < B > ) = { r'_1 , .. , r'_j }
+	    O < A_c > crt ( inport r_1 , .. , inport r_j  ) : O' < A_c >
+	    O' < A_c > crt ( outport r'_1 , .. , outport r'_j  ) : O'' < A_c >
+	    P_c crt ( wire w_1 , .. , wire w_j )
+	    P_c crt ( wire w'_1 , .. , wire w'_j )
+	    P_c crt ( wire w_e )
+	    P_c crt ( wire w'_e )
+	    O'' < A_c > crt ( inport A_c.r_1 , .. , inport A_c.r_j ) : O''' < A_c > 
+	    O''' < A_c > crt ( outport A_c.r'_1 , .. , outport A_c.r'_j ) : O'''' < A_c > 
+	    O'''' < A_c > crt ( inport A_c.environ , outport A_c.environ ) : O''''' < A_c > 
+	    O''''' < A_c > atch ( environ <-> w_e )
+	    O''''' < A_c > atch ( environ <-> w'_e )
+	    O < D > atch ( A.environ <-> w_e )
+	    O < D > atch ( A.environ <-> w'_e )
+	    O''''' < A_c > atch ( r_1 <-> w_1 , .. , r_j <-> w_j )
+	    O''''' < A_c > atch ( r'_1 <-> w'_1 , .. , r'_j <-> w'_j )
+	    K_i' = K_i [ O < A > -> { r_1 , .. , r_j } ]
+	    K_i'' = K_i' [ O < D > -> { r_1 , .. , r_j } ]	    
+	    K_o' = K_o [ O < A > -> { r'_1 , .. , r'_j } ]	    
+	    K_o'' = K_o' [ O < D > -> { r'_1 , .. , r'_j } ]	    
+      --------------------------------------------------------------- :: set
+	K_i , K_o , P_c , O < D > |- set A as P ( x1 , .. , xn )::B : E
+	    
+	    O < D > crt ( wire w_1 ) : O' < D >
+	    O' < D > crt ( wire w_1' ) : O'' < D >
+	    pexp = ( A , [ r_1 , r_1' ] ) 
+	    pexp' = ( B , [ r_2 , r_2' ] )
+	    O'' < D > atch ( A.r_1 <-> w_1 )  
+	    O'' < D > atch ( B.r_2 <-> w_2 ) 
+	    O'' < D > atch ( A.r_1' <-> w_1' ) 
+	    O'' < D > atch ( B.r_2' <-> w_2' )
+	------------------------------------------------------------ :: connect_and
+	O < D > |- connect pexp and pexp' : O'' < D >
+
+       	    O < D > crt ( wire w_1 ) : O' < D >
+           pexp = ( A , [ r_1 , r_1' ] )
+           pexp' = ( B , [ r_2 , r_2' ] )
+	------------------------------------------------------------ ::  connect_to
+	O < D > |- connect pexp to pexp' : E
+
+	     E ( P_c , B , _ ) = O < B >
+	     E ( P , A , _ ) = O < A >
+	     E' = E [ ( P_c , s . A , D ) -> O < s  . A > ]
+	     O < A > copy O < s . A >
+	     O < B > crt ( inport s . A )
+	     O < B > crt ( outport s . A )
+	------------------------------------------------------------- ::  opensession
+	K, P_c , O < D > |- open  s  as  P ( x1 , .. , xn ) { A : B } : E
+
+	    O < D > apnd ( while ( true ) { /* str */ } ) : O' < D >
+	    O' < D > replace ( /* str */ , wstmt ) : O'' < D >
+	------------------------------------------------------------- :: wrap
+	    O < D > |- wrap { wstmt } : O'' < D >
+
+defn
+	Cenv |- wstmt : Cenv' :: ::  wstmt_com :: Compl_
+	{{ com Compiling statements inside wrap }} by
+
+	    pexp = ( A , [ r_1 , r_1'] )
+	    E' = E [ ( _ , _ , _ ) -> O < Z > ]
+    	    E' = E [ ( _ , _ , _ ) -> O < Z' > ]
+	    O < Z > apnd ( if ( A . r . ITR ) { /* str */ } ) : O' < Z >
+	    O < Z' > |- stmt1 : O' < Z' >
+	    O' < Z' > |- stmtn : O'' < Z' >
+	    O' < Z > replace ( /* str */ , O'' < Z' > ) : O'' < Z >
+	------------------------------------------------------------- :: before
+	  O < D > |- before pexp do { statement1 , .. , statementn } : O'' < Z >
+
+  	    pexp = ( A , [ r_1 , r_1'] )
+	    E' = E [ ( _ , _ , _ ) -> O < A > ]
+	------------------------------------------------------------- :: after
+	  O < D > |- after pexp do { statement1 , .. , statementn } : O < Z >

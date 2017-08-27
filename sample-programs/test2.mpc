@@ -1,4 +1,3 @@
-
 /* Runtime configuration (for test on Alice's side, using stdin/stdout):
  * session-identifier: <e.g., a (64*n)-bit string> where n=2 is the # parties
  * localhost-port: 672
@@ -7,17 +6,13 @@
  * party Alice: localhost
  * party Bob: remotehostaddress:672
  */
-
 // environment expected by the test protocol:
 // Alice's local environment: 
 //  give an F value z to Alice, and obtain an output from Alice.
 // Bob's local environment: 
 //  give an F value pair (x,y) to Bob, and obtain an output from Bob.
 
-
-
-
-/* a subprotocol, that will be used in test below, in two ways */
+/* a subprotocol, that will be used in test below, in two ways  */
 protocol add(field F) : party A, B {
 	in A {
 		F a;
@@ -49,9 +44,9 @@ protocol add(field F) : party A, B {
 protocol test(field F,
 	 	  (protocol add(field F) : party A, B)
 		  ) : party Alice, Bob {
-
+	
 	// Alice and Bob open an add session.
-
+	
 	session S;
 	open S as add(F) {A:Alice; B:Bob;}
 

@@ -9,7 +9,7 @@ protocol inner(int n, int index, int sp, field F) : party P[n] {
 	for each P[#i] {
 		for each P[#j] except j in {i} {
 			in P[i] {
-				F tmp = $;
+				F tmp = $; /* FIXME: What is $? */
 				s += tmp;
 			}
 			P[i].tmp => P[j].t;

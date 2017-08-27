@@ -1,9 +1,72 @@
+// P[i] in wrapinner for server s:
+// 	reports randomness on WLrandreport[s] & inputs on WLreport[s]. 
+// 	reads reports from P[j] on WLread[s][j] (status of WL on WLread[s][i]).
+
+// ports declared in a protocol are in addition to the default (duplex) ports
+// environ and random for every party
+protocol wrapinner (int nC, int nS, int index, int sp, field F /* FIXME Adding field F and int sp */
+	 (protocol inner(int n, int index, int sp, field F) : party P[n]) )
+	: party R[nC] each with {outport Wrandout, outport Wout, inport Wrandin[nC], inport Win[nC]} {
+
+	// R[i] reports randomness and environment messages on Wout, and
+	// reads P[j]'s random-tape and its messages from env on Win[j] (if channel is open)
+	// Status of channel is read from Win[i].
+
+	/* FIXME need i, j, k etc. to be declared with its type */
+	in each R[#i] {
+
+		bool status;
+		Win[i] => status;
+
+		party QP[nC];
+		for each QP[#j]
+			set QP[j] as inner(nC, index, sp, F)::P[j]; /* FIXME Fixed typo */
+		for each QP[#j] except j from {i} {
+			for each QP[#k] except k from {i, j}
+				connect QP[j]|P[k] to QP[k]|P[j];  /* FIXME Execute this line in the context of R[#i] */
+		}
+		// No connections made to QP[i] yet
+		QP[i]|random => Wrandout;
+
+		for each QP[#j] except j from {i} {      
+			Wrandin[j] => QP[j]|random;
+			connect Win[j] to QP[j]|environ; 
+		}
+
+		connect QP[i]|environ to environ; 
+		connect environ to { Wout, QP[i]|environ }; 
+		for each QP[i]|P[#j] except j from {i}
+			connect QP[i]|P[j] to { R[j]|environ, QP[j]|P[i] }; /* FIXME desugaring it to two separate statements */
+		
+		// now starting QP[]. OK that some messages will be
+		// to/from ports of R[i] that will be wrapped
+		start QP[i];
+		if (status) { 
+			for each QP[#j] except j from {i} {      
+				start QP[j];
+			}
+		}
+
+		wrap {
+			before each QP[i]|P[#j] except j from {i} {
+			        unknown y;  /* FIXME Declaring y first */
+				R[j]|environ => y;
+				if (status) {
+					QP[j]|P[i] => unknown x;
+					if (x != y)
+						abort;
+				}
+				y => QP[i]|P[j];
+			}
+		}	
+	}
+}
+
 // Assumes that inner protocol is in the plain model,
 // and is secure even if random-tapes can be maliciously chosen. 
-
 protocol IPS (int nClnts, int nSrvrs, int sp, field F, 
 				(protocol outer(int nC, int nS, int sp, field F) : party Clnt[nC], Srvr[nS]),
-				(protocol inner(int n, int index, int sp, field F) : party P[n]), /** FIXME adding the following  **/
+				(protocol inner(int n, int index, int sp, field F) : party P[n]), /* FIXME adding the following  */
 				(protocol wrapinner (int nC, int nS, int index) :  party R[nC]) each with {outport Wrandout, outport Wout, inport Wrandin[nC], inport Win[nC]} 
 				)
 				: party C[nClnts] {
@@ -11,22 +74,23 @@ protocol IPS (int nClnts, int nSrvrs, int sp, field F,
 	// protocol inner implements (i.e., has a local party for)
 	// index-th server in protocol outer
 	// watchlist protocol: to be used only to transmit initialization and env inputs
+	// Here 'uses protocol watchlist can be thought as simply Declaring that a protocol called watchlist exists
 	uses protocol watchlist (int nC, int nS, int sp, field F) 
 			: party P[nC] each with {inport WLrandreport[nS], inport WLreport[nS], 
 								 outport WLrandread[nS][nC], outport WLread[nS][nC]}; 
 
-        /** FIXME adding the next line **/
+        /* FIXME adding the next line */
 	int s;
 	
 	session In[nSrvrs];
 	for each In[#s]
-		open In[s] as wrapinner(nClnts, s, sp, F) { /** FIXME F, is a typo ? **/
-			R[]:C[]; /** FIXME should we desugar it more? **/
+		open In[s] as wrapinner(nClnts, s, sp, F) { /* FIXME F, is a typo ? */
+			R[]:C[]; /* FIXME should we desugar it more? */
 		}
 	
 	//watchlist
 
-	/** FIXME desugaring it to the following. That is explicitly declaring W first **/
+	/* FIXME desugaring it to the following. That is explicitly declaring W first */
 	session W;
 	
 	open session W as watchlist(nClnts, nSrvrs, sp, F) {
@@ -44,7 +108,7 @@ protocol IPS (int nClnts, int nSrvrs, int sp, field F,
 				connect W.P[i]|WLrandread[s][j] to wrandin;
 		}
 
-	/** FIXME again desugaring **/
+	/* FIXME again desugaring */
 	session Out;
 	
 	partial open session Out as outer(nClnts, nSrvrs, sp, F) {
@@ -54,70 +118,6 @@ protocol IPS (int nClnts, int nSrvrs, int sp, field F,
 	in each C[#i] {
 		for each o of Out.Clnt[i]|Srvr[#s]
 			connect o and In[s].R[i];
-		connect environ and Out.Clnt[i]; // FIXME who's environment ? Should the syntax highlight that
-	}
-}
-
-// P[i] in wrapinner for server s:
-// 	reports randomness on WLrandreport[s] & inputs on WLreport[s]. 
-// 	reads reports from P[j] on WLread[s][j] (status of WL on WLread[s][i]).
-
-// ports declared in a protocol are in addition to the default (duplex) ports
-// environ and random for every party
-protocol wrapinner (int nC, int nS, int index, int sp, field F // FIXME Adding field F and int sp
-	 (protocol inner(int n, int index, int sp, field F) : party P[n]) )
-	: party R[nC] each with {outport Wrandout, outport Wout, inport Wrandin[nC], inport Win[nC]} {
-
-	// R[i] reports randomness and environment messages on Wout, and
-	// reads P[j]'s random-tape and its messages from env on Win[j] (if channel is open)
-	// Status of channel is read from Win[i].
-
-	// FIXME need i, j, k etc. to be declared with its type.
-	in each R[#i] {
-
-		bool status;
-		Win[i] => status;
-
-		party QP[nC];
-		for each QP[#j]
-			set QP[j] as inner(nC, index, sp, F)::P[j]; // FIXME Fixed typo
-		for each QP[#j] except j from {i} {
-			for each QP[#k] except k from {i,j}
-				connect QP[j]|P[k] to QP[k]|P[j];
-		}
-		// No connections made to QP[i] yet
-	
-		QP[i]|random => Wrandout;
-
-		for each QP[#j] except j from {i} {      
-			Wrandin[j] => QP[j]|random;
-			connect Win[j] to QP[j]|environ; 
-		}
-
-		connect QP[i]|environ to environ; 
-		connect environ to { Wout, QP[i]|environ }; 
-		for each QP[i]|P[#j] except j from {i}
-			connect QP[i]|P[j] to { R[j]|environ, QP[j]|P[i] }; // FIXME desugaring it to two separate statements
-		
-		// now starting QP[]. OK that some messages will be
-		// to/from ports of R[i] that will be wrapped
-		start QP[i];
-		if (status) { 
-			for each QP[#j] except j from {i} {      
-				start QP[j];
-			}
-		}
-
-		wrap {
-			before each QP[i]|P[#j] except j from {i} {
-				R[j]|environ => unknown y; // FIXME Declare y first
-				if (status) {
-					QP[j]|P[i] => unknown x;
-					if (x!=y)
-						abort;
-				}
-				y => QP[i]|P[j];
-			}
-		}	
+		connect environ and Out.Clnt[i]; /* FIXME who's environment ? Should the syntax highlight that */
 	}
 }

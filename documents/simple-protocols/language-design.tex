@@ -15,16 +15,45 @@
 \usepackage{proof}
 \usepackage{mathrsfs}
 \usepackage{upgreek}
+\usepackage{extarrows}
+\usepackage{MnSymbol}
 % \usepackage{stmaryrd}
 \usepackage{marvosym}
 \usepackage{listings}
 % Adding the ott commands
 \input{grammar.tex}
+\def\ott@regularize@underscores#1#2{%
+  \begingroup%
+  \escapechar=-1 %
+  \expandafter\def\expandafter\_\expandafter{\string\_}%
+  \def\@tempa{#1}%
+  \expandafter\expandafter\expandafter\def%
+  \expandafter\expandafter\expandafter\@tempb%
+  \expandafter\expandafter\expandafter{%
+    \expandafter\string\csname#2\endcsname}%
+  \expandafter\expandafter\expandafter\def%
+  \expandafter\expandafter\expandafter\@tempc%
+  \expandafter\expandafter\expandafter{%
+    \expandafter\@tempa\expandafter{\@tempb}}%
+  \expandafter\endgroup\@tempc%
+}
+
+\def\ottdrulelabel@z#1{\label{defn.#1}}
+\def\ottdrulelabel@b#1{\ott@regularize@underscores\ottdrulelabel@z}
+\def\ottdrulelabel@a#1#2{\ottdrulelabel@b#1}
+\def\ottdruleref@a#1{%
+  \expandafter\@setref\csname r@defn.#1\endcsname%
+  {\ottdrulename{#1}\@gobbletwo}%
+  {#1}
+}
+
+\renewcommand\ottdruleref{\ott@regularize@underscores\ottdruleref@a}
+
 \renewcommand{\ottdrulename}[1]{\texttt{#1}}
 
 \renewcommand{\ottprodline}[6]{& & $#1$ & $#2$ & $#3 #4$ & $#5$ &
   \def\ottprodlinetmp{#6}\ifx\ottprodlinetmp\empty\else\def\ottprodlinetmp{\\ & & & \multicolumn{3}{l}{$~~#6$}}\fi\ottprodlinetmp}
-
+\newif\ifottbreakconclusionline \ottbreakconclusionlinetrue
 \newcommand\ottmaybebreakline{}
 \newcommand{\ottconclusion}[1]{%
   \ifottbreakconclusionline%
@@ -33,6 +62,12 @@
   \else%
     #1%
   \fi%
+}
+
+\renewenvironment{ottdefnblock}[3][]{%
+  \vspace{1em}\par%
+  \subsection{\protect\framebox{\mbox{#2}} \quad #3}%
+}{%
 }
 
 % \input{ott-spec.ltx}
@@ -47,7 +82,6 @@
 \maketitle
 \input{sections/syntax.tex}
 \input{sections/types.tex}
-\input{sections/operationalSemantics.tex}
 
 \end{document}
 
