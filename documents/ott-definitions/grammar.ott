@@ -583,6 +583,7 @@ defn
 
 	------------------------------------------------------ :: expstmt
 	O < D > |- x : read ( x )
+	
 defn
 	Cenv |- prtcl : Cenv' :: ::  prtcl_com :: Compl_
 	{{ com Compiling Protocol }} by
@@ -600,7 +601,8 @@ defn
 	P crt ( wire w1 )
 	O < A_1 > atch ( A2 <-> w1 )
 	------------------------------------------------------- :: prtcl
-	O < D > |- protocol P ( tau1 x1 , .. , taun xn ( prtcl' ) ) : party A each with { Port1 y1 , .. , Porti yi } { stmt } : O' < D > 
+	O < D > |- protocol P ( tau1 x1 , .. , taun xn ( prtcl' ) ) : party A each with { Port1 y1 , .. , Porti yi } { stmt } : O' < D >
+	
 defn
 	Cenv |- wstmt : Cenv' :: ::  wstmt_com :: Compl_
 	{{ com Compiling statements inside wrap }} by
