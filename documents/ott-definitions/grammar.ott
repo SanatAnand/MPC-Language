@@ -35,20 +35,23 @@ metavar K ::=
 
 grammar
 tau {{ tex \tau }} :: 'type_' ::= {{ com Types }}
-    | Party :: :: party 
+    | Party :: :: party
+      {{ com The parties are denoted by the metavariables A, B, D, Z }}
     | Int :: :: itn
     | Bool :: :: bool
     | Session ::  :: session
     | Port :: :: port {{ com subsumes inport and outport }}
     | Field :: :: field
+      	   {{ com Currently considered as an integer type }}
     | Protocol :: :: protocol
-    | unknown :: :: unknwn 
+    | unknown :: :: unknwn
+      	    {{ com For types that are not known currently }}
     | () :: :: wellTyped {{ com unit type }}
     | _ :: :: donotcare {{ com don't care }}
 
  Port :: 'prt_' ::=
       | inport :: :: in_port {{ tex \textcircled{$\downarrow$} }}
-       	      {{ com Inport }}
+       	      {{ com inport }}
       | outport :: :: out_port  {{ tex \textcircled{$\uparrow$} }}
        	       {{ com outport }}
 	
@@ -61,7 +64,7 @@ constant :: CONST_ ::=
 program :: 'prog_' ::=
 	 | prtcl1 , .. , prtcln :: :: Program
 	% {{ tex [[prtcl]]^+ }}
-	{{ com one or more protocols }}
+	{{ com A program consists of one or more protocols }}
 
 prtcl :: 'prtcl_' ::=
        | protocol P ( tau1 x1 , .. , taun xn ( prtcl' ) ) : party A1 , .. , Am each with { Port1 x1' , .. , Porti xi' } { stmt } :: :: prtcldec
@@ -131,9 +134,9 @@ wstmt {{ tex \mathcal{W}_{stmt} }} :: 'wstmt_' ::= {{ com Statements inside wrap
 	  % {{ tex \textbf{after} \ [[pexp_w]] \ \textbf{do} \ \{ [[statement]]^+ \} }}
 
 pexp {{ tex \mathcal{P}_{exp} }} :: 'pexp_' ::=
-     | A I r :: :: env {{ com Port of a Party }}
-     | A I B :: :: twoparties {{ com Port of another Party }}
-     | s . A I r :: :: sessionParty_env {{ com Port [[r]] of a Party [[A]] that belongs to session [[s]] }} 
+     | A I portname :: :: env {{ com Port of a Party. The name of the ports can be Party name, env etc. }}
+     % | A I B :: :: twoparties {{ com Port of another Party }}
+     | s . A I portname :: :: sessionParty_env {{ com Port [[portname]] of a Party [[A]] that belongs to session [[s]] }} 
      % | A :: :: party {{ com Party }}
      % | x :: :: var {{ com Variable }}
      % | A I env :: :: partys_env {{ com env port of a party called A }}
@@ -144,16 +147,20 @@ exp :: 'expr_' ::=
     % | s . A :: :: vart_party {{ com Party [[A]] of a variable [[s]] }}
     | x :: :: statement {{ com Expression statement }}
 
-scope :: 'scope_' ::=
+scope :: 'scope_' ::= {{ com The Various types of scopes }}
      | C :: ::  current_scop {{ com Current Scope }} {{ tex \mathcal{C} }}
      | _ :: :: dont_care_scop {{ com Do not care }}
      | W :: :: global_scop {{ com Global Scope }} {{ tex \mathcal{G} }}
      | A :: :: party_scop {{ com Party Scope for statements like in A \{ .. \} }}
      | P :: :: protocol_scop {{ com Protocol Scope }}
      | s :: :: sessions_party_scp {{ com Sessions Scope }}
-     | scope . scope' :: :: scope_within_another_scope {{ com scope within another scope }}
+     | scope . scope' :: :: scope_within_another_scope {{ com [[scope]] within another [[scope']] }}
 
-    
+argsig :: 'argsig_' ::=
+       | { tau1 , .. , taun } :: :: type_signature {{ com Arguments signature consists of only the list of types taken as argument by a protocol }}
+
+portlist :: 'prtlist_' ::=
+	 | { T1 , .. , Tn } :: :: port_list {{ com List of ports a protocol has }}
 
 Tenv {{ tex \mathcal{E} }} :: 'TypeEnv' ::= {{ com Type environment }}
   | empty :: :: em {{ tex \phi }} {{ com Empty Type enviornment }}
@@ -174,7 +181,7 @@ Tenv {{ tex \mathcal{E} }} :: 'TypeEnv' ::= {{ com Type environment }}
 
 % Compilation environment ------ 
 Cenv {{ tex \mathcal{M} }} :: 'CompEnv' ::= {{ com Compilation environment }}
-     | _ :: :: empty
+     | _ :: :: empty {{ tex \phi }} {{ com Empty compilation environment }}
      | E :: :: prtcl_party_to_codeObj
      {{ com Maps ( Protocol, Party, PartyScope ) to Code Object }}
      | O < scope > :: :: codeObj_scope
@@ -193,11 +200,7 @@ Cenv {{ tex \mathcal{M} }} :: 'CompEnv' ::= {{ com Compilation environment }}
 
   % | sesn :: :: session_scope {{ tex \mathcal{S} }} {{ com Session Scope }}
   % | G , M , R , S : tau  :: :: typ {{ tex G, \  M, \ \R, \ \mathcal{S} : [[tau]] }}
-argsig :: 'argsig_' ::=
-       | { tau1 , .. , taun } :: :: type_signature
 
-portlist :: 'prtlist_' ::=
-	 | { T1 , .. , Tn } :: :: port_list
 
 
 formula :: 'formula_' ::=
@@ -245,7 +248,7 @@ formula :: 'formula_' ::=
 %------- Formulae for writing compilation semantics
   	| Cenv ( P , A , scope ) = O < scope' > :: :: prtcl_party_code_objectv
 	| Cenv |- stmt , Cenv' :: :: comp_stmt
-	| Cenv |-  stmt; : Cenv' :: :: crtstmt_in_codeObj 
+	| Cenv |-  stmt ; : Cenv' :: :: crtstmt_in_codeObj 
 	% | Cenv < scope > comp_instr ( stmt1 , .. , stmtn ) : Cenv' :: :: crtstm_in_currentcodeobj 
 	| Cenv < scope > comp_instr ( comp_types1 portname1 , .. , comp_typesn portnamen ) : Cenv' :: :: crtcomptypePort_in_currentcodeobj 
 	| Cenv < scope > comp_instr ( comp_types1 w1 , .. , comp_typesn wn )  : Cenv' :: :: crtcomptypeWire_in_currentcodeobj
@@ -288,7 +291,8 @@ prt_cnc :: 'PortCnc' ::=
     | <-> :: :: bidirectional {{ com Bi-directional }}
     | --> :: :: uni_right {{ com Uni-directional rght }}
     | <-- :: :: uni_left {{ com Uni-directional lft }}
-    
+
+
 
 impl_instr :: 'ImplInstr' ::= {{ com Instructions from the implementation language }}
 	    | while ( impl_expr ) { /* str */ } :: :: whilestmt {{ com While statement }}
@@ -502,8 +506,8 @@ defns
 	------------------------------- :: decl
 	 O , D |- tau x ; : O' < D >
 
-	   O < D > |- stmt; : O' < D >
-	   O' < D > |- stmt'; : O'' < D >
+	   O < D > |- stmt ; : O' < D >
+	   O' < D > |- stmt' ; : O'' < D >
 	 ------------------------------- ::  seq
 	 O , D |- stmt; stmt'; : O'' < D >
 	   
@@ -593,7 +597,7 @@ defn
 
 	    pexp = ( A , r )
 	    E' = E [ ( _ , _ , _ ) -> O < Z > ]
-    	    E' = E [ ( _ , _ , _ ) -> O < Z' > ]
+    	    E'' = E' [ ( _ , _ , _ ) -> O < Z' > ]
 	    O < Z > apnd ( if ( A . r . ITR ) { /* str */ } ) : O' < Z >
 	    O < Z' > |- stmt1 : O' < Z' >
 	    O' < Z' > |- stmtn : O'' < Z' >
@@ -626,8 +630,7 @@ defn
 	O < A_1 > atch ( A_m <-> w_m-1 )
 	O < A_m > atch ( A_1 <-> w_i )
 	O < A_m > atch ( A_m-1 <-> w_j )
-	% O < A_m > atch ( A1 
-	------------------------------------------------------- :: prtcl
+	------------------------------------------------------------------------- :: prtcl
 	 E , K , P_c , O , D |- protocol P ( tau1 x1 , .. , taun xn ( prtcl' ) ) : party A each with { Port1 y1 , .. , Porti yi } { stmt } : O' < D >
 
 defn
