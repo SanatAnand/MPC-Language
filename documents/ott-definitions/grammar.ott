@@ -245,7 +245,7 @@ formula :: 'formula_' ::=
 %------- Formulae for writing compilation semantics
   	| Cenv ( P , A , scope ) = O < scope' > :: :: prtcl_party_code_objectv
 	| Cenv |- stmt , Cenv' :: :: comp_stmt
-	% | O < scope > comp_instr ( stmt ) :: :: crtstmt_in_codeObj 
+	| Cenv |-  stmt; : Cenv' :: :: crtstmt_in_codeObj 
 	% | Cenv < scope > comp_instr ( stmt1 , .. , stmtn ) : Cenv' :: :: crtstm_in_currentcodeobj 
 	| Cenv < scope > comp_instr ( comp_types1 portname1 , .. , comp_typesn portnamen ) : Cenv' :: :: crtcomptypePort_in_currentcodeobj 
 	| Cenv < scope > comp_instr ( comp_types1 w1 , .. , comp_typesn wn )  : Cenv' :: :: crtcomptypeWire_in_currentcodeobj
@@ -498,6 +498,15 @@ defns
 	Cenv |- stmt : Cenv' :: ::  stmt_com :: Compl_
 	{{ com Compiling Statements }} by
 
+	    O < D > crt ( tau x ; ) : O' < D >
+	------------------------------- :: decl
+	 O , D |- tau x ; : O' < D >
+
+	   O < D > |- stmt; : O' < D >
+	   O' < D > |- stmt'; : O'' < D >
+	 ------------------------------- ::  seq
+	 O , D |- stmt; stmt'; : O'' < D >
+	   
 	     E ( P_c , A_1 , _ ) = O < A_1 >
 	     E ( P_c , A_m , _ ) = O < A_m >
 	     P_c , O < A_1 > |- stmt , O' < A_1 >
@@ -505,9 +514,7 @@ defns
 	-------------------------------------- :: pvt
 	E , P_c , O |- in each A_1 , .. , A_m { stmt } : O' < A_1 > , O' < A_m >
 
-	    O < D > crt ( tau x ; ) : O' < D >
-	------------------------------- :: decl
-	 O , D |- tau x ; : O' < D >
+	    
 
 	O < D > apnd ( x = read ( environ ) ) : O' < D > 
 	------------------------------- :: sendPortToVar
@@ -613,10 +620,13 @@ defn
 	O' < A_m > crt ( Port1 y1 , .. , Porti yi ) : O'' < A_m >
 	O < A_m > crt ( Port A2 , .. , Port Am ) : O < A_m >
 	O < A_m > crt ( Port environ ) : O < A_m >
-	j = ( m * ( m - 1) ) / 2 )
+	% j = ( m * ( m  - 1 ) ) / 2 ----------> How do we write this calculation ?
 	P crt ( wire w1 , .. , wire wj )
-	O < A_1 > atch ( A2 <-> w1 )
-	O < A_m > atch ( A1 
+	O < A_1 > atch ( A_2 <-> w_1 )
+	O < A_1 > atch ( A_m <-> w_m-1 )
+	O < A_m > atch ( A_1 <-> w_i )
+	O < A_m > atch ( A_m-1 <-> w_j )
+	% O < A_m > atch ( A1 
 	------------------------------------------------------- :: prtcl
 	 E , K , P_c , O , D |- protocol P ( tau1 x1 , .. , taun xn ( prtcl' ) ) : party A each with { Port1 y1 , .. , Porti yi } { stmt } : O' < D >
 
