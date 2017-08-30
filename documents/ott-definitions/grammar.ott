@@ -479,12 +479,11 @@ defn Tenv |- pexp : tau :: :: Pexp :: Pexp_ by
 	  ---------------------------------------------- :: PortOfParty
 	  G , M , R , S , L , C |- A I r : Port
 
-	    G ( A ) = ( Party , C )
-	    L ( A , C ) = portlist
-	    B belongsto portlist
-	 ---------------------------------------------- :: PortOfAnotherParty
-	 G , M , R , S , L , C |- A I B : Port
-	  
+	 G ( C ) = ( Party , _ )
+	 L ( C , _ ) = portlist
+	 r belongsto portlist
+	 ------------------------------------------- :: PortOfCurntParty
+	 G , M , R , S , L , C |- r : Port
 
 
 {{ com
@@ -513,21 +512,27 @@ defns
 	   
 	     E ( P_c , A_1 , _ ) = O < A_1 >
 	     E ( P_c , A_m , _ ) = O < A_m >
-	     P_c , O < A_1 > |- stmt , O' < A_1 >
-	     P_c , O < A_m > |- stmt , O' < A_m >
+	E , K , P_c , O , A_1 |- stmt , E' , K' , P_c' , O'
+	E' , K' , P_c' , O' , A_m |- stmt , E'' , K'' , P_c'' , O'' 
 	-------------------------------------- :: pvt
-	E , P_c , O |- in each A_1 , .. , A_m { stmt } : O' < A_1 > , O' < A_m >
+	E , P_c , O |- in each A_1 , .. , A_m { stmt } : E'' , K'' , P_c'' , O''
 
-	    
-
-	O < D > apnd ( x = read ( environ ) ) : O' < D > 
+	O , D |- pexp = ( A , r ) 
+	O < D > apnd ( x = read ( A . r ) ) : O' < D > 
 	------------------------------- :: sendPortToVar
-	 O , D |- env => x ; : O' < D >
+	 O , D |- pexp => x ; : O'
 
-	O < D > apnd ( environ = read ( x ) ) : O' < D > 
+	 O , D |- pexp = ( A , r )
+	O < D > apnd ( A . r = read ( x ) ) : O' < D > 
 	------------------------------- :: sendVarToPort
-	 O , D |- x => env ; : O' < D >
+	 O , D |- x => env ; : O'
 
+	 O , D |- pexp = ( A_1 , r_1 )
+	 O , D |- pexp' = ( B_1 , r_2 )
+	 O < D > apnd ( B_1 . r_2 = read ( A_1 . r_1 ) : O' < D >
+	 ---------------------------------------------------------- :: sendPexpToPexp
+	 O , D |- pexp => pexp' ; : O'
+	 
 	  O < A > apnd ( send x to B ) : O' < A >
 	-------------------------------- :: sendExprToExpr_A
 	O , A  |- A . x => B . y : O' < A >
@@ -550,11 +555,16 @@ defns
 	     O < s . A > atch ( environ <-> w )
 	     K ( O < A > ) = { ( r1 Port1 ) , .. , ( rn Portn ) }	     
 	     O < s . A > crt ( Port1 r1 , .. , Portn rn ) : O' < s . A >
+	     O < B > crt ( Port1 s . A . r1 , .. , Portn s . A . rn ) : O' < B >
+	     P_c crt ( wire w1 , .. , wire wn )
+	     O < B > atch ( s . A . r1 <-> w1 , .. , s . A . rn <-> wn )
+	     O < s . A > atch ( r1 <-> w1 , .. , rn <-> wn )
 	     K' = K [ O < s . A > -> { ( r1 Port1 ) , .. , ( rn Portn ) } ]
 	     K''  = K' [ O < B > -> K ( O < B > ) union { ( s . A . environ Port ) } ]
+	     K''' = K'' [ O < B > -> K ( O < B > ) union { ( s . A . r1 Port1 ) , .. , ( s . A . rn Portn ) } ]
 	------------------------------------------------------------- ::  openSession
-	E , K , P_c , O , D |- open  s  as  P ( x1 , .. , xi ) { A : B } : E' , K'' , P_c' , O' < B > , O' < s . A >
-
+	E , K , P_c , O , D |- open  s  as  P ( x1 , .. , xi ) { A : B } : E' , K''' , P_c' , O'
+	
 % Compilation rules for set
 	    E ( P , B , _ ) = O < B >
 	    E' = E [ ( P_c , A , D ) -> O < A . D > ]
@@ -571,21 +581,21 @@ defns
 	E , K , P_c , O , D |- set A as P ( x1 , .. , xi )::B : K'' , P_c' , E' , O' < A . D > , O' < D >
 
 	    O < D > apnd ( while ( true ) { /* str */ } ) : O' < D >
-	    O' < D > replace ( /* str */ , wstmt ) : O'' < D >
+	    E , K , O' , D |- wstmt : O''
 	------------------------------------------------------------- :: wrap
-	     O , D |- wrap { wstmt } : O'' < D >
+	     O , D |- wrap { wstmt } : O''
 	     
 	   O < D > crt ( wire w ) : O' < D >
-           pexp = ( A , r_1 )
-           pexp' = ( B , r_2 )
+	   O' , D |- pexp = ( A , r_1 )
+           O' , D |- pexp' = ( B , r_2 )
 	   O' < D > atch ( A . r_1 --> w )
 	   O' < D > atch ( B . r_2 <-- w )
 	------------------------------------------------------------ ::  connect_To
 	 O , D |- connect pexp to pexp' : O' < D >
 	 
 	    O < D > crt ( wire w ) : O' < D >
-	    pexp = ( A , r_1 ) 
-	    pexp' = ( B , r_2 )
+	    O' , D |-  pexp = ( A , r_1 ) 
+	    O' , D |- pexp' = ( B , r_2 )
 	    O' < D > atch ( A . r_1 <-> w )
 	    O' < D > atch ( B . r_2 <-> w )
 	------------------------------------------------------------ :: connect_And
@@ -597,13 +607,12 @@ defn
 
 	    pexp = ( A , r )
 	    E' = E [ ( _ , _ , _ ) -> O < Z > ]
-    	    E'' = E' [ ( _ , _ , _ ) -> O < Z' > ]
-	    O < Z > apnd ( if ( A . r . ITR ) { /* str */ } ) : O' < Z >
-	    O < Z' > |- stmt1 : O' < Z' >
-	    O' < Z' > |- stmtn : O'' < Z' >
-	    O' < Z > replace ( /* str */ , O'' < Z' > ) : O'' < Z >
+	    O < D > replace ( /* str */ , if ( A . r . ITR ) { /* str */ } ) : O' < D >
+	    O' , Z |- stmt1 : O''
+	    O'' , Z |- stmtn : O'''
+	    O' < D > replace ( /* str */ , O''' < Z' > ) : O'' < D >
 	------------------------------------------------------------- :: before
-	 E , O , D |- before pexp do { statement1 , .. , statementn } : E' , O'' < Z >
+	 E , O , D |- before pexp do { statement1 , .. , statementn } : E , O'
 
   	    pexp = ( A , r )
 	    E' = E [ ( _ , _ , _ ) -> O < A > ]
@@ -618,20 +627,27 @@ defn
 	E'' = E' [ ( P , A_m , _ ) -> O < A_m > ]
 	O < A_1 > crt ( tau1 x1 , .. , taun xn ; ) : O' < A_1 >
 	O' < A_1 > crt ( Port1 y1 , .. , Porti yi ) : O'' < A_1 >
-	O < A_1 > crt ( Port A2 , .. , Port Am ) : O < A_1 >
-	O < A_1 > crt ( Port environ ) : O < A_1 >
+	O'' < A_1 > crt ( Port A2 , .. , Port Am ) : O''' < A_1 >
+	O''' < A_1 > crt ( Port environ ) : O'''' < A_1 >
 	O < A_m > crt ( tau1 x1 , .. , taun xn ; ) : O' < A_m >
 	O' < A_m > crt ( Port1 y1 , .. , Porti yi ) : O'' < A_m >
-	O < A_m > crt ( Port A2 , .. , Port Am ) : O < A_m >
-	O < A_m > crt ( Port environ ) : O < A_m >
+	O'' < A_m > crt ( Port A1 , .. , Port Am-1 ) : O''' < A_m >
+	O''' < A_m > crt ( Port environ ) : O'''' < A_m >
 	% j = ( m * ( m  - 1 ) ) / 2 ----------> How do we write this calculation ?
 	P crt ( wire w1 , .. , wire wj )
-	O < A_1 > atch ( A_2 <-> w_1 )
-	O < A_1 > atch ( A_m <-> w_m-1 )
-	O < A_m > atch ( A_1 <-> w_i )
-	O < A_m > atch ( A_m-1 <-> w_j )
+	O'''' < A_1 > atch ( A_2 <-> w_1 )
+	O'''' < A_1 > atch ( A_m <-> w_m-1 )
+	O'''' < A_m > atch ( A_1 <-> w_i )
+	O'''' < A_m > atch ( A_m-1 <-> w_j )
+	K' = K [ O < A_1 > -> { ( y1 Port1 ) , .. , ( yi Porti ) } ]
+	K'' = K' [ O < A_1 > -> K ( O < A_1 > ) union { ( A2 Port ) , .. , ( Am Port ) }
+	K''' = K'' [ O < A_1 > -> K ( O < A_1 > ) union { ( environ Port ) } ]
+	K'''' = K''' [ O < A_m > -> { ( y1 Port1 ) , .. , ( yi Porti ) } ]
+	K''''' = K'''' [ O < A_m > -> K ( O < A_m > ) union { ( A_1 Port ) , .. , ( A_m-1 Port ) } ]
+	K'''''' = K''''' [ O < A_m > -> K ( O < A_m > ) union { ( environ Port ) } ]
+	E'' , K'''''' , P , O'''' , A_1 |- stmt : E''' , K''''''' , P' , O'''''
 	------------------------------------------------------------------------- :: prtcl
-	 E , K , P_c , O , D |- protocol P ( tau1 x1 , .. , taun xn ( prtcl' ) ) : party A each with { Port1 y1 , .. , Porti yi } { stmt } : O' < D >
+	 E , K , O , D |- protocol P ( tau1 x1 , .. , taun xn ( prtcl' ) ) : party A each with { Port1 y1 , .. , Porti yi } { stmt } : E' , K''''''' , O'''''
 
 defn
 	Cenv |- exp : impl_instr :: ::  exp_com :: Compl_
@@ -646,7 +662,11 @@ defn
 	{{ com Compiling Port Expression }} by
 
 	---------------------------------------------------- :: ExpToEnv
-	_ |- s . A I r : ( s . A , r )
+	O , D |- s . A I r : ( s . A , r )
 
 	---------------------------------------------------- :: PortOfAnotherParty
-	_ |- A I B : ( A , B )
+	O , D |- A I B : ( A , B )
+
+
+	------------------------------------------------- :: OnlyPortOfCurntParty
+	O , D |- r : ( D , r )
