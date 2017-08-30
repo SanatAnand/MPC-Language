@@ -37,7 +37,7 @@ protocol wrapinner (int nC, int nS, int index, int sp, field F /* FIXME Adding f
 		connect environ to { Wout, QP[i]|environ }; 
 		for each QP[i]|P[#j] except j from {i}
 			connect QP[i]|P[j] to { R[j]|environ, QP[j]|P[i] }; /* FIXME desugaring it to two separate statements */
-		
+		/* FIXME I am assuming R[j]|env exists in R[i] */
 		// now starting QP[]. OK that some messages will be
 		// to/from ports of R[i] that will be wrapped
 		start QP[i];
