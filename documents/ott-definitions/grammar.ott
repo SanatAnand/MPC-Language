@@ -312,11 +312,12 @@ impl_instr :: 'ImplInstr' ::= {{ com Instructions from the implementation langua
 impl_expr :: 'ImplExpr' ::= {{ com Expressions for the implementation language }}
 	    | constant :: :: cnstnt {{ com Booleans like true or false }}
 	    | portname :: :: prtname {{ com Portname }}
-	    | portname . ITR :: :: prtintentToread {{ com Port intent to read }}
+	    | portname . ITR :: :: prt_intentToread {{ com Port intent to read }}
+	    | portname . HWR :: :: prt_hwritten {{ com Port have written }}
 	    
 % Type Checking rules ----------------------------------------------
 defns
-  Jtype :: '' ::= 
+  Jtype :: '' ::=  
   
   % Type checking constants
   defn
@@ -332,13 +333,19 @@ defns
 	G , M , R , S , L , C|- false : Bool
 	
  % Type checking Statements
-  defn 	Tenv |- stmt : tau , Tenv' :: :: Stmt :: Stmt_ by
+  defn 	Tenv |- stmt : tau , Tenv' :: :: Stmt :: Stmt_ {{ com Checking Statements }}by 
+
+	{{ com
+\subsubsection{Declaration} The type checking of declaring a variable simply checks if a variab }}
 
   	     	G ( x ) != ( _ , C )
 		G' = G [ x -> ( tau , C ) ]
 		% TODO: see how we change R here
 	------------------------------------------------------ :: decl
-	G , M , R , S , L, C |- tau x ; : () , G' , M , R , S , L , C 
+	G , M , R , S , L, C |- tau x ; : () , G' , M , R , S , L , C
+
+{{ com
+\subsubsection{Sequence} The type checking of declaring a variable simply checks if a variab }}
 
 	G , M , R , S , L , _ |- statement : () , G' , M , R , S' , L'
 	G' , M , R , S' , L' , _ |- statement' : () , G'' , M , R , S'' , L''
@@ -492,7 +499,7 @@ The following rules define the compilation sematics of our language. Our languag
 first gets compiled to the following representation.
 }}
 % G , M , R , S , L , C |- 
-% ************* Opertional Semantics rule ================================================================
+% ************* Opertional Semantics rule =======================================================
 defns
   Jop :: '' ::=
   defn
@@ -613,9 +620,13 @@ defn
 	 E , O , D |- before pexp do { statement1 , .. , statementn } : E , O'
 
 	    O , D  |- pexp = ( A , r )
-	    E' = E [ ( _ , _ , _ ) -> O < A > ]
+	    E' = E [ ( _ , _ , Z ) -> O < Z > ]
+	    O < D > replace ( /* str */ , if ( A . r . HWR ) { /* str */ } ) : O' < D >
+	    O' , Z |- stmt1 : O''
+	    O'' , Z |- stmtn : O'''
+	    O' < D > replace ( /* str */ , O''' < Z > ) : O'' < D >	    
 	------------------------------------------------------------- :: after
-	  E , O , D |- after pexp do { statement1 , .. , statementn } : O < Z >
+	  E , O , D |- after pexp do { statement1 , .. , statementn } : E , O'
 defn
 	Cenv |- prtcl : Cenv' :: ::  prtcl_com :: Compl_
 	{{ com Compiling Protocol }} by
