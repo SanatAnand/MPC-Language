@@ -93,7 +93,7 @@ protocol IPS (int nClnts, int nSrvrs, int sp, field F,
 	/* FIXME desugaring it to the following. That is explicitly declaring W first */
 	session W;
 	
-	open session W as watchlist(nClnts, nSrvrs, sp, F) {
+	open W as watchlist(nClnts, nSrvrs, sp, F) {
 		P[]:C[];
 	}
 
@@ -111,13 +111,13 @@ protocol IPS (int nClnts, int nSrvrs, int sp, field F,
 	/* FIXME again desugaring */
 	session Out;
 	
-	partial open session Out as outer(nClnts, nSrvrs, sp, F) {
+	partial open Out as outer(nClnts, nSrvrs, sp, F) {
 		Clnt[]:C[];
 	}
 
 	in each C[#i] {
 		for each o of Out.Clnt[i]|Srvr[#s]
 			connect o and In[s].R[i];
-		connect environ and Out.Clnt[i]; /* FIXME who's environment ? Should the syntax highlight that */
+		connect environ and Out.Clnt[i]; 
 	}
 }
