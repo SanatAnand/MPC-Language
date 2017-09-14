@@ -22,7 +22,7 @@ bool currently_in_block = false;
 
 inline void Parser::error(char const *msg)
 {
-    std::cerr << msg << '\n';
+    std::cerr << msg<<" at line "<<get_line_number()<< '\n';
 }
 
 inline int Parser::lex()

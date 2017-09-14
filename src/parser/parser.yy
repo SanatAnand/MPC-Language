@@ -1052,6 +1052,14 @@ statement:
 		$$ = $1;
 	}
 	}
+|
+	error ';'
+	{
+	if(NOT_ONLY_PARSE)
+	{
+		$$ = new Abort_Ast(get_line_number());
+	}
+	}
 ;
 
 abort_statement:
@@ -1736,3 +1744,19 @@ constant:
 ;
 
 //////////////////////////////////////////////////////
+
+// %%
+// void yyerror(char *s){
+//     fprintf(stderr,"%s Error at line: %d\n",s, linenum);
+// }
+// int yywrap(){
+//     return 1;
+// }
+// int main(int argc, char *argv[])
+// {
+//     /* Call the lexer, then quit. */
+//     yyin=fopen(argv[1],"r");
+//     yyparse();
+//     fclose(yyin);
+//     return 0;
+// }
