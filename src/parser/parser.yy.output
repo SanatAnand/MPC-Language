@@ -1,0 +1,4661 @@
+[parser.yy (info)] Line 1765: 
+Production Rules
+(rule precedences determined from %prec or 1st terminal between parentheses):
+1: program ->  protocol_list
+2: protocol_list ->  protocol
+3: protocol_list ->  protocol protocol_list
+4: protocol ('{') ->  prot_decl '{' #0001 opt_uses #0002 statement_list '}'
+5: #0001 ->  <empty>
+6: #0002 ->  <empty>
+7: prot_decl (PROTOCOL) ->  PROTOCOL NAME '(' opt_arg_list ')' ':' PARTY p_list
+8: p_list ->  p_list_elem
+9: p_list (',') ->  p_list ',' p_list_elem
+10: p_list_elem ->  exp opt_port_clause
+11: opt_port_clause ->  <empty>
+12: opt_port_clause (WITH) ->  opt_each WITH port_clause
+13: port_clause ('{') ->  '{' port_decl_list '}'
+14: port_decl_list ->  port_decl
+15: port_decl_list (',') ->  port_decl_list ',' port_decl
+16: port_decl ->  type term
+17: opt_arg_list ->  <empty>
+18: opt_arg_list ->  arg_list
+19: arg_list ->  arg
+20: arg_list (',') ->  arg_list ',' arg
+21: arg ->  type term
+22: arg ('(') ->  '(' prot_decl ')'
+23: term ->  variable dimlist
+24: term ('#') ->  '#' variable
+25: term ('@') ->  '@'
+26: term (RAND) ->  RAND
+27: term ->  constant
+28: term (ENV) ->  ENV
+29: term (IDEAL) ->  IDEAL
+30: term (RAND_PORT) ->  RAND_PORT
+31: term (ENV_PORT) ->  ENV_PORT
+32: term (DOUBLE_DOT) ->  DOUBLE_DOT
+33: dimlist ->  <empty>
+34: dimlist ('[') ->  dimlist '[' exp ']'
+35: dimlist ('[') ->  dimlist '[' ']'
+36: exp ('+') ->  exp '+' exp
+37: exp ('-') ->  exp '-' exp
+38: exp ('*') ->  exp '*' exp
+39: exp ('/') ->  exp '/' exp
+40: exp ('%') ->  exp '%' exp
+41: exp (UMINUS) ->  '-' exp
+42: exp (B_AND) ->  exp B_AND exp
+43: exp (OR) ->  exp OR exp
+44: exp (NOT) ->  NOT exp
+45: exp (EQ) ->  exp EQ exp
+46: exp (LT) ->  exp LT exp
+47: exp (GT) ->  exp GT exp
+48: exp (NE) ->  exp NE exp
+49: exp (LE) ->  exp LE exp
+50: exp (GE) ->  exp GE exp
+51: exp ('(') ->  '(' exp ')'
+52: exp ('|') ->  exp '|' term
+53: exp ('.') ->  term '.' exp
+54: exp (FROM) ->  term FROM exp_list
+55: exp ->  exp_list
+56: exp ->  term
+57: opt_uses ->  <empty>
+58: opt_uses (USES) ->  USES prot_decl_list ';'
+59: prot_decl_list ->  prot_decl
+60: prot_decl_list ->  prot_decl_list prot_decl
+61: statement_list ->  statement
+62: statement_list ->  statement_list statement
+63: statement ->  assignment_statement
+64: statement ->  mult_statement
+65: statement ->  pvt_statement
+66: statement ->  with_statement
+67: statement ->  send_statement
+68: statement ->  session_call
+69: statement ->  tying_statement
+70: statement ->  declaration_statement
+71: statement ->  protocol
+72: statement ->  loop_statement
+73: statement ->  cond_statement
+74: statement ->  wrap_statement
+75: statement ->  connect_statement
+76: statement ->  abort_statement
+77: statement ->  seq_statement
+78: statement ->  start_statement
+79: statement ->  set_statement
+80: statement ->  forward_statement
+81: statement (_error_) ->  _error_ ';'
+82: abort_statement (ABORTING) ->  ABORTING ';'
+83: wrap_statement (WRAP) ->  WRAP statement
+84: start_statement (START) ->  START exp ';'
+85: seq_statement (BEFORE) ->  BEFORE opt_each_expr '{' statement_list '}'
+86: seq_statement (AFTER) ->  AFTER opt_each_expr '{' statement_list '}'
+87: opt_each ->  <empty>
+88: opt_each (EACH) ->  EACH
+89: assignment_statement (ASSIGN) ->  term ASSIGN exp ';'
+90: mult_statement ('{') ->  '{' statement_list '}'
+91: pvt_statement (IN) ->  IN opt_each_expr '{' statement_list '}'
+92: with_statement (WITH) ->  WITH opt_each_expr '{' port_decl_list '}' ';'
+93: send_statement (SEND) ->  exp SEND exp ';'
+94: session_call (OPEN) ->  opt_partial OPEN term AS prot_call '{' statement_list '}'
+95: opt_partial ->  <empty>
+96: opt_partial (PARTIAL) ->  PARTIAL
+97: prot_call (NAME) ->  NAME '(' opt_id_list ')'
+98: opt_id_list ->  <empty>
+99: opt_id_list ->  id_list
+100: id_list ->  variable
+101: id_list (',') ->  id_list ',' variable
+102: tying_statement (':') ->  exp ':' exp ';'
+103: declaration_statement (';') ->  type varlist ';'
+104: type (PARTY) ->  PARTY
+105: type (INTEGER) ->  INTEGER
+106: type (SESSION) ->  SESSION
+107: type (UNKNOWN) ->  UNKNOWN
+108: type (PORT) ->  PORT
+109: type (INPORT) ->  INPORT
+110: type (OUTPORT) ->  OUTPORT
+111: type (BOOL) ->  BOOL
+112: type (FIELD) ->  FIELD
+113: type (NAME) ->  NAME
+114: varlist ->  decl_term
+115: varlist (',') ->  varlist ',' decl_term
+116: decl_term ->  term opt_port_clause
+117: loop_statement (FOR) ->  FOR each_expr statement
+118: opt_each_expr ->  exp
+119: opt_each_expr ->  each_expr
+120: each_expr (EACH) ->  EACH variable OF exp opt_cond
+121: each_expr (EACH) ->  EACH exp opt_cond
+122: each_expr (EACH) ->  EACH variable OF exp
+123: each_expr (EACH) ->  EACH exp
+124: opt_cond (EXCEPT) ->  EXCEPT exp
+125: opt_cond (WHERE) ->  WHERE exp
+126: cond_statement (THEN) ->  IF '(' exp ')' statement
+127: cond_statement (IF) ->  IF '(' exp ')' statement ELSE statement
+128: set_statement (SET) ->  SET exp AS prot_call DOUBLE_COLON exp ';'
+129: connect_statement (CONNECT) ->  CONNECT exp to_and exp ';'
+130: to_and (TO) ->  TO
+131: to_and (AND) ->  AND
+132: exp_list ('{') ->  '{' exp_list_elem '}'
+133: exp_list_elem ->  exp
+134: exp_list_elem (',') ->  exp_list_elem ',' exp
+135: forward_statement (FORWARD) ->  FORWARD exp TO exp ';'
+136: variable (NAME) ->  NAME
+137: constant (INTEGER_NUMBER) ->  INTEGER_NUMBER
+138: program_$ ->  program
+
+[parser.yy (info)] 
+Symbolic Terminal tokens:
+       error
+       EOF
+   257: INTEGER_NUMBER
+   258: NAME
+   259: INTEGER
+   260: FIELD
+   261: PROTOCOL
+   262: ASSIGN
+   263: PARTY
+   264: SEND
+   265: IDEAL
+   266: ENV
+   267: IN
+   268: OPEN
+   269: AS
+   270: RAND
+   271: USES
+   272: ABORTING
+   273: WRAP
+   274: START
+   275: BEFORE
+   276: AFTER
+   277: EACH
+   278: SESSION
+   279: UNKNOWN
+   280: PORT
+   281: INPORT
+   282: OUTPORT
+   283: FOR
+   284: OF
+   285: EXCEPT
+   286: WHERE
+   287: IF
+   288: SET
+   289: CONNECT
+   290: TO
+   291: FORWARD
+   292: AND
+   293: ENV_PORT
+   294: RAND_PORT
+   295: BOOL
+   296: PARTIAL
+   297: WITH
+   298: DOUBLE_COLON
+   299: DOUBLE_DOT
+   300: FROM
+   301: OR
+   302: B_AND
+   303: EQ
+   304: NE
+   305: LT
+   306: LE
+   307: GE
+   308: GT
+    43: '+'
+    45: '-'
+    42: '*'
+    47: '/'
+    37: '%'
+   309: UMINUS
+   310: NOT
+    46: '.'
+   124: '|'
+    40: '('
+   311: THEN
+   312: ELSE
+   123: '{'
+   125: '}'
+    41: ')'
+    58: ':'
+    44: ','
+    35: '#'
+    64: '@'
+    91: '['
+    93: ']'
+    59: ';'
+
+[parser.yy (info)] 
+Grammar States: 
+[parser.yy (info)] State 0:
+138: program_$ ->  . program 
+  0:   On program to state 1
+  1:   On protocol_list to state 2
+  2:   On protocol to state 3
+  3:   On prot_decl to state 4
+  4:   On PROTOCOL to state 5
+
+
+State 1:
+138: program_$ -> program  . 
+
+
+State 2:
+1: program -> protocol_list  . 
+  Reduce by 1: program -> protocol_list  . 
+
+
+State 3:
+2: protocol_list -> protocol  . 
+3: protocol_list -> protocol  . protocol_list 
+  0:   On protocol_list to state 6
+  1:   On protocol to state 3
+  2:   On prot_decl to state 4
+  3:   On PROTOCOL to state 5
+  Reduce by 2: protocol_list -> protocol  . 
+
+
+State 4:
+4: protocol -> prot_decl  . '{' #0001 opt_uses #0002 statement_list '}' 
+  0:   On '{' to state 7
+
+
+State 5:
+7: prot_decl -> PROTOCOL  . NAME '(' opt_arg_list ')' ':' PARTY p_list 
+  0:   On NAME to state 8
+
+
+State 6:
+3: protocol_list -> protocol protocol_list  . 
+  Reduce by 3: protocol_list -> protocol protocol_list  . 
+
+
+State 7:
+4: protocol -> prot_decl '{'  . #0001 opt_uses #0002 statement_list '}' 
+  0:   On #0001 to state 9
+  Reduce by 5: #0001 ->  . 
+
+
+State 8:
+7: prot_decl -> PROTOCOL NAME  . '(' opt_arg_list ')' ':' PARTY p_list 
+  0:   On '(' to state 10
+
+
+State 9:
+4: protocol -> prot_decl '{' #0001  . opt_uses #0002 statement_list '}' 
+  0:   On opt_uses to state 11
+  1:   On USES to state 12
+  Reduce by 57: opt_uses ->  . 
+
+
+State 10:
+7: prot_decl -> PROTOCOL NAME '('  . opt_arg_list ')' ':' PARTY p_list 
+  0:   On opt_arg_list to state 13
+  1:   On arg_list to state 14
+  2:   On arg to state 15
+  3:   On type to state 16
+  4:   On '(' to state 17
+  5:   On PARTY to state 18
+  6:   On INTEGER to state 19
+  7:   On SESSION to state 20
+  8:   On UNKNOWN to state 21
+  9:   On PORT to state 22
+  10:   On INPORT to state 23
+  11:   On OUTPORT to state 24
+  12:   On BOOL to state 25
+  13:   On FIELD to state 26
+  14:   On NAME to state 27
+  Reduce by 17: opt_arg_list ->  . 
+
+
+State 11:
+4: protocol -> prot_decl '{' #0001 opt_uses  . #0002 statement_list '}' 
+  0:   On #0002 to state 28
+  Reduce by 6: #0002 ->  . 
+
+
+State 12:
+58: opt_uses -> USES  . prot_decl_list ';' 
+  0:   On prot_decl_list to state 29
+  1:   On prot_decl to state 30
+  2:   On PROTOCOL to state 5
+
+
+State 13:
+7: prot_decl -> PROTOCOL NAME '(' opt_arg_list  . ')' ':' PARTY p_list 
+  0:   On ')' to state 31
+
+
+State 14:
+18: opt_arg_list -> arg_list  . 
+20: arg_list -> arg_list  . ',' arg 
+  0:   On ',' to state 32
+  Reduce by 18: opt_arg_list -> arg_list  . 
+
+
+State 15:
+19: arg_list -> arg  . 
+  Reduce by 19: arg_list -> arg  . 
+
+
+State 16:
+21: arg -> type  . term 
+  0:   On term to state 33
+  1:   On variable to state 34
+  2:   On '#' to state 35
+  3:   On '@' to state 36
+  4:   On RAND to state 37
+  5:   On constant to state 38
+  6:   On ENV to state 39
+  7:   On IDEAL to state 40
+  8:   On RAND_PORT to state 41
+  9:   On ENV_PORT to state 42
+  10:   On DOUBLE_DOT to state 43
+  11:   On NAME to state 44
+  12:   On INTEGER_NUMBER to state 45
+
+
+State 17:
+22: arg -> '('  . prot_decl ')' 
+  0:   On prot_decl to state 46
+  1:   On PROTOCOL to state 5
+
+
+State 18:
+104: type -> PARTY  . 
+  Reduce by 104: type -> PARTY  . 
+
+
+State 19:
+105: type -> INTEGER  . 
+  Reduce by 105: type -> INTEGER  . 
+
+
+State 20:
+106: type -> SESSION  . 
+  Reduce by 106: type -> SESSION  . 
+
+
+State 21:
+107: type -> UNKNOWN  . 
+  Reduce by 107: type -> UNKNOWN  . 
+
+
+State 22:
+108: type -> PORT  . 
+  Reduce by 108: type -> PORT  . 
+
+
+State 23:
+109: type -> INPORT  . 
+  Reduce by 109: type -> INPORT  . 
+
+
+State 24:
+110: type -> OUTPORT  . 
+  Reduce by 110: type -> OUTPORT  . 
+
+
+State 25:
+111: type -> BOOL  . 
+  Reduce by 111: type -> BOOL  . 
+
+
+State 26:
+112: type -> FIELD  . 
+  Reduce by 112: type -> FIELD  . 
+
+
+State 27:
+113: type -> NAME  . 
+  Reduce by 113: type -> NAME  . 
+
+
+State 28:
+4: protocol -> prot_decl '{' #0001 opt_uses #0002  . statement_list '}' 
+  0:   On statement_list to state 47
+  1:   On statement to state 48
+  2:   On assignment_statement to state 49
+  3:   On mult_statement to state 50
+  4:   On pvt_statement to state 51
+  5:   On with_statement to state 52
+  6:   On send_statement to state 53
+  7:   On session_call to state 54
+  8:   On tying_statement to state 55
+  9:   On declaration_statement to state 56
+  10:   On protocol to state 57
+  11:   On loop_statement to state 58
+  12:   On cond_statement to state 59
+  13:   On wrap_statement to state 60
+  14:   On connect_statement to state 61
+  15:   On abort_statement to state 62
+  16:   On seq_statement to state 63
+  17:   On start_statement to state 64
+  18:   On set_statement to state 65
+  19:   On forward_statement to state 66
+  20:   On _error_ to state 67
+  21:   On term to state 68
+  22:   On '{' to state 69
+  23:   On IN to state 70
+  24:   On WITH to state 71
+  25:   On exp to state 72
+  26:   On opt_partial to state 73
+  27:   On type to state 74
+  28:   On prot_decl to state 4
+  29:   On FOR to state 75
+  30:   On IF to state 76
+  31:   On WRAP to state 77
+  32:   On CONNECT to state 78
+  33:   On ABORTING to state 79
+  34:   On BEFORE to state 80
+  35:   On AFTER to state 81
+  36:   On START to state 82
+  37:   On SET to state 83
+  38:   On FORWARD to state 84
+  39:   On variable to state 34
+  40:   On '#' to state 35
+  41:   On '@' to state 36
+  42:   On RAND to state 37
+  43:   On constant to state 38
+  44:   On ENV to state 39
+  45:   On IDEAL to state 40
+  46:   On RAND_PORT to state 41
+  47:   On ENV_PORT to state 42
+  48:   On DOUBLE_DOT to state 43
+  49:   On '-' to state 85
+  50:   On NOT to state 86
+  51:   On '(' to state 87
+  52:   On exp_list to state 88
+  53:   On PARTIAL to state 89
+  54:   On PARTY to state 18
+  55:   On INTEGER to state 19
+  56:   On SESSION to state 20
+  57:   On UNKNOWN to state 21
+  58:   On PORT to state 22
+  59:   On INPORT to state 23
+  60:   On OUTPORT to state 24
+  61:   On BOOL to state 25
+  62:   On FIELD to state 26
+  63:   On NAME to state 90
+  64:   On PROTOCOL to state 5
+  65:   On INTEGER_NUMBER to state 45
+  Reduce by 95: opt_partial ->  . 
+
+
+State 29:
+58: opt_uses -> USES prot_decl_list  . ';' 
+60: prot_decl_list -> prot_decl_list  . prot_decl 
+  0:   On ';' to state 91
+  1:   On prot_decl to state 92
+  2:   On PROTOCOL to state 5
+
+
+State 30:
+59: prot_decl_list -> prot_decl  . 
+  Reduce by 59: prot_decl_list -> prot_decl  . 
+
+
+State 31:
+7: prot_decl -> PROTOCOL NAME '(' opt_arg_list ')'  . ':' PARTY p_list 
+  0:   On ':' to state 93
+
+
+State 32:
+20: arg_list -> arg_list ','  . arg 
+  0:   On arg to state 94
+  1:   On type to state 16
+  2:   On '(' to state 17
+  3:   On PARTY to state 18
+  4:   On INTEGER to state 19
+  5:   On SESSION to state 20
+  6:   On UNKNOWN to state 21
+  7:   On PORT to state 22
+  8:   On INPORT to state 23
+  9:   On OUTPORT to state 24
+  10:   On BOOL to state 25
+  11:   On FIELD to state 26
+  12:   On NAME to state 27
+
+
+State 33:
+21: arg -> type term  . 
+  Reduce by 21: arg -> type term  . 
+
+
+State 34:
+23: term -> variable  . dimlist 
+  0:   On dimlist to state 95
+  Reduce by 33: dimlist ->  . 
+
+
+State 35:
+24: term -> '#'  . variable 
+  0:   On variable to state 96
+  1:   On NAME to state 44
+
+
+State 36:
+25: term -> '@'  . 
+  Reduce by 25: term -> '@'  . 
+
+
+State 37:
+26: term -> RAND  . 
+  Reduce by 26: term -> RAND  . 
+
+
+State 38:
+27: term -> constant  . 
+  Reduce by 27: term -> constant  . 
+
+
+State 39:
+28: term -> ENV  . 
+  Reduce by 28: term -> ENV  . 
+
+
+State 40:
+29: term -> IDEAL  . 
+  Reduce by 29: term -> IDEAL  . 
+
+
+State 41:
+30: term -> RAND_PORT  . 
+  Reduce by 30: term -> RAND_PORT  . 
+
+
+State 42:
+31: term -> ENV_PORT  . 
+  Reduce by 31: term -> ENV_PORT  . 
+
+
+State 43:
+32: term -> DOUBLE_DOT  . 
+  Reduce by 32: term -> DOUBLE_DOT  . 
+
+
+State 44:
+136: variable -> NAME  . 
+  Reduce by 136: variable -> NAME  . 
+
+
+State 45:
+137: constant -> INTEGER_NUMBER  . 
+  Reduce by 137: constant -> INTEGER_NUMBER  . 
+
+
+State 46:
+22: arg -> '(' prot_decl  . ')' 
+  0:   On ')' to state 97
+
+
+State 47:
+4: protocol -> prot_decl '{' #0001 opt_uses #0002 statement_list  . '}' 
+62: statement_list -> statement_list  . statement 
+  0:   On '}' to state 98
+  1:   On statement to state 99
+  2:   On assignment_statement to state 49
+  3:   On mult_statement to state 50
+  4:   On pvt_statement to state 51
+  5:   On with_statement to state 52
+  6:   On send_statement to state 53
+  7:   On session_call to state 54
+  8:   On tying_statement to state 55
+  9:   On declaration_statement to state 56
+  10:   On protocol to state 57
+  11:   On loop_statement to state 58
+  12:   On cond_statement to state 59
+  13:   On wrap_statement to state 60
+  14:   On connect_statement to state 61
+  15:   On abort_statement to state 62
+  16:   On seq_statement to state 63
+  17:   On start_statement to state 64
+  18:   On set_statement to state 65
+  19:   On forward_statement to state 66
+  20:   On _error_ to state 67
+  21:   On term to state 68
+  22:   On '{' to state 69
+  23:   On IN to state 70
+  24:   On WITH to state 71
+  25:   On exp to state 72
+  26:   On opt_partial to state 73
+  27:   On type to state 74
+  28:   On prot_decl to state 4
+  29:   On FOR to state 75
+  30:   On IF to state 76
+  31:   On WRAP to state 77
+  32:   On CONNECT to state 78
+  33:   On ABORTING to state 79
+  34:   On BEFORE to state 80
+  35:   On AFTER to state 81
+  36:   On START to state 82
+  37:   On SET to state 83
+  38:   On FORWARD to state 84
+  39:   On variable to state 34
+  40:   On '#' to state 35
+  41:   On '@' to state 36
+  42:   On RAND to state 37
+  43:   On constant to state 38
+  44:   On ENV to state 39
+  45:   On IDEAL to state 40
+  46:   On RAND_PORT to state 41
+  47:   On ENV_PORT to state 42
+  48:   On DOUBLE_DOT to state 43
+  49:   On '-' to state 85
+  50:   On NOT to state 86
+  51:   On '(' to state 87
+  52:   On exp_list to state 88
+  53:   On PARTIAL to state 89
+  54:   On PARTY to state 18
+  55:   On INTEGER to state 19
+  56:   On SESSION to state 20
+  57:   On UNKNOWN to state 21
+  58:   On PORT to state 22
+  59:   On INPORT to state 23
+  60:   On OUTPORT to state 24
+  61:   On BOOL to state 25
+  62:   On FIELD to state 26
+  63:   On NAME to state 90
+  64:   On PROTOCOL to state 5
+  65:   On INTEGER_NUMBER to state 45
+  Reduce by 95: opt_partial ->  . 
+
+
+State 48:
+61: statement_list -> statement  . 
+  Reduce by 61: statement_list -> statement  . 
+
+
+State 49:
+63: statement -> assignment_statement  . 
+  Reduce by 63: statement -> assignment_statement  . 
+
+
+State 50:
+64: statement -> mult_statement  . 
+  Reduce by 64: statement -> mult_statement  . 
+
+
+State 51:
+65: statement -> pvt_statement  . 
+  Reduce by 65: statement -> pvt_statement  . 
+
+
+State 52:
+66: statement -> with_statement  . 
+  Reduce by 66: statement -> with_statement  . 
+
+
+State 53:
+67: statement -> send_statement  . 
+  Reduce by 67: statement -> send_statement  . 
+
+
+State 54:
+68: statement -> session_call  . 
+  Reduce by 68: statement -> session_call  . 
+
+
+State 55:
+69: statement -> tying_statement  . 
+  Reduce by 69: statement -> tying_statement  . 
+
+
+State 56:
+70: statement -> declaration_statement  . 
+  Reduce by 70: statement -> declaration_statement  . 
+
+
+State 57:
+71: statement -> protocol  . 
+  Reduce by 71: statement -> protocol  . 
+
+
+State 58:
+72: statement -> loop_statement  . 
+  Reduce by 72: statement -> loop_statement  . 
+
+
+State 59:
+73: statement -> cond_statement  . 
+  Reduce by 73: statement -> cond_statement  . 
+
+
+State 60:
+74: statement -> wrap_statement  . 
+  Reduce by 74: statement -> wrap_statement  . 
+
+
+State 61:
+75: statement -> connect_statement  . 
+  Reduce by 75: statement -> connect_statement  . 
+
+
+State 62:
+76: statement -> abort_statement  . 
+  Reduce by 76: statement -> abort_statement  . 
+
+
+State 63:
+77: statement -> seq_statement  . 
+  Reduce by 77: statement -> seq_statement  . 
+
+
+State 64:
+78: statement -> start_statement  . 
+  Reduce by 78: statement -> start_statement  . 
+
+
+State 65:
+79: statement -> set_statement  . 
+  Reduce by 79: statement -> set_statement  . 
+
+
+State 66:
+80: statement -> forward_statement  . 
+  Reduce by 80: statement -> forward_statement  . 
+
+
+State 67:
+81: statement -> _error_  . ';' 
+  0:   On ';' to state 100
+
+
+State 68:
+89: assignment_statement -> term  . ASSIGN exp ';' 
+53: exp -> term  . '.' exp 
+54: exp -> term  . FROM exp_list 
+56: exp -> term  . 
+  0:   On ASSIGN to state 101
+  1:   On '.' to state 102
+  2:   On FROM to state 103
+  Reduce by 56: exp -> term  . 
+
+
+State 69:
+90: mult_statement -> '{'  . statement_list '}' 
+132: exp_list -> '{'  . exp_list_elem '}' 
+  0:   On statement_list to state 104
+  1:   On exp_list_elem to state 105
+  2:   On statement to state 48
+  3:   On exp to state 106
+  4:   On assignment_statement to state 49
+  5:   On mult_statement to state 50
+  6:   On pvt_statement to state 51
+  7:   On with_statement to state 52
+  8:   On send_statement to state 53
+  9:   On session_call to state 54
+  10:   On tying_statement to state 55
+  11:   On declaration_statement to state 56
+  12:   On protocol to state 57
+  13:   On loop_statement to state 58
+  14:   On cond_statement to state 59
+  15:   On wrap_statement to state 60
+  16:   On connect_statement to state 61
+  17:   On abort_statement to state 62
+  18:   On seq_statement to state 63
+  19:   On start_statement to state 64
+  20:   On set_statement to state 65
+  21:   On forward_statement to state 66
+  22:   On _error_ to state 67
+  23:   On '-' to state 85
+  24:   On NOT to state 86
+  25:   On '(' to state 87
+  26:   On term to state 68
+  27:   On exp_list to state 88
+  28:   On '{' to state 69
+  29:   On IN to state 70
+  30:   On WITH to state 71
+  31:   On opt_partial to state 73
+  32:   On type to state 74
+  33:   On prot_decl to state 4
+  34:   On FOR to state 75
+  35:   On IF to state 76
+  36:   On WRAP to state 77
+  37:   On CONNECT to state 78
+  38:   On ABORTING to state 79
+  39:   On BEFORE to state 80
+  40:   On AFTER to state 81
+  41:   On START to state 82
+  42:   On SET to state 83
+  43:   On FORWARD to state 84
+  44:   On variable to state 34
+  45:   On '#' to state 35
+  46:   On '@' to state 36
+  47:   On RAND to state 37
+  48:   On constant to state 38
+  49:   On ENV to state 39
+  50:   On IDEAL to state 40
+  51:   On RAND_PORT to state 41
+  52:   On ENV_PORT to state 42
+  53:   On DOUBLE_DOT to state 43
+  54:   On PARTIAL to state 89
+  55:   On PARTY to state 18
+  56:   On INTEGER to state 19
+  57:   On SESSION to state 20
+  58:   On UNKNOWN to state 21
+  59:   On PORT to state 22
+  60:   On INPORT to state 23
+  61:   On OUTPORT to state 24
+  62:   On BOOL to state 25
+  63:   On FIELD to state 26
+  64:   On NAME to state 90
+  65:   On PROTOCOL to state 5
+  66:   On INTEGER_NUMBER to state 45
+  Reduce by 95: opt_partial ->  . 
+
+
+State 70:
+91: pvt_statement -> IN  . opt_each_expr '{' statement_list '}' 
+  0:   On opt_each_expr to state 107
+  1:   On exp to state 108
+  2:   On each_expr to state 109
+  3:   On '-' to state 85
+  4:   On NOT to state 86
+  5:   On '(' to state 87
+  6:   On term to state 110
+  7:   On exp_list to state 88
+  8:   On EACH to state 111
+  9:   On variable to state 34
+  10:   On '#' to state 35
+  11:   On '@' to state 36
+  12:   On RAND to state 37
+  13:   On constant to state 38
+  14:   On ENV to state 39
+  15:   On IDEAL to state 40
+  16:   On RAND_PORT to state 41
+  17:   On ENV_PORT to state 42
+  18:   On DOUBLE_DOT to state 43
+  19:   On '{' to state 112
+  20:   On NAME to state 44
+  21:   On INTEGER_NUMBER to state 45
+
+
+State 71:
+92: with_statement -> WITH  . opt_each_expr '{' port_decl_list '}' ';' 
+  0:   On opt_each_expr to state 113
+  1:   On exp to state 108
+  2:   On each_expr to state 109
+  3:   On '-' to state 85
+  4:   On NOT to state 86
+  5:   On '(' to state 87
+  6:   On term to state 110
+  7:   On exp_list to state 88
+  8:   On EACH to state 111
+  9:   On variable to state 34
+  10:   On '#' to state 35
+  11:   On '@' to state 36
+  12:   On RAND to state 37
+  13:   On constant to state 38
+  14:   On ENV to state 39
+  15:   On IDEAL to state 40
+  16:   On RAND_PORT to state 41
+  17:   On ENV_PORT to state 42
+  18:   On DOUBLE_DOT to state 43
+  19:   On '{' to state 112
+  20:   On NAME to state 44
+  21:   On INTEGER_NUMBER to state 45
+
+
+State 72:
+93: send_statement -> exp  . SEND exp ';' 
+102: tying_statement -> exp  . ':' exp ';' 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On SEND to state 114
+  1:   On ':' to state 115
+  2:   On '+' to state 116
+  3:   On '-' to state 117
+  4:   On '*' to state 118
+  5:   On '/' to state 119
+  6:   On '%' to state 120
+  7:   On B_AND to state 121
+  8:   On OR to state 122
+  9:   On EQ to state 123
+  10:   On LT to state 124
+  11:   On GT to state 125
+  12:   On NE to state 126
+  13:   On LE to state 127
+  14:   On GE to state 128
+  15:   On '|' to state 129
+
+
+State 73:
+94: session_call -> opt_partial  . OPEN term AS prot_call '{' statement_list '}' 
+  0:   On OPEN to state 130
+
+
+State 74:
+103: declaration_statement -> type  . varlist ';' 
+  0:   On varlist to state 131
+  1:   On decl_term to state 132
+  2:   On term to state 133
+  3:   On variable to state 34
+  4:   On '#' to state 35
+  5:   On '@' to state 36
+  6:   On RAND to state 37
+  7:   On constant to state 38
+  8:   On ENV to state 39
+  9:   On IDEAL to state 40
+  10:   On RAND_PORT to state 41
+  11:   On ENV_PORT to state 42
+  12:   On DOUBLE_DOT to state 43
+  13:   On NAME to state 44
+  14:   On INTEGER_NUMBER to state 45
+
+
+State 75:
+117: loop_statement -> FOR  . each_expr statement 
+  0:   On each_expr to state 134
+  1:   On EACH to state 111
+
+
+State 76:
+126: cond_statement -> IF  . '(' exp ')' statement 
+127: cond_statement -> IF  . '(' exp ')' statement ELSE statement 
+  0:   On '(' to state 135
+
+
+State 77:
+83: wrap_statement -> WRAP  . statement 
+  0:   On statement to state 136
+  1:   On assignment_statement to state 49
+  2:   On mult_statement to state 50
+  3:   On pvt_statement to state 51
+  4:   On with_statement to state 52
+  5:   On send_statement to state 53
+  6:   On session_call to state 54
+  7:   On tying_statement to state 55
+  8:   On declaration_statement to state 56
+  9:   On protocol to state 57
+  10:   On loop_statement to state 58
+  11:   On cond_statement to state 59
+  12:   On wrap_statement to state 60
+  13:   On connect_statement to state 61
+  14:   On abort_statement to state 62
+  15:   On seq_statement to state 63
+  16:   On start_statement to state 64
+  17:   On set_statement to state 65
+  18:   On forward_statement to state 66
+  19:   On _error_ to state 67
+  20:   On term to state 68
+  21:   On '{' to state 69
+  22:   On IN to state 70
+  23:   On WITH to state 71
+  24:   On exp to state 72
+  25:   On opt_partial to state 73
+  26:   On type to state 74
+  27:   On prot_decl to state 4
+  28:   On FOR to state 75
+  29:   On IF to state 76
+  30:   On WRAP to state 77
+  31:   On CONNECT to state 78
+  32:   On ABORTING to state 79
+  33:   On BEFORE to state 80
+  34:   On AFTER to state 81
+  35:   On START to state 82
+  36:   On SET to state 83
+  37:   On FORWARD to state 84
+  38:   On variable to state 34
+  39:   On '#' to state 35
+  40:   On '@' to state 36
+  41:   On RAND to state 37
+  42:   On constant to state 38
+  43:   On ENV to state 39
+  44:   On IDEAL to state 40
+  45:   On RAND_PORT to state 41
+  46:   On ENV_PORT to state 42
+  47:   On DOUBLE_DOT to state 43
+  48:   On '-' to state 85
+  49:   On NOT to state 86
+  50:   On '(' to state 87
+  51:   On exp_list to state 88
+  52:   On PARTIAL to state 89
+  53:   On PARTY to state 18
+  54:   On INTEGER to state 19
+  55:   On SESSION to state 20
+  56:   On UNKNOWN to state 21
+  57:   On PORT to state 22
+  58:   On INPORT to state 23
+  59:   On OUTPORT to state 24
+  60:   On BOOL to state 25
+  61:   On FIELD to state 26
+  62:   On NAME to state 90
+  63:   On PROTOCOL to state 5
+  64:   On INTEGER_NUMBER to state 45
+  Reduce by 95: opt_partial ->  . 
+
+
+State 78:
+129: connect_statement -> CONNECT  . exp to_and exp ';' 
+  0:   On exp to state 137
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 79:
+82: abort_statement -> ABORTING  . ';' 
+  0:   On ';' to state 138
+
+
+State 80:
+85: seq_statement -> BEFORE  . opt_each_expr '{' statement_list '}' 
+  0:   On opt_each_expr to state 139
+  1:   On exp to state 108
+  2:   On each_expr to state 109
+  3:   On '-' to state 85
+  4:   On NOT to state 86
+  5:   On '(' to state 87
+  6:   On term to state 110
+  7:   On exp_list to state 88
+  8:   On EACH to state 111
+  9:   On variable to state 34
+  10:   On '#' to state 35
+  11:   On '@' to state 36
+  12:   On RAND to state 37
+  13:   On constant to state 38
+  14:   On ENV to state 39
+  15:   On IDEAL to state 40
+  16:   On RAND_PORT to state 41
+  17:   On ENV_PORT to state 42
+  18:   On DOUBLE_DOT to state 43
+  19:   On '{' to state 112
+  20:   On NAME to state 44
+  21:   On INTEGER_NUMBER to state 45
+
+
+State 81:
+86: seq_statement -> AFTER  . opt_each_expr '{' statement_list '}' 
+  0:   On opt_each_expr to state 140
+  1:   On exp to state 108
+  2:   On each_expr to state 109
+  3:   On '-' to state 85
+  4:   On NOT to state 86
+  5:   On '(' to state 87
+  6:   On term to state 110
+  7:   On exp_list to state 88
+  8:   On EACH to state 111
+  9:   On variable to state 34
+  10:   On '#' to state 35
+  11:   On '@' to state 36
+  12:   On RAND to state 37
+  13:   On constant to state 38
+  14:   On ENV to state 39
+  15:   On IDEAL to state 40
+  16:   On RAND_PORT to state 41
+  17:   On ENV_PORT to state 42
+  18:   On DOUBLE_DOT to state 43
+  19:   On '{' to state 112
+  20:   On NAME to state 44
+  21:   On INTEGER_NUMBER to state 45
+
+
+State 82:
+84: start_statement -> START  . exp ';' 
+  0:   On exp to state 141
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 83:
+128: set_statement -> SET  . exp AS prot_call DOUBLE_COLON exp ';' 
+  0:   On exp to state 142
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 84:
+135: forward_statement -> FORWARD  . exp TO exp ';' 
+  0:   On exp to state 143
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 85:
+41: exp -> '-'  . exp 
+  0:   On exp to state 144
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 86:
+44: exp -> NOT  . exp 
+  0:   On exp to state 145
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 87:
+51: exp -> '('  . exp ')' 
+  0:   On exp to state 146
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 88:
+55: exp -> exp_list  . 
+  Reduce by 55: exp -> exp_list  . 
+
+
+State 89:
+96: opt_partial -> PARTIAL  . 
+  Reduce by 96: opt_partial -> PARTIAL  . 
+
+
+State 90:
+113: type -> NAME  . 
+136: variable -> NAME  . 
+  Reduce by 113: type -> NAME  . 
+  Reduce by 136: variable -> NAME  . 
+
+
+State 91:
+58: opt_uses -> USES prot_decl_list ';'  . 
+  Reduce by 58: opt_uses -> USES prot_decl_list ';'  . 
+
+
+State 92:
+60: prot_decl_list -> prot_decl_list prot_decl  . 
+  Reduce by 60: prot_decl_list -> prot_decl_list prot_decl  . 
+
+
+State 93:
+7: prot_decl -> PROTOCOL NAME '(' opt_arg_list ')' ':'  . PARTY p_list 
+  0:   On PARTY to state 147
+
+
+State 94:
+20: arg_list -> arg_list ',' arg  . 
+  Reduce by 20: arg_list -> arg_list ',' arg  . 
+
+
+State 95:
+23: term -> variable dimlist  . 
+34: dimlist -> dimlist  . '[' exp ']' 
+35: dimlist -> dimlist  . '[' ']' 
+  0:   On '[' to state 148
+  Reduce by 23: term -> variable dimlist  . 
+
+
+State 96:
+24: term -> '#' variable  . 
+  Reduce by 24: term -> '#' variable  . 
+
+
+State 97:
+22: arg -> '(' prot_decl ')'  . 
+  Reduce by 22: arg -> '(' prot_decl ')'  . 
+
+
+State 98:
+4: protocol -> prot_decl '{' #0001 opt_uses #0002 statement_list '}'  . 
+  Reduce by 4: protocol -> prot_decl '{' #0001 opt_uses #0002 statement_list '}'  . 
+
+
+State 99:
+62: statement_list -> statement_list statement  . 
+  Reduce by 62: statement_list -> statement_list statement  . 
+
+
+State 100:
+81: statement -> _error_ ';'  . 
+  Reduce by 81: statement -> _error_ ';'  . 
+
+
+State 101:
+89: assignment_statement -> term ASSIGN  . exp ';' 
+  0:   On exp to state 149
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 102:
+53: exp -> term '.'  . exp 
+  0:   On exp to state 150
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 103:
+54: exp -> term FROM  . exp_list 
+  0:   On exp_list to state 151
+  1:   On '{' to state 112
+
+
+State 104:
+90: mult_statement -> '{' statement_list  . '}' 
+62: statement_list -> statement_list  . statement 
+  0:   On '}' to state 152
+  1:   On statement to state 99
+  2:   On assignment_statement to state 49
+  3:   On mult_statement to state 50
+  4:   On pvt_statement to state 51
+  5:   On with_statement to state 52
+  6:   On send_statement to state 53
+  7:   On session_call to state 54
+  8:   On tying_statement to state 55
+  9:   On declaration_statement to state 56
+  10:   On protocol to state 57
+  11:   On loop_statement to state 58
+  12:   On cond_statement to state 59
+  13:   On wrap_statement to state 60
+  14:   On connect_statement to state 61
+  15:   On abort_statement to state 62
+  16:   On seq_statement to state 63
+  17:   On start_statement to state 64
+  18:   On set_statement to state 65
+  19:   On forward_statement to state 66
+  20:   On _error_ to state 67
+  21:   On term to state 68
+  22:   On '{' to state 69
+  23:   On IN to state 70
+  24:   On WITH to state 71
+  25:   On exp to state 72
+  26:   On opt_partial to state 73
+  27:   On type to state 74
+  28:   On prot_decl to state 4
+  29:   On FOR to state 75
+  30:   On IF to state 76
+  31:   On WRAP to state 77
+  32:   On CONNECT to state 78
+  33:   On ABORTING to state 79
+  34:   On BEFORE to state 80
+  35:   On AFTER to state 81
+  36:   On START to state 82
+  37:   On SET to state 83
+  38:   On FORWARD to state 84
+  39:   On variable to state 34
+  40:   On '#' to state 35
+  41:   On '@' to state 36
+  42:   On RAND to state 37
+  43:   On constant to state 38
+  44:   On ENV to state 39
+  45:   On IDEAL to state 40
+  46:   On RAND_PORT to state 41
+  47:   On ENV_PORT to state 42
+  48:   On DOUBLE_DOT to state 43
+  49:   On '-' to state 85
+  50:   On NOT to state 86
+  51:   On '(' to state 87
+  52:   On exp_list to state 88
+  53:   On PARTIAL to state 89
+  54:   On PARTY to state 18
+  55:   On INTEGER to state 19
+  56:   On SESSION to state 20
+  57:   On UNKNOWN to state 21
+  58:   On PORT to state 22
+  59:   On INPORT to state 23
+  60:   On OUTPORT to state 24
+  61:   On BOOL to state 25
+  62:   On FIELD to state 26
+  63:   On NAME to state 90
+  64:   On PROTOCOL to state 5
+  65:   On INTEGER_NUMBER to state 45
+  Reduce by 95: opt_partial ->  . 
+
+
+State 105:
+132: exp_list -> '{' exp_list_elem  . '}' 
+134: exp_list_elem -> exp_list_elem  . ',' exp 
+  0:   On '}' to state 153
+  1:   On ',' to state 154
+
+
+State 106:
+133: exp_list_elem -> exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+93: send_statement -> exp  . SEND exp ';' 
+102: tying_statement -> exp  . ':' exp ';' 
+  0:   On '+' to state 116
+  1:   On '-' to state 117
+  2:   On '*' to state 118
+  3:   On '/' to state 119
+  4:   On '%' to state 120
+  5:   On B_AND to state 121
+  6:   On OR to state 122
+  7:   On EQ to state 123
+  8:   On LT to state 124
+  9:   On GT to state 125
+  10:   On NE to state 126
+  11:   On LE to state 127
+  12:   On GE to state 128
+  13:   On '|' to state 129
+  14:   On SEND to state 114
+  15:   On ':' to state 115
+  Reduce by 133: exp_list_elem -> exp  . 
+
+
+State 107:
+91: pvt_statement -> IN opt_each_expr  . '{' statement_list '}' 
+  0:   On '{' to state 155
+
+
+State 108:
+118: opt_each_expr -> exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On '+' to state 116
+  1:   On '-' to state 117
+  2:   On '*' to state 118
+  3:   On '/' to state 119
+  4:   On '%' to state 120
+  5:   On B_AND to state 121
+  6:   On OR to state 122
+  7:   On EQ to state 123
+  8:   On LT to state 124
+  9:   On GT to state 125
+  10:   On NE to state 126
+  11:   On LE to state 127
+  12:   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 118: opt_each_expr -> exp  . 
+
+
+State 109:
+119: opt_each_expr -> each_expr  . 
+  Reduce by 119: opt_each_expr -> each_expr  . 
+
+
+State 110:
+53: exp -> term  . '.' exp 
+54: exp -> term  . FROM exp_list 
+56: exp -> term  . 
+  0:   On '.' to state 102
+  1:   On FROM to state 103
+  Reduce by 56: exp -> term  . 
+
+
+State 111:
+120: each_expr -> EACH  . variable OF exp opt_cond 
+121: each_expr -> EACH  . exp opt_cond 
+122: each_expr -> EACH  . variable OF exp 
+123: each_expr -> EACH  . exp 
+  0:   On variable to state 156
+  1:   On exp to state 157
+  2:   On NAME to state 44
+  3:   On '-' to state 85
+  4:   On NOT to state 86
+  5:   On '(' to state 87
+  6:   On term to state 110
+  7:   On exp_list to state 88
+  8:   On '#' to state 35
+  9:   On '@' to state 36
+  10:   On RAND to state 37
+  11:   On constant to state 38
+  12:   On ENV to state 39
+  13:   On IDEAL to state 40
+  14:   On RAND_PORT to state 41
+  15:   On ENV_PORT to state 42
+  16:   On DOUBLE_DOT to state 43
+  17:   On '{' to state 112
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 112:
+132: exp_list -> '{'  . exp_list_elem '}' 
+  0:   On exp_list_elem to state 105
+  1:   On exp to state 158
+  2:   On '-' to state 85
+  3:   On NOT to state 86
+  4:   On '(' to state 87
+  5:   On term to state 110
+  6:   On exp_list to state 88
+  7:   On variable to state 34
+  8:   On '#' to state 35
+  9:   On '@' to state 36
+  10:   On RAND to state 37
+  11:   On constant to state 38
+  12:   On ENV to state 39
+  13:   On IDEAL to state 40
+  14:   On RAND_PORT to state 41
+  15:   On ENV_PORT to state 42
+  16:   On DOUBLE_DOT to state 43
+  17:   On '{' to state 112
+  18:   On NAME to state 44
+  19:   On INTEGER_NUMBER to state 45
+
+
+State 113:
+92: with_statement -> WITH opt_each_expr  . '{' port_decl_list '}' ';' 
+  0:   On '{' to state 159
+
+
+State 114:
+93: send_statement -> exp SEND  . exp ';' 
+  0:   On exp to state 160
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 115:
+102: tying_statement -> exp ':'  . exp ';' 
+  0:   On exp to state 161
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 116:
+36: exp -> exp '+'  . exp 
+  0:   On exp to state 162
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 117:
+37: exp -> exp '-'  . exp 
+  0:   On exp to state 163
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 118:
+38: exp -> exp '*'  . exp 
+  0:   On exp to state 164
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 119:
+39: exp -> exp '/'  . exp 
+  0:   On exp to state 165
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 120:
+40: exp -> exp '%'  . exp 
+  0:   On exp to state 166
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 121:
+42: exp -> exp B_AND  . exp 
+  0:   On exp to state 167
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 122:
+43: exp -> exp OR  . exp 
+  0:   On exp to state 168
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 123:
+45: exp -> exp EQ  . exp 
+  0:   On exp to state 169
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 124:
+46: exp -> exp LT  . exp 
+  0:   On exp to state 170
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 125:
+47: exp -> exp GT  . exp 
+  0:   On exp to state 171
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 126:
+48: exp -> exp NE  . exp 
+  0:   On exp to state 172
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 127:
+49: exp -> exp LE  . exp 
+  0:   On exp to state 173
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 128:
+50: exp -> exp GE  . exp 
+  0:   On exp to state 174
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 129:
+52: exp -> exp '|'  . term 
+  0:   On term to state 175
+  1:   On variable to state 34
+  2:   On '#' to state 35
+  3:   On '@' to state 36
+  4:   On RAND to state 37
+  5:   On constant to state 38
+  6:   On ENV to state 39
+  7:   On IDEAL to state 40
+  8:   On RAND_PORT to state 41
+  9:   On ENV_PORT to state 42
+  10:   On DOUBLE_DOT to state 43
+  11:   On NAME to state 44
+  12:   On INTEGER_NUMBER to state 45
+
+
+State 130:
+94: session_call -> opt_partial OPEN  . term AS prot_call '{' statement_list '}' 
+  0:   On term to state 176
+  1:   On variable to state 34
+  2:   On '#' to state 35
+  3:   On '@' to state 36
+  4:   On RAND to state 37
+  5:   On constant to state 38
+  6:   On ENV to state 39
+  7:   On IDEAL to state 40
+  8:   On RAND_PORT to state 41
+  9:   On ENV_PORT to state 42
+  10:   On DOUBLE_DOT to state 43
+  11:   On NAME to state 44
+  12:   On INTEGER_NUMBER to state 45
+
+
+State 131:
+103: declaration_statement -> type varlist  . ';' 
+115: varlist -> varlist  . ',' decl_term 
+  0:   On ';' to state 177
+  1:   On ',' to state 178
+
+
+State 132:
+114: varlist -> decl_term  . 
+  Reduce by 114: varlist -> decl_term  . 
+
+
+State 133:
+116: decl_term -> term  . opt_port_clause 
+  0:   On opt_port_clause to state 179
+  1:   On opt_each to state 180
+  2:   On EACH to state 181
+  Reduce by 11: opt_port_clause ->  . 
+  Reduce by 87: opt_each ->  . 
+
+
+State 134:
+117: loop_statement -> FOR each_expr  . statement 
+  0:   On statement to state 182
+  1:   On assignment_statement to state 49
+  2:   On mult_statement to state 50
+  3:   On pvt_statement to state 51
+  4:   On with_statement to state 52
+  5:   On send_statement to state 53
+  6:   On session_call to state 54
+  7:   On tying_statement to state 55
+  8:   On declaration_statement to state 56
+  9:   On protocol to state 57
+  10:   On loop_statement to state 58
+  11:   On cond_statement to state 59
+  12:   On wrap_statement to state 60
+  13:   On connect_statement to state 61
+  14:   On abort_statement to state 62
+  15:   On seq_statement to state 63
+  16:   On start_statement to state 64
+  17:   On set_statement to state 65
+  18:   On forward_statement to state 66
+  19:   On _error_ to state 67
+  20:   On term to state 68
+  21:   On '{' to state 69
+  22:   On IN to state 70
+  23:   On WITH to state 71
+  24:   On exp to state 72
+  25:   On opt_partial to state 73
+  26:   On type to state 74
+  27:   On prot_decl to state 4
+  28:   On FOR to state 75
+  29:   On IF to state 76
+  30:   On WRAP to state 77
+  31:   On CONNECT to state 78
+  32:   On ABORTING to state 79
+  33:   On BEFORE to state 80
+  34:   On AFTER to state 81
+  35:   On START to state 82
+  36:   On SET to state 83
+  37:   On FORWARD to state 84
+  38:   On variable to state 34
+  39:   On '#' to state 35
+  40:   On '@' to state 36
+  41:   On RAND to state 37
+  42:   On constant to state 38
+  43:   On ENV to state 39
+  44:   On IDEAL to state 40
+  45:   On RAND_PORT to state 41
+  46:   On ENV_PORT to state 42
+  47:   On DOUBLE_DOT to state 43
+  48:   On '-' to state 85
+  49:   On NOT to state 86
+  50:   On '(' to state 87
+  51:   On exp_list to state 88
+  52:   On PARTIAL to state 89
+  53:   On PARTY to state 18
+  54:   On INTEGER to state 19
+  55:   On SESSION to state 20
+  56:   On UNKNOWN to state 21
+  57:   On PORT to state 22
+  58:   On INPORT to state 23
+  59:   On OUTPORT to state 24
+  60:   On BOOL to state 25
+  61:   On FIELD to state 26
+  62:   On NAME to state 90
+  63:   On PROTOCOL to state 5
+  64:   On INTEGER_NUMBER to state 45
+  Reduce by 95: opt_partial ->  . 
+
+
+State 135:
+126: cond_statement -> IF '('  . exp ')' statement 
+127: cond_statement -> IF '('  . exp ')' statement ELSE statement 
+  0:   On exp to state 183
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 136:
+83: wrap_statement -> WRAP statement  . 
+  Reduce by 83: wrap_statement -> WRAP statement  . 
+
+
+State 137:
+129: connect_statement -> CONNECT exp  . to_and exp ';' 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On to_and to state 184
+  1:   On '+' to state 116
+  2:   On '-' to state 117
+  3:   On '*' to state 118
+  4:   On '/' to state 119
+  5:   On '%' to state 120
+  6:   On B_AND to state 121
+  7:   On OR to state 122
+  8:   On EQ to state 123
+  9:   On LT to state 124
+  10:   On GT to state 125
+  11:   On NE to state 126
+  12:   On LE to state 127
+  13:   On GE to state 128
+  14:   On '|' to state 129
+  15:   On TO to state 185
+  16:   On AND to state 186
+
+
+State 138:
+82: abort_statement -> ABORTING ';'  . 
+  Reduce by 82: abort_statement -> ABORTING ';'  . 
+
+
+State 139:
+85: seq_statement -> BEFORE opt_each_expr  . '{' statement_list '}' 
+  0:   On '{' to state 187
+
+
+State 140:
+86: seq_statement -> AFTER opt_each_expr  . '{' statement_list '}' 
+  0:   On '{' to state 188
+
+
+State 141:
+84: start_statement -> START exp  . ';' 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On ';' to state 189
+  1:   On '+' to state 116
+  2:   On '-' to state 117
+  3:   On '*' to state 118
+  4:   On '/' to state 119
+  5:   On '%' to state 120
+  6:   On B_AND to state 121
+  7:   On OR to state 122
+  8:   On EQ to state 123
+  9:   On LT to state 124
+  10:   On GT to state 125
+  11:   On NE to state 126
+  12:   On LE to state 127
+  13:   On GE to state 128
+  14:   On '|' to state 129
+
+
+State 142:
+128: set_statement -> SET exp  . AS prot_call DOUBLE_COLON exp ';' 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On AS to state 190
+  1:   On '+' to state 116
+  2:   On '-' to state 117
+  3:   On '*' to state 118
+  4:   On '/' to state 119
+  5:   On '%' to state 120
+  6:   On B_AND to state 121
+  7:   On OR to state 122
+  8:   On EQ to state 123
+  9:   On LT to state 124
+  10:   On GT to state 125
+  11:   On NE to state 126
+  12:   On LE to state 127
+  13:   On GE to state 128
+  14:   On '|' to state 129
+
+
+State 143:
+135: forward_statement -> FORWARD exp  . TO exp ';' 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On TO to state 191
+  1:   On '+' to state 116
+  2:   On '-' to state 117
+  3:   On '*' to state 118
+  4:   On '/' to state 119
+  5:   On '%' to state 120
+  6:   On B_AND to state 121
+  7:   On OR to state 122
+  8:   On EQ to state 123
+  9:   On LT to state 124
+  10:   On GT to state 125
+  11:   On NE to state 126
+  12:   On LE to state 127
+  13:   On GE to state 128
+  14:   On '|' to state 129
+
+
+State 144:
+41: exp -> '-' exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0 (removed by precedence):   On '+' to state 116
+  1 (removed by precedence):   On '-' to state 117
+  2 (removed by precedence):   On '*' to state 118
+  3 (removed by precedence):   On '/' to state 119
+  4 (removed by precedence):   On '%' to state 120
+  5 (removed by precedence):   On B_AND to state 121
+  6 (removed by precedence):   On OR to state 122
+  7 (removed by precedence):   On EQ to state 123
+  8 (removed by precedence):   On LT to state 124
+  9 (removed by precedence):   On GT to state 125
+  10 (removed by precedence):   On NE to state 126
+  11 (removed by precedence):   On LE to state 127
+  12 (removed by precedence):   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 41: exp -> '-' exp  . 
+
+
+State 145:
+44: exp -> NOT exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0 (removed by precedence):   On '+' to state 116
+  1 (removed by precedence):   On '-' to state 117
+  2 (removed by precedence):   On '*' to state 118
+  3 (removed by precedence):   On '/' to state 119
+  4 (removed by precedence):   On '%' to state 120
+  5 (removed by precedence):   On B_AND to state 121
+  6 (removed by precedence):   On OR to state 122
+  7 (removed by precedence):   On EQ to state 123
+  8 (removed by precedence):   On LT to state 124
+  9 (removed by precedence):   On GT to state 125
+  10 (removed by precedence):   On NE to state 126
+  11 (removed by precedence):   On LE to state 127
+  12 (removed by precedence):   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 44: exp -> NOT exp  . 
+
+
+State 146:
+51: exp -> '(' exp  . ')' 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On ')' to state 192
+  1:   On '+' to state 116
+  2:   On '-' to state 117
+  3:   On '*' to state 118
+  4:   On '/' to state 119
+  5:   On '%' to state 120
+  6:   On B_AND to state 121
+  7:   On OR to state 122
+  8:   On EQ to state 123
+  9:   On LT to state 124
+  10:   On GT to state 125
+  11:   On NE to state 126
+  12:   On LE to state 127
+  13:   On GE to state 128
+  14:   On '|' to state 129
+
+
+State 147:
+7: prot_decl -> PROTOCOL NAME '(' opt_arg_list ')' ':' PARTY  . p_list 
+  0:   On p_list to state 193
+  1:   On p_list_elem to state 194
+  2:   On exp to state 195
+  3:   On '-' to state 85
+  4:   On NOT to state 86
+  5:   On '(' to state 87
+  6:   On term to state 110
+  7:   On exp_list to state 88
+  8:   On variable to state 34
+  9:   On '#' to state 35
+  10:   On '@' to state 36
+  11:   On RAND to state 37
+  12:   On constant to state 38
+  13:   On ENV to state 39
+  14:   On IDEAL to state 40
+  15:   On RAND_PORT to state 41
+  16:   On ENV_PORT to state 42
+  17:   On DOUBLE_DOT to state 43
+  18:   On '{' to state 112
+  19:   On NAME to state 44
+  20:   On INTEGER_NUMBER to state 45
+
+
+State 148:
+34: dimlist -> dimlist '['  . exp ']' 
+35: dimlist -> dimlist '['  . ']' 
+  0:   On exp to state 196
+  1:   On ']' to state 197
+  2:   On '-' to state 85
+  3:   On NOT to state 86
+  4:   On '(' to state 87
+  5:   On term to state 110
+  6:   On exp_list to state 88
+  7:   On variable to state 34
+  8:   On '#' to state 35
+  9:   On '@' to state 36
+  10:   On RAND to state 37
+  11:   On constant to state 38
+  12:   On ENV to state 39
+  13:   On IDEAL to state 40
+  14:   On RAND_PORT to state 41
+  15:   On ENV_PORT to state 42
+  16:   On DOUBLE_DOT to state 43
+  17:   On '{' to state 112
+  18:   On NAME to state 44
+  19:   On INTEGER_NUMBER to state 45
+
+
+State 149:
+89: assignment_statement -> term ASSIGN exp  . ';' 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On ';' to state 198
+  1:   On '+' to state 116
+  2:   On '-' to state 117
+  3:   On '*' to state 118
+  4:   On '/' to state 119
+  5:   On '%' to state 120
+  6:   On B_AND to state 121
+  7:   On OR to state 122
+  8:   On EQ to state 123
+  9:   On LT to state 124
+  10:   On GT to state 125
+  11:   On NE to state 126
+  12:   On LE to state 127
+  13:   On GE to state 128
+  14:   On '|' to state 129
+
+
+State 150:
+53: exp -> term '.' exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0 (removed by precedence):   On '+' to state 116
+  1 (removed by precedence):   On '-' to state 117
+  2 (removed by precedence):   On '*' to state 118
+  3 (removed by precedence):   On '/' to state 119
+  4 (removed by precedence):   On '%' to state 120
+  5 (removed by precedence):   On B_AND to state 121
+  6 (removed by precedence):   On OR to state 122
+  7 (removed by precedence):   On EQ to state 123
+  8 (removed by precedence):   On LT to state 124
+  9 (removed by precedence):   On GT to state 125
+  10 (removed by precedence):   On NE to state 126
+  11 (removed by precedence):   On LE to state 127
+  12 (removed by precedence):   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 53: exp -> term '.' exp  . 
+
+
+State 151:
+54: exp -> term FROM exp_list  . 
+  Reduce by 54: exp -> term FROM exp_list  . 
+
+
+State 152:
+90: mult_statement -> '{' statement_list '}'  . 
+  Reduce by 90: mult_statement -> '{' statement_list '}'  . 
+
+
+State 153:
+132: exp_list -> '{' exp_list_elem '}'  . 
+  Reduce by 132: exp_list -> '{' exp_list_elem '}'  . 
+
+
+State 154:
+134: exp_list_elem -> exp_list_elem ','  . exp 
+  0:   On exp to state 199
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 155:
+91: pvt_statement -> IN opt_each_expr '{'  . statement_list '}' 
+  0:   On statement_list to state 200
+  1:   On statement to state 48
+  2:   On assignment_statement to state 49
+  3:   On mult_statement to state 50
+  4:   On pvt_statement to state 51
+  5:   On with_statement to state 52
+  6:   On send_statement to state 53
+  7:   On session_call to state 54
+  8:   On tying_statement to state 55
+  9:   On declaration_statement to state 56
+  10:   On protocol to state 57
+  11:   On loop_statement to state 58
+  12:   On cond_statement to state 59
+  13:   On wrap_statement to state 60
+  14:   On connect_statement to state 61
+  15:   On abort_statement to state 62
+  16:   On seq_statement to state 63
+  17:   On start_statement to state 64
+  18:   On set_statement to state 65
+  19:   On forward_statement to state 66
+  20:   On _error_ to state 67
+  21:   On term to state 68
+  22:   On '{' to state 69
+  23:   On IN to state 70
+  24:   On WITH to state 71
+  25:   On exp to state 72
+  26:   On opt_partial to state 73
+  27:   On type to state 74
+  28:   On prot_decl to state 4
+  29:   On FOR to state 75
+  30:   On IF to state 76
+  31:   On WRAP to state 77
+  32:   On CONNECT to state 78
+  33:   On ABORTING to state 79
+  34:   On BEFORE to state 80
+  35:   On AFTER to state 81
+  36:   On START to state 82
+  37:   On SET to state 83
+  38:   On FORWARD to state 84
+  39:   On variable to state 34
+  40:   On '#' to state 35
+  41:   On '@' to state 36
+  42:   On RAND to state 37
+  43:   On constant to state 38
+  44:   On ENV to state 39
+  45:   On IDEAL to state 40
+  46:   On RAND_PORT to state 41
+  47:   On ENV_PORT to state 42
+  48:   On DOUBLE_DOT to state 43
+  49:   On '-' to state 85
+  50:   On NOT to state 86
+  51:   On '(' to state 87
+  52:   On exp_list to state 88
+  53:   On PARTIAL to state 89
+  54:   On PARTY to state 18
+  55:   On INTEGER to state 19
+  56:   On SESSION to state 20
+  57:   On UNKNOWN to state 21
+  58:   On PORT to state 22
+  59:   On INPORT to state 23
+  60:   On OUTPORT to state 24
+  61:   On BOOL to state 25
+  62:   On FIELD to state 26
+  63:   On NAME to state 90
+  64:   On PROTOCOL to state 5
+  65:   On INTEGER_NUMBER to state 45
+  Reduce by 95: opt_partial ->  . 
+
+
+State 156:
+120: each_expr -> EACH variable  . OF exp opt_cond 
+122: each_expr -> EACH variable  . OF exp 
+23: term -> variable  . dimlist 
+  0:   On OF to state 201
+  1:   On dimlist to state 95
+  Reduce by 33: dimlist ->  . 
+
+
+State 157:
+121: each_expr -> EACH exp  . opt_cond 
+123: each_expr -> EACH exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On opt_cond to state 202
+  1:   On '+' to state 116
+  2:   On '-' to state 117
+  3:   On '*' to state 118
+  4:   On '/' to state 119
+  5:   On '%' to state 120
+  6:   On B_AND to state 121
+  7:   On OR to state 122
+  8:   On EQ to state 123
+  9:   On LT to state 124
+  10:   On GT to state 125
+  11:   On NE to state 126
+  12:   On LE to state 127
+  13:   On GE to state 128
+  14:   On '|' to state 129
+  15:   On EXCEPT to state 203
+  16:   On WHERE to state 204
+  Reduce by 123: each_expr -> EACH exp  . 
+
+
+State 158:
+133: exp_list_elem -> exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On '+' to state 116
+  1:   On '-' to state 117
+  2:   On '*' to state 118
+  3:   On '/' to state 119
+  4:   On '%' to state 120
+  5:   On B_AND to state 121
+  6:   On OR to state 122
+  7:   On EQ to state 123
+  8:   On LT to state 124
+  9:   On GT to state 125
+  10:   On NE to state 126
+  11:   On LE to state 127
+  12:   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 133: exp_list_elem -> exp  . 
+
+
+State 159:
+92: with_statement -> WITH opt_each_expr '{'  . port_decl_list '}' ';' 
+  0:   On port_decl_list to state 205
+  1:   On port_decl to state 206
+  2:   On type to state 207
+  3:   On PARTY to state 18
+  4:   On INTEGER to state 19
+  5:   On SESSION to state 20
+  6:   On UNKNOWN to state 21
+  7:   On PORT to state 22
+  8:   On INPORT to state 23
+  9:   On OUTPORT to state 24
+  10:   On BOOL to state 25
+  11:   On FIELD to state 26
+  12:   On NAME to state 27
+
+
+State 160:
+93: send_statement -> exp SEND exp  . ';' 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On ';' to state 208
+  1:   On '+' to state 116
+  2:   On '-' to state 117
+  3:   On '*' to state 118
+  4:   On '/' to state 119
+  5:   On '%' to state 120
+  6:   On B_AND to state 121
+  7:   On OR to state 122
+  8:   On EQ to state 123
+  9:   On LT to state 124
+  10:   On GT to state 125
+  11:   On NE to state 126
+  12:   On LE to state 127
+  13:   On GE to state 128
+  14:   On '|' to state 129
+
+
+State 161:
+102: tying_statement -> exp ':' exp  . ';' 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On ';' to state 209
+  1:   On '+' to state 116
+  2:   On '-' to state 117
+  3:   On '*' to state 118
+  4:   On '/' to state 119
+  5:   On '%' to state 120
+  6:   On B_AND to state 121
+  7:   On OR to state 122
+  8:   On EQ to state 123
+  9:   On LT to state 124
+  10:   On GT to state 125
+  11:   On NE to state 126
+  12:   On LE to state 127
+  13:   On GE to state 128
+  14:   On '|' to state 129
+
+
+State 162:
+36: exp -> exp '+' exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0 (removed by precedence):   On '+' to state 116
+  1 (removed by precedence):   On '-' to state 117
+  2:   On '*' to state 118
+  3:   On '/' to state 119
+  4:   On '%' to state 120
+  5 (removed by precedence):   On B_AND to state 121
+  6 (removed by precedence):   On OR to state 122
+  7 (removed by precedence):   On EQ to state 123
+  8 (removed by precedence):   On LT to state 124
+  9 (removed by precedence):   On GT to state 125
+  10 (removed by precedence):   On NE to state 126
+  11 (removed by precedence):   On LE to state 127
+  12 (removed by precedence):   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 36: exp -> exp '+' exp  . 
+
+
+State 163:
+37: exp -> exp '-' exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0 (removed by precedence):   On '+' to state 116
+  1 (removed by precedence):   On '-' to state 117
+  2:   On '*' to state 118
+  3:   On '/' to state 119
+  4:   On '%' to state 120
+  5 (removed by precedence):   On B_AND to state 121
+  6 (removed by precedence):   On OR to state 122
+  7 (removed by precedence):   On EQ to state 123
+  8 (removed by precedence):   On LT to state 124
+  9 (removed by precedence):   On GT to state 125
+  10 (removed by precedence):   On NE to state 126
+  11 (removed by precedence):   On LE to state 127
+  12 (removed by precedence):   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 37: exp -> exp '-' exp  . 
+
+
+State 164:
+38: exp -> exp '*' exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0 (removed by precedence):   On '+' to state 116
+  1 (removed by precedence):   On '-' to state 117
+  2 (removed by precedence):   On '*' to state 118
+  3 (removed by precedence):   On '/' to state 119
+  4 (removed by precedence):   On '%' to state 120
+  5 (removed by precedence):   On B_AND to state 121
+  6 (removed by precedence):   On OR to state 122
+  7 (removed by precedence):   On EQ to state 123
+  8 (removed by precedence):   On LT to state 124
+  9 (removed by precedence):   On GT to state 125
+  10 (removed by precedence):   On NE to state 126
+  11 (removed by precedence):   On LE to state 127
+  12 (removed by precedence):   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 38: exp -> exp '*' exp  . 
+
+
+State 165:
+39: exp -> exp '/' exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0 (removed by precedence):   On '+' to state 116
+  1 (removed by precedence):   On '-' to state 117
+  2 (removed by precedence):   On '*' to state 118
+  3 (removed by precedence):   On '/' to state 119
+  4 (removed by precedence):   On '%' to state 120
+  5 (removed by precedence):   On B_AND to state 121
+  6 (removed by precedence):   On OR to state 122
+  7 (removed by precedence):   On EQ to state 123
+  8 (removed by precedence):   On LT to state 124
+  9 (removed by precedence):   On GT to state 125
+  10 (removed by precedence):   On NE to state 126
+  11 (removed by precedence):   On LE to state 127
+  12 (removed by precedence):   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 39: exp -> exp '/' exp  . 
+
+
+State 166:
+40: exp -> exp '%' exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0 (removed by precedence):   On '+' to state 116
+  1 (removed by precedence):   On '-' to state 117
+  2 (removed by precedence):   On '*' to state 118
+  3 (removed by precedence):   On '/' to state 119
+  4 (removed by precedence):   On '%' to state 120
+  5 (removed by precedence):   On B_AND to state 121
+  6 (removed by precedence):   On OR to state 122
+  7 (removed by precedence):   On EQ to state 123
+  8 (removed by precedence):   On LT to state 124
+  9 (removed by precedence):   On GT to state 125
+  10 (removed by precedence):   On NE to state 126
+  11 (removed by precedence):   On LE to state 127
+  12 (removed by precedence):   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 40: exp -> exp '%' exp  . 
+
+
+State 167:
+42: exp -> exp B_AND exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On '+' to state 116
+  1:   On '-' to state 117
+  2:   On '*' to state 118
+  3:   On '/' to state 119
+  4:   On '%' to state 120
+  5 (removed by precedence):   On B_AND to state 121
+  6 (removed by precedence):   On OR to state 122
+  7:   On EQ to state 123
+  8:   On LT to state 124
+  9:   On GT to state 125
+  10:   On NE to state 126
+  11:   On LE to state 127
+  12:   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 42: exp -> exp B_AND exp  . 
+
+
+State 168:
+43: exp -> exp OR exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On '+' to state 116
+  1:   On '-' to state 117
+  2:   On '*' to state 118
+  3:   On '/' to state 119
+  4:   On '%' to state 120
+  5:   On B_AND to state 121
+  6 (removed by precedence):   On OR to state 122
+  7:   On EQ to state 123
+  8:   On LT to state 124
+  9:   On GT to state 125
+  10:   On NE to state 126
+  11:   On LE to state 127
+  12:   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 43: exp -> exp OR exp  . 
+
+
+State 169:
+45: exp -> exp EQ exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On '+' to state 116
+  1:   On '-' to state 117
+  2:   On '*' to state 118
+  3:   On '/' to state 119
+  4:   On '%' to state 120
+  5 (removed by precedence):   On B_AND to state 121
+  6 (removed by precedence):   On OR to state 122
+  7 (removed by precedence):   On EQ to state 123
+  8:   On LT to state 124
+  9:   On GT to state 125
+  10 (removed by precedence):   On NE to state 126
+  11:   On LE to state 127
+  12:   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 45: exp -> exp EQ exp  . 
+
+
+State 170:
+46: exp -> exp LT exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On '+' to state 116
+  1:   On '-' to state 117
+  2:   On '*' to state 118
+  3:   On '/' to state 119
+  4:   On '%' to state 120
+  5 (removed by precedence):   On B_AND to state 121
+  6 (removed by precedence):   On OR to state 122
+  7 (removed by precedence):   On EQ to state 123
+  8 (removed by precedence):   On LT to state 124
+  9 (removed by precedence):   On GT to state 125
+  10 (removed by precedence):   On NE to state 126
+  11 (removed by precedence):   On LE to state 127
+  12 (removed by precedence):   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 46: exp -> exp LT exp  . 
+
+
+State 171:
+47: exp -> exp GT exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On '+' to state 116
+  1:   On '-' to state 117
+  2:   On '*' to state 118
+  3:   On '/' to state 119
+  4:   On '%' to state 120
+  5 (removed by precedence):   On B_AND to state 121
+  6 (removed by precedence):   On OR to state 122
+  7 (removed by precedence):   On EQ to state 123
+  8 (removed by precedence):   On LT to state 124
+  9 (removed by precedence):   On GT to state 125
+  10 (removed by precedence):   On NE to state 126
+  11 (removed by precedence):   On LE to state 127
+  12 (removed by precedence):   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 47: exp -> exp GT exp  . 
+
+
+State 172:
+48: exp -> exp NE exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On '+' to state 116
+  1:   On '-' to state 117
+  2:   On '*' to state 118
+  3:   On '/' to state 119
+  4:   On '%' to state 120
+  5 (removed by precedence):   On B_AND to state 121
+  6 (removed by precedence):   On OR to state 122
+  7 (removed by precedence):   On EQ to state 123
+  8:   On LT to state 124
+  9:   On GT to state 125
+  10 (removed by precedence):   On NE to state 126
+  11:   On LE to state 127
+  12:   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 48: exp -> exp NE exp  . 
+
+
+State 173:
+49: exp -> exp LE exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On '+' to state 116
+  1:   On '-' to state 117
+  2:   On '*' to state 118
+  3:   On '/' to state 119
+  4:   On '%' to state 120
+  5 (removed by precedence):   On B_AND to state 121
+  6 (removed by precedence):   On OR to state 122
+  7 (removed by precedence):   On EQ to state 123
+  8 (removed by precedence):   On LT to state 124
+  9 (removed by precedence):   On GT to state 125
+  10 (removed by precedence):   On NE to state 126
+  11 (removed by precedence):   On LE to state 127
+  12 (removed by precedence):   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 49: exp -> exp LE exp  . 
+
+
+State 174:
+50: exp -> exp GE exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On '+' to state 116
+  1:   On '-' to state 117
+  2:   On '*' to state 118
+  3:   On '/' to state 119
+  4:   On '%' to state 120
+  5 (removed by precedence):   On B_AND to state 121
+  6 (removed by precedence):   On OR to state 122
+  7 (removed by precedence):   On EQ to state 123
+  8 (removed by precedence):   On LT to state 124
+  9 (removed by precedence):   On GT to state 125
+  10 (removed by precedence):   On NE to state 126
+  11 (removed by precedence):   On LE to state 127
+  12 (removed by precedence):   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 50: exp -> exp GE exp  . 
+
+
+State 175:
+52: exp -> exp '|' term  . 
+  Reduce by 52: exp -> exp '|' term  . 
+
+
+State 176:
+94: session_call -> opt_partial OPEN term  . AS prot_call '{' statement_list '}' 
+  0:   On AS to state 210
+
+
+State 177:
+103: declaration_statement -> type varlist ';'  . 
+  Reduce by 103: declaration_statement -> type varlist ';'  . 
+
+
+State 178:
+115: varlist -> varlist ','  . decl_term 
+  0:   On decl_term to state 211
+  1:   On term to state 133
+  2:   On variable to state 34
+  3:   On '#' to state 35
+  4:   On '@' to state 36
+  5:   On RAND to state 37
+  6:   On constant to state 38
+  7:   On ENV to state 39
+  8:   On IDEAL to state 40
+  9:   On RAND_PORT to state 41
+  10:   On ENV_PORT to state 42
+  11:   On DOUBLE_DOT to state 43
+  12:   On NAME to state 44
+  13:   On INTEGER_NUMBER to state 45
+
+
+State 179:
+116: decl_term -> term opt_port_clause  . 
+  Reduce by 116: decl_term -> term opt_port_clause  . 
+
+
+State 180:
+12: opt_port_clause -> opt_each  . WITH port_clause 
+  0:   On WITH to state 212
+
+
+State 181:
+88: opt_each -> EACH  . 
+  Reduce by 88: opt_each -> EACH  . 
+
+
+State 182:
+117: loop_statement -> FOR each_expr statement  . 
+  Reduce by 117: loop_statement -> FOR each_expr statement  . 
+
+
+State 183:
+126: cond_statement -> IF '(' exp  . ')' statement 
+127: cond_statement -> IF '(' exp  . ')' statement ELSE statement 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On ')' to state 213
+  1:   On '+' to state 116
+  2:   On '-' to state 117
+  3:   On '*' to state 118
+  4:   On '/' to state 119
+  5:   On '%' to state 120
+  6:   On B_AND to state 121
+  7:   On OR to state 122
+  8:   On EQ to state 123
+  9:   On LT to state 124
+  10:   On GT to state 125
+  11:   On NE to state 126
+  12:   On LE to state 127
+  13:   On GE to state 128
+  14:   On '|' to state 129
+
+
+State 184:
+129: connect_statement -> CONNECT exp to_and  . exp ';' 
+  0:   On exp to state 214
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 185:
+130: to_and -> TO  . 
+  Reduce by 130: to_and -> TO  . 
+
+
+State 186:
+131: to_and -> AND  . 
+  Reduce by 131: to_and -> AND  . 
+
+
+State 187:
+85: seq_statement -> BEFORE opt_each_expr '{'  . statement_list '}' 
+  0:   On statement_list to state 215
+  1:   On statement to state 48
+  2:   On assignment_statement to state 49
+  3:   On mult_statement to state 50
+  4:   On pvt_statement to state 51
+  5:   On with_statement to state 52
+  6:   On send_statement to state 53
+  7:   On session_call to state 54
+  8:   On tying_statement to state 55
+  9:   On declaration_statement to state 56
+  10:   On protocol to state 57
+  11:   On loop_statement to state 58
+  12:   On cond_statement to state 59
+  13:   On wrap_statement to state 60
+  14:   On connect_statement to state 61
+  15:   On abort_statement to state 62
+  16:   On seq_statement to state 63
+  17:   On start_statement to state 64
+  18:   On set_statement to state 65
+  19:   On forward_statement to state 66
+  20:   On _error_ to state 67
+  21:   On term to state 68
+  22:   On '{' to state 69
+  23:   On IN to state 70
+  24:   On WITH to state 71
+  25:   On exp to state 72
+  26:   On opt_partial to state 73
+  27:   On type to state 74
+  28:   On prot_decl to state 4
+  29:   On FOR to state 75
+  30:   On IF to state 76
+  31:   On WRAP to state 77
+  32:   On CONNECT to state 78
+  33:   On ABORTING to state 79
+  34:   On BEFORE to state 80
+  35:   On AFTER to state 81
+  36:   On START to state 82
+  37:   On SET to state 83
+  38:   On FORWARD to state 84
+  39:   On variable to state 34
+  40:   On '#' to state 35
+  41:   On '@' to state 36
+  42:   On RAND to state 37
+  43:   On constant to state 38
+  44:   On ENV to state 39
+  45:   On IDEAL to state 40
+  46:   On RAND_PORT to state 41
+  47:   On ENV_PORT to state 42
+  48:   On DOUBLE_DOT to state 43
+  49:   On '-' to state 85
+  50:   On NOT to state 86
+  51:   On '(' to state 87
+  52:   On exp_list to state 88
+  53:   On PARTIAL to state 89
+  54:   On PARTY to state 18
+  55:   On INTEGER to state 19
+  56:   On SESSION to state 20
+  57:   On UNKNOWN to state 21
+  58:   On PORT to state 22
+  59:   On INPORT to state 23
+  60:   On OUTPORT to state 24
+  61:   On BOOL to state 25
+  62:   On FIELD to state 26
+  63:   On NAME to state 90
+  64:   On PROTOCOL to state 5
+  65:   On INTEGER_NUMBER to state 45
+  Reduce by 95: opt_partial ->  . 
+
+
+State 188:
+86: seq_statement -> AFTER opt_each_expr '{'  . statement_list '}' 
+  0:   On statement_list to state 216
+  1:   On statement to state 48
+  2:   On assignment_statement to state 49
+  3:   On mult_statement to state 50
+  4:   On pvt_statement to state 51
+  5:   On with_statement to state 52
+  6:   On send_statement to state 53
+  7:   On session_call to state 54
+  8:   On tying_statement to state 55
+  9:   On declaration_statement to state 56
+  10:   On protocol to state 57
+  11:   On loop_statement to state 58
+  12:   On cond_statement to state 59
+  13:   On wrap_statement to state 60
+  14:   On connect_statement to state 61
+  15:   On abort_statement to state 62
+  16:   On seq_statement to state 63
+  17:   On start_statement to state 64
+  18:   On set_statement to state 65
+  19:   On forward_statement to state 66
+  20:   On _error_ to state 67
+  21:   On term to state 68
+  22:   On '{' to state 69
+  23:   On IN to state 70
+  24:   On WITH to state 71
+  25:   On exp to state 72
+  26:   On opt_partial to state 73
+  27:   On type to state 74
+  28:   On prot_decl to state 4
+  29:   On FOR to state 75
+  30:   On IF to state 76
+  31:   On WRAP to state 77
+  32:   On CONNECT to state 78
+  33:   On ABORTING to state 79
+  34:   On BEFORE to state 80
+  35:   On AFTER to state 81
+  36:   On START to state 82
+  37:   On SET to state 83
+  38:   On FORWARD to state 84
+  39:   On variable to state 34
+  40:   On '#' to state 35
+  41:   On '@' to state 36
+  42:   On RAND to state 37
+  43:   On constant to state 38
+  44:   On ENV to state 39
+  45:   On IDEAL to state 40
+  46:   On RAND_PORT to state 41
+  47:   On ENV_PORT to state 42
+  48:   On DOUBLE_DOT to state 43
+  49:   On '-' to state 85
+  50:   On NOT to state 86
+  51:   On '(' to state 87
+  52:   On exp_list to state 88
+  53:   On PARTIAL to state 89
+  54:   On PARTY to state 18
+  55:   On INTEGER to state 19
+  56:   On SESSION to state 20
+  57:   On UNKNOWN to state 21
+  58:   On PORT to state 22
+  59:   On INPORT to state 23
+  60:   On OUTPORT to state 24
+  61:   On BOOL to state 25
+  62:   On FIELD to state 26
+  63:   On NAME to state 90
+  64:   On PROTOCOL to state 5
+  65:   On INTEGER_NUMBER to state 45
+  Reduce by 95: opt_partial ->  . 
+
+
+State 189:
+84: start_statement -> START exp ';'  . 
+  Reduce by 84: start_statement -> START exp ';'  . 
+
+
+State 190:
+128: set_statement -> SET exp AS  . prot_call DOUBLE_COLON exp ';' 
+  0:   On prot_call to state 217
+  1:   On NAME to state 218
+
+
+State 191:
+135: forward_statement -> FORWARD exp TO  . exp ';' 
+  0:   On exp to state 219
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 192:
+51: exp -> '(' exp ')'  . 
+  Reduce by 51: exp -> '(' exp ')'  . 
+
+
+State 193:
+7: prot_decl -> PROTOCOL NAME '(' opt_arg_list ')' ':' PARTY p_list  . 
+9: p_list -> p_list  . ',' p_list_elem 
+  0:   On ',' to state 220
+  Reduce by 7: prot_decl -> PROTOCOL NAME '(' opt_arg_list ')' ':' PARTY p_list  . 
+
+
+State 194:
+8: p_list -> p_list_elem  . 
+  Reduce by 8: p_list -> p_list_elem  . 
+
+
+State 195:
+10: p_list_elem -> exp  . opt_port_clause 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On opt_port_clause to state 221
+  1:   On '+' to state 116
+  2:   On '-' to state 117
+  3:   On '*' to state 118
+  4:   On '/' to state 119
+  5:   On '%' to state 120
+  6:   On B_AND to state 121
+  7:   On OR to state 122
+  8:   On EQ to state 123
+  9:   On LT to state 124
+  10:   On GT to state 125
+  11:   On NE to state 126
+  12:   On LE to state 127
+  13:   On GE to state 128
+  14:   On '|' to state 129
+  15:   On opt_each to state 180
+  16:   On EACH to state 181
+  Reduce by 11: opt_port_clause ->  . 
+  Reduce by 87: opt_each ->  . 
+
+
+State 196:
+34: dimlist -> dimlist '[' exp  . ']' 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On ']' to state 222
+  1:   On '+' to state 116
+  2:   On '-' to state 117
+  3:   On '*' to state 118
+  4:   On '/' to state 119
+  5:   On '%' to state 120
+  6:   On B_AND to state 121
+  7:   On OR to state 122
+  8:   On EQ to state 123
+  9:   On LT to state 124
+  10:   On GT to state 125
+  11:   On NE to state 126
+  12:   On LE to state 127
+  13:   On GE to state 128
+  14:   On '|' to state 129
+
+
+State 197:
+35: dimlist -> dimlist '[' ']'  . 
+  Reduce by 35: dimlist -> dimlist '[' ']'  . 
+
+
+State 198:
+89: assignment_statement -> term ASSIGN exp ';'  . 
+  Reduce by 89: assignment_statement -> term ASSIGN exp ';'  . 
+
+
+State 199:
+134: exp_list_elem -> exp_list_elem ',' exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On '+' to state 116
+  1:   On '-' to state 117
+  2:   On '*' to state 118
+  3:   On '/' to state 119
+  4:   On '%' to state 120
+  5:   On B_AND to state 121
+  6:   On OR to state 122
+  7:   On EQ to state 123
+  8:   On LT to state 124
+  9:   On GT to state 125
+  10:   On NE to state 126
+  11:   On LE to state 127
+  12:   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 134: exp_list_elem -> exp_list_elem ',' exp  . 
+
+
+State 200:
+91: pvt_statement -> IN opt_each_expr '{' statement_list  . '}' 
+62: statement_list -> statement_list  . statement 
+  0:   On '}' to state 223
+  1:   On statement to state 99
+  2:   On assignment_statement to state 49
+  3:   On mult_statement to state 50
+  4:   On pvt_statement to state 51
+  5:   On with_statement to state 52
+  6:   On send_statement to state 53
+  7:   On session_call to state 54
+  8:   On tying_statement to state 55
+  9:   On declaration_statement to state 56
+  10:   On protocol to state 57
+  11:   On loop_statement to state 58
+  12:   On cond_statement to state 59
+  13:   On wrap_statement to state 60
+  14:   On connect_statement to state 61
+  15:   On abort_statement to state 62
+  16:   On seq_statement to state 63
+  17:   On start_statement to state 64
+  18:   On set_statement to state 65
+  19:   On forward_statement to state 66
+  20:   On _error_ to state 67
+  21:   On term to state 68
+  22:   On '{' to state 69
+  23:   On IN to state 70
+  24:   On WITH to state 71
+  25:   On exp to state 72
+  26:   On opt_partial to state 73
+  27:   On type to state 74
+  28:   On prot_decl to state 4
+  29:   On FOR to state 75
+  30:   On IF to state 76
+  31:   On WRAP to state 77
+  32:   On CONNECT to state 78
+  33:   On ABORTING to state 79
+  34:   On BEFORE to state 80
+  35:   On AFTER to state 81
+  36:   On START to state 82
+  37:   On SET to state 83
+  38:   On FORWARD to state 84
+  39:   On variable to state 34
+  40:   On '#' to state 35
+  41:   On '@' to state 36
+  42:   On RAND to state 37
+  43:   On constant to state 38
+  44:   On ENV to state 39
+  45:   On IDEAL to state 40
+  46:   On RAND_PORT to state 41
+  47:   On ENV_PORT to state 42
+  48:   On DOUBLE_DOT to state 43
+  49:   On '-' to state 85
+  50:   On NOT to state 86
+  51:   On '(' to state 87
+  52:   On exp_list to state 88
+  53:   On PARTIAL to state 89
+  54:   On PARTY to state 18
+  55:   On INTEGER to state 19
+  56:   On SESSION to state 20
+  57:   On UNKNOWN to state 21
+  58:   On PORT to state 22
+  59:   On INPORT to state 23
+  60:   On OUTPORT to state 24
+  61:   On BOOL to state 25
+  62:   On FIELD to state 26
+  63:   On NAME to state 90
+  64:   On PROTOCOL to state 5
+  65:   On INTEGER_NUMBER to state 45
+  Reduce by 95: opt_partial ->  . 
+
+
+State 201:
+120: each_expr -> EACH variable OF  . exp opt_cond 
+122: each_expr -> EACH variable OF  . exp 
+  0:   On exp to state 224
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 202:
+121: each_expr -> EACH exp opt_cond  . 
+  Reduce by 121: each_expr -> EACH exp opt_cond  . 
+
+
+State 203:
+124: opt_cond -> EXCEPT  . exp 
+  0:   On exp to state 225
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 204:
+125: opt_cond -> WHERE  . exp 
+  0:   On exp to state 226
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 205:
+92: with_statement -> WITH opt_each_expr '{' port_decl_list  . '}' ';' 
+15: port_decl_list -> port_decl_list  . ',' port_decl 
+  0:   On '}' to state 227
+  1:   On ',' to state 228
+
+
+State 206:
+14: port_decl_list -> port_decl  . 
+  Reduce by 14: port_decl_list -> port_decl  . 
+
+
+State 207:
+16: port_decl -> type  . term 
+  0:   On term to state 229
+  1:   On variable to state 34
+  2:   On '#' to state 35
+  3:   On '@' to state 36
+  4:   On RAND to state 37
+  5:   On constant to state 38
+  6:   On ENV to state 39
+  7:   On IDEAL to state 40
+  8:   On RAND_PORT to state 41
+  9:   On ENV_PORT to state 42
+  10:   On DOUBLE_DOT to state 43
+  11:   On NAME to state 44
+  12:   On INTEGER_NUMBER to state 45
+
+
+State 208:
+93: send_statement -> exp SEND exp ';'  . 
+  Reduce by 93: send_statement -> exp SEND exp ';'  . 
+
+
+State 209:
+102: tying_statement -> exp ':' exp ';'  . 
+  Reduce by 102: tying_statement -> exp ':' exp ';'  . 
+
+
+State 210:
+94: session_call -> opt_partial OPEN term AS  . prot_call '{' statement_list '}' 
+  0:   On prot_call to state 230
+  1:   On NAME to state 218
+
+
+State 211:
+115: varlist -> varlist ',' decl_term  . 
+  Reduce by 115: varlist -> varlist ',' decl_term  . 
+
+
+State 212:
+12: opt_port_clause -> opt_each WITH  . port_clause 
+  0:   On port_clause to state 231
+  1:   On '{' to state 232
+
+
+State 213:
+126: cond_statement -> IF '(' exp ')'  . statement 
+127: cond_statement -> IF '(' exp ')'  . statement ELSE statement 
+  0:   On statement to state 233
+  1:   On assignment_statement to state 49
+  2:   On mult_statement to state 50
+  3:   On pvt_statement to state 51
+  4:   On with_statement to state 52
+  5:   On send_statement to state 53
+  6:   On session_call to state 54
+  7:   On tying_statement to state 55
+  8:   On declaration_statement to state 56
+  9:   On protocol to state 57
+  10:   On loop_statement to state 58
+  11:   On cond_statement to state 59
+  12:   On wrap_statement to state 60
+  13:   On connect_statement to state 61
+  14:   On abort_statement to state 62
+  15:   On seq_statement to state 63
+  16:   On start_statement to state 64
+  17:   On set_statement to state 65
+  18:   On forward_statement to state 66
+  19:   On _error_ to state 67
+  20:   On term to state 68
+  21:   On '{' to state 69
+  22:   On IN to state 70
+  23:   On WITH to state 71
+  24:   On exp to state 72
+  25:   On opt_partial to state 73
+  26:   On type to state 74
+  27:   On prot_decl to state 4
+  28:   On FOR to state 75
+  29:   On IF to state 76
+  30:   On WRAP to state 77
+  31:   On CONNECT to state 78
+  32:   On ABORTING to state 79
+  33:   On BEFORE to state 80
+  34:   On AFTER to state 81
+  35:   On START to state 82
+  36:   On SET to state 83
+  37:   On FORWARD to state 84
+  38:   On variable to state 34
+  39:   On '#' to state 35
+  40:   On '@' to state 36
+  41:   On RAND to state 37
+  42:   On constant to state 38
+  43:   On ENV to state 39
+  44:   On IDEAL to state 40
+  45:   On RAND_PORT to state 41
+  46:   On ENV_PORT to state 42
+  47:   On DOUBLE_DOT to state 43
+  48:   On '-' to state 85
+  49:   On NOT to state 86
+  50:   On '(' to state 87
+  51:   On exp_list to state 88
+  52:   On PARTIAL to state 89
+  53:   On PARTY to state 18
+  54:   On INTEGER to state 19
+  55:   On SESSION to state 20
+  56:   On UNKNOWN to state 21
+  57:   On PORT to state 22
+  58:   On INPORT to state 23
+  59:   On OUTPORT to state 24
+  60:   On BOOL to state 25
+  61:   On FIELD to state 26
+  62:   On NAME to state 90
+  63:   On PROTOCOL to state 5
+  64:   On INTEGER_NUMBER to state 45
+  Reduce by 95: opt_partial ->  . 
+
+
+State 214:
+129: connect_statement -> CONNECT exp to_and exp  . ';' 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On ';' to state 234
+  1:   On '+' to state 116
+  2:   On '-' to state 117
+  3:   On '*' to state 118
+  4:   On '/' to state 119
+  5:   On '%' to state 120
+  6:   On B_AND to state 121
+  7:   On OR to state 122
+  8:   On EQ to state 123
+  9:   On LT to state 124
+  10:   On GT to state 125
+  11:   On NE to state 126
+  12:   On LE to state 127
+  13:   On GE to state 128
+  14:   On '|' to state 129
+
+
+State 215:
+85: seq_statement -> BEFORE opt_each_expr '{' statement_list  . '}' 
+62: statement_list -> statement_list  . statement 
+  0:   On '}' to state 235
+  1:   On statement to state 99
+  2:   On assignment_statement to state 49
+  3:   On mult_statement to state 50
+  4:   On pvt_statement to state 51
+  5:   On with_statement to state 52
+  6:   On send_statement to state 53
+  7:   On session_call to state 54
+  8:   On tying_statement to state 55
+  9:   On declaration_statement to state 56
+  10:   On protocol to state 57
+  11:   On loop_statement to state 58
+  12:   On cond_statement to state 59
+  13:   On wrap_statement to state 60
+  14:   On connect_statement to state 61
+  15:   On abort_statement to state 62
+  16:   On seq_statement to state 63
+  17:   On start_statement to state 64
+  18:   On set_statement to state 65
+  19:   On forward_statement to state 66
+  20:   On _error_ to state 67
+  21:   On term to state 68
+  22:   On '{' to state 69
+  23:   On IN to state 70
+  24:   On WITH to state 71
+  25:   On exp to state 72
+  26:   On opt_partial to state 73
+  27:   On type to state 74
+  28:   On prot_decl to state 4
+  29:   On FOR to state 75
+  30:   On IF to state 76
+  31:   On WRAP to state 77
+  32:   On CONNECT to state 78
+  33:   On ABORTING to state 79
+  34:   On BEFORE to state 80
+  35:   On AFTER to state 81
+  36:   On START to state 82
+  37:   On SET to state 83
+  38:   On FORWARD to state 84
+  39:   On variable to state 34
+  40:   On '#' to state 35
+  41:   On '@' to state 36
+  42:   On RAND to state 37
+  43:   On constant to state 38
+  44:   On ENV to state 39
+  45:   On IDEAL to state 40
+  46:   On RAND_PORT to state 41
+  47:   On ENV_PORT to state 42
+  48:   On DOUBLE_DOT to state 43
+  49:   On '-' to state 85
+  50:   On NOT to state 86
+  51:   On '(' to state 87
+  52:   On exp_list to state 88
+  53:   On PARTIAL to state 89
+  54:   On PARTY to state 18
+  55:   On INTEGER to state 19
+  56:   On SESSION to state 20
+  57:   On UNKNOWN to state 21
+  58:   On PORT to state 22
+  59:   On INPORT to state 23
+  60:   On OUTPORT to state 24
+  61:   On BOOL to state 25
+  62:   On FIELD to state 26
+  63:   On NAME to state 90
+  64:   On PROTOCOL to state 5
+  65:   On INTEGER_NUMBER to state 45
+  Reduce by 95: opt_partial ->  . 
+
+
+State 216:
+86: seq_statement -> AFTER opt_each_expr '{' statement_list  . '}' 
+62: statement_list -> statement_list  . statement 
+  0:   On '}' to state 236
+  1:   On statement to state 99
+  2:   On assignment_statement to state 49
+  3:   On mult_statement to state 50
+  4:   On pvt_statement to state 51
+  5:   On with_statement to state 52
+  6:   On send_statement to state 53
+  7:   On session_call to state 54
+  8:   On tying_statement to state 55
+  9:   On declaration_statement to state 56
+  10:   On protocol to state 57
+  11:   On loop_statement to state 58
+  12:   On cond_statement to state 59
+  13:   On wrap_statement to state 60
+  14:   On connect_statement to state 61
+  15:   On abort_statement to state 62
+  16:   On seq_statement to state 63
+  17:   On start_statement to state 64
+  18:   On set_statement to state 65
+  19:   On forward_statement to state 66
+  20:   On _error_ to state 67
+  21:   On term to state 68
+  22:   On '{' to state 69
+  23:   On IN to state 70
+  24:   On WITH to state 71
+  25:   On exp to state 72
+  26:   On opt_partial to state 73
+  27:   On type to state 74
+  28:   On prot_decl to state 4
+  29:   On FOR to state 75
+  30:   On IF to state 76
+  31:   On WRAP to state 77
+  32:   On CONNECT to state 78
+  33:   On ABORTING to state 79
+  34:   On BEFORE to state 80
+  35:   On AFTER to state 81
+  36:   On START to state 82
+  37:   On SET to state 83
+  38:   On FORWARD to state 84
+  39:   On variable to state 34
+  40:   On '#' to state 35
+  41:   On '@' to state 36
+  42:   On RAND to state 37
+  43:   On constant to state 38
+  44:   On ENV to state 39
+  45:   On IDEAL to state 40
+  46:   On RAND_PORT to state 41
+  47:   On ENV_PORT to state 42
+  48:   On DOUBLE_DOT to state 43
+  49:   On '-' to state 85
+  50:   On NOT to state 86
+  51:   On '(' to state 87
+  52:   On exp_list to state 88
+  53:   On PARTIAL to state 89
+  54:   On PARTY to state 18
+  55:   On INTEGER to state 19
+  56:   On SESSION to state 20
+  57:   On UNKNOWN to state 21
+  58:   On PORT to state 22
+  59:   On INPORT to state 23
+  60:   On OUTPORT to state 24
+  61:   On BOOL to state 25
+  62:   On FIELD to state 26
+  63:   On NAME to state 90
+  64:   On PROTOCOL to state 5
+  65:   On INTEGER_NUMBER to state 45
+  Reduce by 95: opt_partial ->  . 
+
+
+State 217:
+128: set_statement -> SET exp AS prot_call  . DOUBLE_COLON exp ';' 
+  0:   On DOUBLE_COLON to state 237
+
+
+State 218:
+97: prot_call -> NAME  . '(' opt_id_list ')' 
+  0:   On '(' to state 238
+
+
+State 219:
+135: forward_statement -> FORWARD exp TO exp  . ';' 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On ';' to state 239
+  1:   On '+' to state 116
+  2:   On '-' to state 117
+  3:   On '*' to state 118
+  4:   On '/' to state 119
+  5:   On '%' to state 120
+  6:   On B_AND to state 121
+  7:   On OR to state 122
+  8:   On EQ to state 123
+  9:   On LT to state 124
+  10:   On GT to state 125
+  11:   On NE to state 126
+  12:   On LE to state 127
+  13:   On GE to state 128
+  14:   On '|' to state 129
+
+
+State 220:
+9: p_list -> p_list ','  . p_list_elem 
+  0:   On p_list_elem to state 240
+  1:   On exp to state 195
+  2:   On '-' to state 85
+  3:   On NOT to state 86
+  4:   On '(' to state 87
+  5:   On term to state 110
+  6:   On exp_list to state 88
+  7:   On variable to state 34
+  8:   On '#' to state 35
+  9:   On '@' to state 36
+  10:   On RAND to state 37
+  11:   On constant to state 38
+  12:   On ENV to state 39
+  13:   On IDEAL to state 40
+  14:   On RAND_PORT to state 41
+  15:   On ENV_PORT to state 42
+  16:   On DOUBLE_DOT to state 43
+  17:   On '{' to state 112
+  18:   On NAME to state 44
+  19:   On INTEGER_NUMBER to state 45
+
+
+State 221:
+10: p_list_elem -> exp opt_port_clause  . 
+  Reduce by 10: p_list_elem -> exp opt_port_clause  . 
+
+
+State 222:
+34: dimlist -> dimlist '[' exp ']'  . 
+  Reduce by 34: dimlist -> dimlist '[' exp ']'  . 
+
+
+State 223:
+91: pvt_statement -> IN opt_each_expr '{' statement_list '}'  . 
+  Reduce by 91: pvt_statement -> IN opt_each_expr '{' statement_list '}'  . 
+
+
+State 224:
+120: each_expr -> EACH variable OF exp  . opt_cond 
+122: each_expr -> EACH variable OF exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On opt_cond to state 241
+  1:   On '+' to state 116
+  2:   On '-' to state 117
+  3:   On '*' to state 118
+  4:   On '/' to state 119
+  5:   On '%' to state 120
+  6:   On B_AND to state 121
+  7:   On OR to state 122
+  8:   On EQ to state 123
+  9:   On LT to state 124
+  10:   On GT to state 125
+  11:   On NE to state 126
+  12:   On LE to state 127
+  13:   On GE to state 128
+  14:   On '|' to state 129
+  15:   On EXCEPT to state 203
+  16:   On WHERE to state 204
+  Reduce by 122: each_expr -> EACH variable OF exp  . 
+
+
+State 225:
+124: opt_cond -> EXCEPT exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On '+' to state 116
+  1:   On '-' to state 117
+  2:   On '*' to state 118
+  3:   On '/' to state 119
+  4:   On '%' to state 120
+  5:   On B_AND to state 121
+  6:   On OR to state 122
+  7:   On EQ to state 123
+  8:   On LT to state 124
+  9:   On GT to state 125
+  10:   On NE to state 126
+  11:   On LE to state 127
+  12:   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 124: opt_cond -> EXCEPT exp  . 
+
+
+State 226:
+125: opt_cond -> WHERE exp  . 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On '+' to state 116
+  1:   On '-' to state 117
+  2:   On '*' to state 118
+  3:   On '/' to state 119
+  4:   On '%' to state 120
+  5:   On B_AND to state 121
+  6:   On OR to state 122
+  7:   On EQ to state 123
+  8:   On LT to state 124
+  9:   On GT to state 125
+  10:   On NE to state 126
+  11:   On LE to state 127
+  12:   On GE to state 128
+  13:   On '|' to state 129
+  Reduce by 125: opt_cond -> WHERE exp  . 
+
+
+State 227:
+92: with_statement -> WITH opt_each_expr '{' port_decl_list '}'  . ';' 
+  0:   On ';' to state 242
+
+
+State 228:
+15: port_decl_list -> port_decl_list ','  . port_decl 
+  0:   On port_decl to state 243
+  1:   On type to state 207
+  2:   On PARTY to state 18
+  3:   On INTEGER to state 19
+  4:   On SESSION to state 20
+  5:   On UNKNOWN to state 21
+  6:   On PORT to state 22
+  7:   On INPORT to state 23
+  8:   On OUTPORT to state 24
+  9:   On BOOL to state 25
+  10:   On FIELD to state 26
+  11:   On NAME to state 27
+
+
+State 229:
+16: port_decl -> type term  . 
+  Reduce by 16: port_decl -> type term  . 
+
+
+State 230:
+94: session_call -> opt_partial OPEN term AS prot_call  . '{' statement_list '}' 
+  0:   On '{' to state 244
+
+
+State 231:
+12: opt_port_clause -> opt_each WITH port_clause  . 
+  Reduce by 12: opt_port_clause -> opt_each WITH port_clause  . 
+
+
+State 232:
+13: port_clause -> '{'  . port_decl_list '}' 
+  0:   On port_decl_list to state 245
+  1:   On port_decl to state 206
+  2:   On type to state 207
+  3:   On PARTY to state 18
+  4:   On INTEGER to state 19
+  5:   On SESSION to state 20
+  6:   On UNKNOWN to state 21
+  7:   On PORT to state 22
+  8:   On INPORT to state 23
+  9:   On OUTPORT to state 24
+  10:   On BOOL to state 25
+  11:   On FIELD to state 26
+  12:   On NAME to state 27
+
+
+State 233:
+126: cond_statement -> IF '(' exp ')' statement  . 
+127: cond_statement -> IF '(' exp ')' statement  . ELSE statement 
+  0:   On ELSE to state 246
+  Reduce by 126: cond_statement -> IF '(' exp ')' statement  . 
+
+
+State 234:
+129: connect_statement -> CONNECT exp to_and exp ';'  . 
+  Reduce by 129: connect_statement -> CONNECT exp to_and exp ';'  . 
+
+
+State 235:
+85: seq_statement -> BEFORE opt_each_expr '{' statement_list '}'  . 
+  Reduce by 85: seq_statement -> BEFORE opt_each_expr '{' statement_list '}'  . 
+
+
+State 236:
+86: seq_statement -> AFTER opt_each_expr '{' statement_list '}'  . 
+  Reduce by 86: seq_statement -> AFTER opt_each_expr '{' statement_list '}'  . 
+
+
+State 237:
+128: set_statement -> SET exp AS prot_call DOUBLE_COLON  . exp ';' 
+  0:   On exp to state 247
+  1:   On '-' to state 85
+  2:   On NOT to state 86
+  3:   On '(' to state 87
+  4:   On term to state 110
+  5:   On exp_list to state 88
+  6:   On variable to state 34
+  7:   On '#' to state 35
+  8:   On '@' to state 36
+  9:   On RAND to state 37
+  10:   On constant to state 38
+  11:   On ENV to state 39
+  12:   On IDEAL to state 40
+  13:   On RAND_PORT to state 41
+  14:   On ENV_PORT to state 42
+  15:   On DOUBLE_DOT to state 43
+  16:   On '{' to state 112
+  17:   On NAME to state 44
+  18:   On INTEGER_NUMBER to state 45
+
+
+State 238:
+97: prot_call -> NAME '('  . opt_id_list ')' 
+  0:   On opt_id_list to state 248
+  1:   On id_list to state 249
+  2:   On variable to state 250
+  3:   On NAME to state 44
+  Reduce by 98: opt_id_list ->  . 
+
+
+State 239:
+135: forward_statement -> FORWARD exp TO exp ';'  . 
+  Reduce by 135: forward_statement -> FORWARD exp TO exp ';'  . 
+
+
+State 240:
+9: p_list -> p_list ',' p_list_elem  . 
+  Reduce by 9: p_list -> p_list ',' p_list_elem  . 
+
+
+State 241:
+120: each_expr -> EACH variable OF exp opt_cond  . 
+  Reduce by 120: each_expr -> EACH variable OF exp opt_cond  . 
+
+
+State 242:
+92: with_statement -> WITH opt_each_expr '{' port_decl_list '}' ';'  . 
+  Reduce by 92: with_statement -> WITH opt_each_expr '{' port_decl_list '}' ';'  . 
+
+
+State 243:
+15: port_decl_list -> port_decl_list ',' port_decl  . 
+  Reduce by 15: port_decl_list -> port_decl_list ',' port_decl  . 
+
+
+State 244:
+94: session_call -> opt_partial OPEN term AS prot_call '{'  . statement_list '}' 
+  0:   On statement_list to state 251
+  1:   On statement to state 48
+  2:   On assignment_statement to state 49
+  3:   On mult_statement to state 50
+  4:   On pvt_statement to state 51
+  5:   On with_statement to state 52
+  6:   On send_statement to state 53
+  7:   On session_call to state 54
+  8:   On tying_statement to state 55
+  9:   On declaration_statement to state 56
+  10:   On protocol to state 57
+  11:   On loop_statement to state 58
+  12:   On cond_statement to state 59
+  13:   On wrap_statement to state 60
+  14:   On connect_statement to state 61
+  15:   On abort_statement to state 62
+  16:   On seq_statement to state 63
+  17:   On start_statement to state 64
+  18:   On set_statement to state 65
+  19:   On forward_statement to state 66
+  20:   On _error_ to state 67
+  21:   On term to state 68
+  22:   On '{' to state 69
+  23:   On IN to state 70
+  24:   On WITH to state 71
+  25:   On exp to state 72
+  26:   On opt_partial to state 73
+  27:   On type to state 74
+  28:   On prot_decl to state 4
+  29:   On FOR to state 75
+  30:   On IF to state 76
+  31:   On WRAP to state 77
+  32:   On CONNECT to state 78
+  33:   On ABORTING to state 79
+  34:   On BEFORE to state 80
+  35:   On AFTER to state 81
+  36:   On START to state 82
+  37:   On SET to state 83
+  38:   On FORWARD to state 84
+  39:   On variable to state 34
+  40:   On '#' to state 35
+  41:   On '@' to state 36
+  42:   On RAND to state 37
+  43:   On constant to state 38
+  44:   On ENV to state 39
+  45:   On IDEAL to state 40
+  46:   On RAND_PORT to state 41
+  47:   On ENV_PORT to state 42
+  48:   On DOUBLE_DOT to state 43
+  49:   On '-' to state 85
+  50:   On NOT to state 86
+  51:   On '(' to state 87
+  52:   On exp_list to state 88
+  53:   On PARTIAL to state 89
+  54:   On PARTY to state 18
+  55:   On INTEGER to state 19
+  56:   On SESSION to state 20
+  57:   On UNKNOWN to state 21
+  58:   On PORT to state 22
+  59:   On INPORT to state 23
+  60:   On OUTPORT to state 24
+  61:   On BOOL to state 25
+  62:   On FIELD to state 26
+  63:   On NAME to state 90
+  64:   On PROTOCOL to state 5
+  65:   On INTEGER_NUMBER to state 45
+  Reduce by 95: opt_partial ->  . 
+
+
+State 245:
+13: port_clause -> '{' port_decl_list  . '}' 
+15: port_decl_list -> port_decl_list  . ',' port_decl 
+  0:   On '}' to state 252
+  1:   On ',' to state 228
+
+
+State 246:
+127: cond_statement -> IF '(' exp ')' statement ELSE  . statement 
+  0:   On statement to state 253
+  1:   On assignment_statement to state 49
+  2:   On mult_statement to state 50
+  3:   On pvt_statement to state 51
+  4:   On with_statement to state 52
+  5:   On send_statement to state 53
+  6:   On session_call to state 54
+  7:   On tying_statement to state 55
+  8:   On declaration_statement to state 56
+  9:   On protocol to state 57
+  10:   On loop_statement to state 58
+  11:   On cond_statement to state 59
+  12:   On wrap_statement to state 60
+  13:   On connect_statement to state 61
+  14:   On abort_statement to state 62
+  15:   On seq_statement to state 63
+  16:   On start_statement to state 64
+  17:   On set_statement to state 65
+  18:   On forward_statement to state 66
+  19:   On _error_ to state 67
+  20:   On term to state 68
+  21:   On '{' to state 69
+  22:   On IN to state 70
+  23:   On WITH to state 71
+  24:   On exp to state 72
+  25:   On opt_partial to state 73
+  26:   On type to state 74
+  27:   On prot_decl to state 4
+  28:   On FOR to state 75
+  29:   On IF to state 76
+  30:   On WRAP to state 77
+  31:   On CONNECT to state 78
+  32:   On ABORTING to state 79
+  33:   On BEFORE to state 80
+  34:   On AFTER to state 81
+  35:   On START to state 82
+  36:   On SET to state 83
+  37:   On FORWARD to state 84
+  38:   On variable to state 34
+  39:   On '#' to state 35
+  40:   On '@' to state 36
+  41:   On RAND to state 37
+  42:   On constant to state 38
+  43:   On ENV to state 39
+  44:   On IDEAL to state 40
+  45:   On RAND_PORT to state 41
+  46:   On ENV_PORT to state 42
+  47:   On DOUBLE_DOT to state 43
+  48:   On '-' to state 85
+  49:   On NOT to state 86
+  50:   On '(' to state 87
+  51:   On exp_list to state 88
+  52:   On PARTIAL to state 89
+  53:   On PARTY to state 18
+  54:   On INTEGER to state 19
+  55:   On SESSION to state 20
+  56:   On UNKNOWN to state 21
+  57:   On PORT to state 22
+  58:   On INPORT to state 23
+  59:   On OUTPORT to state 24
+  60:   On BOOL to state 25
+  61:   On FIELD to state 26
+  62:   On NAME to state 90
+  63:   On PROTOCOL to state 5
+  64:   On INTEGER_NUMBER to state 45
+  Reduce by 95: opt_partial ->  . 
+
+
+State 247:
+128: set_statement -> SET exp AS prot_call DOUBLE_COLON exp  . ';' 
+36: exp -> exp  . '+' exp 
+37: exp -> exp  . '-' exp 
+38: exp -> exp  . '*' exp 
+39: exp -> exp  . '/' exp 
+40: exp -> exp  . '%' exp 
+42: exp -> exp  . B_AND exp 
+43: exp -> exp  . OR exp 
+45: exp -> exp  . EQ exp 
+46: exp -> exp  . LT exp 
+47: exp -> exp  . GT exp 
+48: exp -> exp  . NE exp 
+49: exp -> exp  . LE exp 
+50: exp -> exp  . GE exp 
+52: exp -> exp  . '|' term 
+  0:   On ';' to state 254
+  1:   On '+' to state 116
+  2:   On '-' to state 117
+  3:   On '*' to state 118
+  4:   On '/' to state 119
+  5:   On '%' to state 120
+  6:   On B_AND to state 121
+  7:   On OR to state 122
+  8:   On EQ to state 123
+  9:   On LT to state 124
+  10:   On GT to state 125
+  11:   On NE to state 126
+  12:   On LE to state 127
+  13:   On GE to state 128
+  14:   On '|' to state 129
+
+
+State 248:
+97: prot_call -> NAME '(' opt_id_list  . ')' 
+  0:   On ')' to state 255
+
+
+State 249:
+99: opt_id_list -> id_list  . 
+101: id_list -> id_list  . ',' variable 
+  0:   On ',' to state 256
+  Reduce by 99: opt_id_list -> id_list  . 
+
+
+State 250:
+100: id_list -> variable  . 
+  Reduce by 100: id_list -> variable  . 
+
+
+State 251:
+94: session_call -> opt_partial OPEN term AS prot_call '{' statement_list  . '}' 
+62: statement_list -> statement_list  . statement 
+  0:   On '}' to state 257
+  1:   On statement to state 99
+  2:   On assignment_statement to state 49
+  3:   On mult_statement to state 50
+  4:   On pvt_statement to state 51
+  5:   On with_statement to state 52
+  6:   On send_statement to state 53
+  7:   On session_call to state 54
+  8:   On tying_statement to state 55
+  9:   On declaration_statement to state 56
+  10:   On protocol to state 57
+  11:   On loop_statement to state 58
+  12:   On cond_statement to state 59
+  13:   On wrap_statement to state 60
+  14:   On connect_statement to state 61
+  15:   On abort_statement to state 62
+  16:   On seq_statement to state 63
+  17:   On start_statement to state 64
+  18:   On set_statement to state 65
+  19:   On forward_statement to state 66
+  20:   On _error_ to state 67
+  21:   On term to state 68
+  22:   On '{' to state 69
+  23:   On IN to state 70
+  24:   On WITH to state 71
+  25:   On exp to state 72
+  26:   On opt_partial to state 73
+  27:   On type to state 74
+  28:   On prot_decl to state 4
+  29:   On FOR to state 75
+  30:   On IF to state 76
+  31:   On WRAP to state 77
+  32:   On CONNECT to state 78
+  33:   On ABORTING to state 79
+  34:   On BEFORE to state 80
+  35:   On AFTER to state 81
+  36:   On START to state 82
+  37:   On SET to state 83
+  38:   On FORWARD to state 84
+  39:   On variable to state 34
+  40:   On '#' to state 35
+  41:   On '@' to state 36
+  42:   On RAND to state 37
+  43:   On constant to state 38
+  44:   On ENV to state 39
+  45:   On IDEAL to state 40
+  46:   On RAND_PORT to state 41
+  47:   On ENV_PORT to state 42
+  48:   On DOUBLE_DOT to state 43
+  49:   On '-' to state 85
+  50:   On NOT to state 86
+  51:   On '(' to state 87
+  52:   On exp_list to state 88
+  53:   On PARTIAL to state 89
+  54:   On PARTY to state 18
+  55:   On INTEGER to state 19
+  56:   On SESSION to state 20
+  57:   On UNKNOWN to state 21
+  58:   On PORT to state 22
+  59:   On INPORT to state 23
+  60:   On OUTPORT to state 24
+  61:   On BOOL to state 25
+  62:   On FIELD to state 26
+  63:   On NAME to state 90
+  64:   On PROTOCOL to state 5
+  65:   On INTEGER_NUMBER to state 45
+  Reduce by 95: opt_partial ->  . 
+
+
+State 252:
+13: port_clause -> '{' port_decl_list '}'  . 
+  Reduce by 13: port_clause -> '{' port_decl_list '}'  . 
+
+
+State 253:
+127: cond_statement -> IF '(' exp ')' statement ELSE statement  . 
+  Reduce by 127: cond_statement -> IF '(' exp ')' statement ELSE statement  . 
+
+
+State 254:
+128: set_statement -> SET exp AS prot_call DOUBLE_COLON exp ';'  . 
+  Reduce by 128: set_statement -> SET exp AS prot_call DOUBLE_COLON exp ';'  . 
+
+
+State 255:
+97: prot_call -> NAME '(' opt_id_list ')'  . 
+  Reduce by 97: prot_call -> NAME '(' opt_id_list ')'  . 
+
+
+State 256:
+101: id_list -> id_list ','  . variable 
+  0:   On variable to state 258
+  1:   On NAME to state 44
+
+
+State 257:
+94: session_call -> opt_partial OPEN term AS prot_call '{' statement_list '}'  . 
+  Reduce by 94: session_call -> opt_partial OPEN term AS prot_call '{' statement_list '}'  . 
+
+
+State 258:
+101: id_list -> id_list ',' variable  . 
+  Reduce by 101: id_list -> id_list ',' variable  . 
+
+
+

@@ -757,7 +757,7 @@ exp:
 	}
 	}
 |
-	exp '|' exp
+	exp '|' term
 	{
 	if(NOT_ONLY_PARSE)
 	{
@@ -771,7 +771,7 @@ exp:
 	}
 	}
 |
-	exp '.' exp
+	term '.' exp
 	{
 	if(NOT_ONLY_PARSE)
 	{
@@ -785,16 +785,18 @@ exp:
 	}
 	}
 |
-	exp FROM exp
+	term FROM exp_list
 	{
 	if(NOT_ONLY_PARSE)
 	{
 		CHECK_INVARIANT((($1 != NULL) && ($3 != NULL)), "lhs/rhs cannot be null");
 
 		Ast * op1 = $1;
-		Ast * op2 = $3;
+		list<Ast*> *exp_list = $3;
 
-		Ast * pl_ast = new From_Expr_Ast(op1, op2, get_line_number());
+		Ast * list_ast = new Expression_List_Ast(exp_list, get_line_number());
+
+		Ast * pl_ast = new From_Expr_Ast(op1, list_ast, get_line_number());
 		$$ = pl_ast;
 	}
 	}
@@ -1149,7 +1151,7 @@ opt_each:
 ;
 
 assignment_statement:
-	exp ASSIGN exp ';'
+	term ASSIGN exp ';'
 	{
 	if(NOT_ONLY_PARSE)
 	{
