@@ -1216,6 +1216,14 @@ void Iteration_Statement_Ast::print_xml(ostream & file_buffer) {
 	file_buffer<<"</IterationStatement>\n";
 }
 
+void Basic_Loop_Ast::print(ostream & file_buffer) {
+}
+
+void Basic_Loop_Ast::print_xml(ostream & file_buffer) {
+}
+
+
+
 template class Number_Ast<double>;
 template class Number_Ast<int>;
 

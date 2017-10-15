@@ -560,5 +560,22 @@ Iteration_Statement_Ast::~Iteration_Statement_Ast() {
 	delete body;
 }
 
+Basic_Loop_Ast::Basic_Loop_Ast( Ast* variable, Ast* array, Ast* limit, Ast* body)
+{
+	this->variable = variable;
+	this->array= array;
+	this->limit = limit;
+	this->body = body;
+}
+
+Basic_Loop_Ast::~Basic_Loop_Ast()
+{
+	delete this->variable;
+	delete this->array;
+	delete this->limit;
+	delete this->body;
+}
+
+
 template class Number_Ast<double>;
 template class Number_Ast<int>;
