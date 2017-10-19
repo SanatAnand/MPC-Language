@@ -284,8 +284,9 @@ class Prot_Arg_Ast:public Ast
 
 class Name_Ast:public Ast
 {
-	string name;
   public:
+	string name;
+
 	Name_Ast(string name, int line);
 	~Name_Ast();
 	
@@ -721,11 +722,10 @@ public:
 
 class Basic_Loop_Ast: public Ast{
 	Ast* variable;
-	Ast* array;
-	Ast* limit;
+	int limit;
 	Ast* body;
 public:
-	Basic_Loop_Ast(Ast* , Ast* , Ast* , Ast* );
+	Basic_Loop_Ast(Ast* variable, int limit, Ast* body);
 	~Basic_Loop_Ast();
 
 	void print(ostream & file_buffer);
