@@ -12,7 +12,7 @@ protocol outer (int nClnts, int nSrvrs, int sp, field F) : party C[nClnts], S[nS
 	}
 
 	for each C[#i] {
-		for each S[#j] except j in {0} {
+		for each S[#j] except j from {0} {
 			in C[i] {
 				F tmp;
 				tmp = $;

@@ -148,6 +148,7 @@ Ast* Desugar_Ast::desugar_loops( Ast* root )
 	// construct the basic for loops from the lists
 	// TODO, appropriate line numbering...for now 0
 	// Innermost loop:
+	
 	std::vector<string>::reverse_iterator iter_names = var_list.rbegin();
 	std::vector<int>::reverse_iterator iter_limits = limits_list.rbegin();
 	
@@ -177,9 +178,22 @@ Ast* Desugar_Ast::desugar_loops( Ast* root )
 		Ast* cond_ast = new Selection_Statement_Ast(each_blk_stmt->cond,new Sequence_Ast(each_blk_stmt->lineno),((Iteration_Statement_Ast*)root)->body,iter_body->lineno);
 		((Sequence_Ast*)iter_body)->ast_push_back(cond_ast);
 	}
+	else
+	{
+		((Sequence_Ast*)iter_body)->ast_push_back(((Iteration_Statement_Ast*)root)->body);
+	}
 
 	//construct the innermost loop body
-	Ast* d_root = new Basic_Loop_Ast(new Name_Ast((*iter_names), each_blk_stmt->lineno), *iter_limits, iter_body);
+	Ast* d_root;
+	if(var_list.empty())
+	{
+		return iter_body;
+	}
+	else
+	{
+		d_root = new Basic_Loop_Ast(new Name_Ast((*iter_names), each_blk_stmt->lineno), *iter_limits, iter_body);
+	}
+	
 	Ast* tmp;
 	iter_names++;
 	iter_limits++;
@@ -189,10 +203,9 @@ Ast* Desugar_Ast::desugar_loops( Ast* root )
 	{
 		tmp = new Basic_Loop_Ast(new Name_Ast((*iter_names), 0), *iter_limits, d_root);
 		d_root = tmp;
+		iter_names++;
+		iter_limits++;
 	}
-
-	//Temporary
-	root = d_root;
 
 	return d_root;
 }
