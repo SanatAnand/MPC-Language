@@ -1217,6 +1217,16 @@ void Iteration_Statement_Ast::print_xml(ostream & file_buffer) {
 }
 
 void Basic_Loop_Ast::print(ostream & file_buffer) {
+	print_tabs(file_buffer, tab_counter);
+	file_buffer<<"for (";
+	variable->print(file_buffer);
+	file_buffer<<" = 0 to "<<limit<<" )";
+	file_buffer<<"{\n";
+	tab_counter++;
+	body->print(file_buffer);
+	tab_counter--;
+	print_tabs(file_buffer, tab_counter);
+	file_buffer<<"}\n";
 }
 
 void Basic_Loop_Ast::print_xml(ostream & file_buffer) {

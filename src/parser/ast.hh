@@ -6,6 +6,7 @@
 #include<iomanip>
 #include<typeinfo>
 #include<list>
+#include<vector>
 
 #define AST_SPACE "         "
 #define AST_NODE_SPACE "            "
@@ -83,12 +84,14 @@ class Ast {
 		ternary_arity = 3
 	}Ast_Arity;
 
-	int lineno;
+	
 	static int tab_counter;
 
   public:
 	Ast();
 	~Ast();
+
+	int lineno;
 
 	virtual void print(ostream & file_buffer) = 0;
 	virtual void print_xml(ostream & file_buffer) = 0;
@@ -732,6 +735,14 @@ public:
 	void print_xml(ostream & file_buffer);
 
 //	Ast* desugar_find_loop(Ast* ast);
+};
+
+class Desugar_Ast{
+	static int get_limits( Ast* root, int index );
+	static string get_new_iterator_name();
+	static void find_hash_vars_and_build_assign_expr( Ast* root, std::vector<string>* var_list, std::vector<int>* limits_list );
+public:
+	static Ast* desugar_loops( Ast* root );
 };
 
 #endif
