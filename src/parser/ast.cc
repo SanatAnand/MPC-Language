@@ -582,5 +582,16 @@ Array_Limit_Ast::Array_Limit_Ast( string array, int index)
 
 Array_Limit_Ast::~Array_Limit_Ast(){}
 
+Send_Assignment_Ast::Send_Assignment_Ast(Ast* lhs, Ast* rhs, int line) {
+	this->lhs = lhs;
+	this->rhs = rhs;
+	this->lineno = line;
+}
+
+Send_Assignment_Ast::~Send_Assignment_Ast() {
+	delete lhs;
+	delete rhs;
+}
+
 template class Number_Ast<double>;
 template class Number_Ast<int>;

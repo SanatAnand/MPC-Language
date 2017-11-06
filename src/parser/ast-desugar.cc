@@ -7,7 +7,7 @@ using namespace std;
 
 #include "ast.hh"
 
-string Desugar_Ast::get_new_iterator_name()
+string Desugar_Ast::get_new_variable_name()
 {
 	//TODO
 	//return a new iterator name
@@ -31,7 +31,7 @@ void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<s
 					{
 						//variable is not specified
 						//generate new iterator name and insert into var_list
-						string name = get_new_iterator_name();
+						string name = get_new_variable_name();
 						(*var_list).push_back(name);
 						//insert into limits_list
 						(*limits_list).push_back(new Array_Limit_Ast( ((Name_Ast*)(((Term_Ast*)root)->child))->name, counter));
@@ -187,15 +187,120 @@ Ast* Desugar_Ast::desugar_loops( Ast* root )
 	return d_root;
 }
 
-Ast* Desugar_Ast::get_party_port(Ast* root)
+Ast* Desugar_Ast::get_party_port(Ast* root, int flag)
 {
 	if(root==NULL)
 		return NULL;
-	
+
 	if(typeid(root)==typeid(Term_Ast))
 	{
-		return NULL;
+		if(flag == 0 )
+		{
+			//if flag=0, then var/port only; i.e.. current party (hence other party must send/receive to/from env since it will be sub-party)
+			//construct new term_ast for "env" and return
+			Ast* name_ast = new Name_Ast("env", ((Term_Ast*)root)->lineno);
+			return new Term_Ast(name_ast, NULL, env_port, ((Term_Ast*)root)->lineno);
+		}
+		else
+		{
+			//else, construct new term_ast from the name stored in term_ast "root" and return
+			Ast* name_ast = new Name_Ast(((Name_Ast*)(((Term_Ast*)root)->child))->name, ((Term_Ast*)root)->lineno);
+			return new Term_Ast(name_ast, NULL, variable, ((Term_Ast*)root)->lineno);
+		}
 	}
+	else if(typeid(root)==typeid(Port_Expr_Ast))
+	{
+		//recurse with flag 1, i.e.. not super-party
+		return get_party_port(((Port_Expr_Ast*)root)->lhs, 1);
+	}
+	else if(typeid(root)==typeid(Party_Expr_Ast))
+	{
+		//recurse with flag 1, i.e.. not super-party
+		return get_party_port(((Party_Expr_Ast*)root)->lhs, 1);
+	}
+}
+
+Ast* Desugar_Ast::desugar_send_lhs(Ast* root, Ast* rhs_port, int flag)
+{
+	if(typeid(root)==typeid(Term_Ast))
+	{
+		if(flag==0)
+		{
+			//if flag=0, then var/port only;
+			//directly assign to rhs_port, construct corresponding ast
+			return new Send_Assignment_Ast(root, rhs_port, ((Term_Ast*)root)->lineno);
+		}
+		else
+		{
+			//cascade send up to the super-party;
+			//assign to env port, construct corresponding ast
+			Ast* name_ast = new Name_Ast("env", ((Term_Ast*)root)->lineno);
+			Ast* term_ast = new Term_Ast(name_ast, NULL, env_port, ((Term_Ast*)root)->lineno);
+			return new Send_Assignment_Ast(root, term_ast, ((Term_Ast*)root)->lineno);
+		}
+	}
+	else if(typeid(root)==typeid(Port_Expr_Ast))
+	{
+		//lhs of root will be single party, rhs will be port
+		//construct assign from port to env
+		Ast* name_ast = new Name_Ast("env", ((Port_Expr_Ast*)root)->lineno);
+		Ast* term_ast = new Term_Ast(name_ast, NULL, env_port, ((Port_Expr_Ast*)root)->lineno);
+		Ast* tmp = new Send_Assignment_Ast(((Port_Expr_Ast*)root)->rhs, term_ast, ((Port_Expr_Ast*)root)->lineno);
+		//put inside in block of party lhs
+		Ast* tmp2 = new In_Ast(tmp, ((Port_Expr_Ast*)root)->lhs, false, ((Port_Expr_Ast*)root)->lineno);
+		return tmp2;	
+	}
+	else if(typeid(root)==typeid(Party_Expr_Ast))
+	{
+		//construct sequence of recursion, read and write
+		Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
+		//recurse on rhs
+		Ast* tmp = desugar_send_lhs(((Party_Expr_Ast*)root)->rhs, rhs_port, 1);
+		//add to sequence
+		((Sequence_Ast*)tmp_seq)->ast_push_back(tmp);
+		//read from child party and store in new tmp variable
+		Ast* tmp_var_name_ast = new Name_Ast(get_new_variable_name(), ((Party_Expr_Ast*)root)->lineno);
+		Ast* tmp_var_term_ast = new Term_Ast(tmp_var_name_ast, NULL, variable, ((Party_Expr_Ast*)root)->lineno);
+		Ast* tmp2 = new Send_Assignment_Ast(get_party_port(((Party_Expr_Ast*)root)->rhs, 0), tmp_var_term_ast, ((Party_Expr_Ast*)root)->lineno);
+		//add to sequence
+		((Sequence_Ast*)tmp_seq)->ast_push_back(tmp2);
+		//cascade up to super-party by writing to env
+		Ast* tmp_env_name_ast = new Name_Ast("env", ((Party_Expr_Ast*)root)->lineno);
+		Ast* tmp_env_term_ast = new Term_Ast(tmp_env_name_ast, NULL, env_port, ((Party_Expr_Ast*)root)->lineno);
+		Ast* tmp3 = new Send_Assignment_Ast(tmp_var_term_ast, tmp_env_term_ast, ((Party_Expr_Ast*)root)->lineno);
+		//add to sequence
+		((Sequence_Ast*)tmp_seq)->ast_push_back(tmp3);
+		//put inside in block of party lhs
+		Ast* tmp_final = new In_Ast(tmp_seq, ((Party_Expr_Ast*)root)->lhs, false, ((Party_Expr_Ast*)root)->lineno);
+		if(flag==0)
+		{
+			//outer most level
+			//read from party root, store in temp variable, send to rhs_port
+			//construct sequence of above
+			//construct sequence of recursion, read and write
+			Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
+			//add tmp_final to the sequence
+			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp_final);
+			//read from child party root and store in new tmp variable
+			Ast* tmp_var_name_ast = new Name_Ast(get_new_variable_name(), ((Party_Expr_Ast*)root)->lineno);
+			Ast* tmp_var_term_ast = new Term_Ast(tmp_var_name_ast, NULL, variable, ((Party_Expr_Ast*)root)->lineno);
+			Ast* tmp = new Send_Assignment_Ast(get_party_port((Party_Expr_Ast*)root, 0), tmp_var_term_ast, ((Party_Expr_Ast*)root)->lineno);
+			//add to sequence
+			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp);
+			//send to rhs_port
+			Ast* tmp2 = new Send_Assignment_Ast(tmp_var_term_ast, rhs_port, ((Party_Expr_Ast*)root)->lineno);
+			//add to sequence
+			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp2);
+			//return it
+			return tmp_seq;
+
+		}		
+		return tmp_final;
+	}
+}
+
+Ast* Desugar_Ast::desugar_send_rhs(Ast* root, Ast* lhs_port, int flag)
+{
 }
 
 Ast* Desugar_Ast::desugar_send( Ast* root )
@@ -205,6 +310,12 @@ Ast* Desugar_Ast::desugar_send( Ast* root )
 	else if(typeid(*root) != typeid(Send_Ast))
 		return NULL;
 
-	Ast* new_lhs = desugar_send_lhs(((Send_Ast*)root)->lhs, get_party_port(((Send_Ast*)root)->rhs));
-	Ast* new_rhs = desugar_send_rhs(((Send_Ast*)root)->rhs, get_party_port(((Send_Ast*)root)->lhs));
+	Ast* new_lhs = desugar_send_lhs(((Send_Ast*)root)->lhs, get_party_port(((Send_Ast*)root)->rhs, 0), 0);
+	Ast* new_rhs = desugar_send_rhs(((Send_Ast*)root)->rhs, get_party_port(((Send_Ast*)root)->lhs, 0), 0);
+	//return sequence of above
+	Ast* tmp_seq = new Sequence_Ast(root->lineno);
+	((Sequence_Ast*)tmp_seq)->ast_push_back(new_lhs);
+	((Sequence_Ast*)tmp_seq)->ast_push_back(new_rhs);
+	//return it
+	return tmp_seq;
 }

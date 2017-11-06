@@ -1245,6 +1245,26 @@ void Array_Limit_Ast::print(ostream & file_buffer) {
 void Array_Limit_Ast::print_xml(ostream & file_buffer) {
 }
 
+void Send_Assignment_Ast::print(ostream & file_buffer) {
+	print_tabs(file_buffer, tab_counter);
+	lhs->print(file_buffer);
+	file_buffer<<" => ";
+	rhs->print(file_buffer);
+	file_buffer<<";\n";
+}
+
+void Send_Assignment_Ast::print_xml(ostream & file_buffer) {
+	print_tabs(file_buffer, tab_counter);
+	file_buffer<<"<Assignment>\n";
+	tab_counter++;
+	print_attribute(file_buffer, "Lvalue", this->lhs);
+	print_attribute(file_buffer, "Rvalue", this->rhs);
+	// print_attribute(file_buffer, "LineNo", this->lineno);
+	tab_counter--;
+	print_tabs(file_buffer, tab_counter);
+	file_buffer<<"</Send_Assignment>\n";
+}
+
 
 template class Number_Ast<double>;
 template class Number_Ast<int>;
