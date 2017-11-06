@@ -1139,6 +1139,7 @@ void Selection_Statement_Ast::print(ostream & file_buffer){
 		tab_counter++;
 		else_part->print(file_buffer);
 		tab_counter--;
+		print_tabs(file_buffer, tab_counter);
 		file_buffer<<"}\n";
 	}
 }
@@ -1192,15 +1193,18 @@ void Each_Statement_Ast::print_xml(ostream & file_buffer){
 
 
 void Iteration_Statement_Ast::print(ostream & file_buffer) {
-	print_tabs(file_buffer, tab_counter);
-	file_buffer<<"for ";
-	each_block->print(file_buffer);
-	file_buffer<<"{\n";
-	tab_counter++;
-	body->print(file_buffer);
-	tab_counter--;
-	print_tabs(file_buffer, tab_counter);
-	file_buffer<<"}\n";
+	Desugar_Ast d;
+	(d.desugar_loops(this))->print(file_buffer);
+	
+	// print_tabs(file_buffer, tab_counter);
+	// file_buffer<<"for ";
+	// each_block->print(file_buffer);
+	// file_buffer<<"{\n";
+	// tab_counter++;
+	// body->print(file_buffer);
+	// tab_counter--;
+	// print_tabs(file_buffer, tab_counter);
+	// file_buffer<<"}\n";
 }
 
 void Iteration_Statement_Ast::print_xml(ostream & file_buffer) {
@@ -1215,6 +1219,24 @@ void Iteration_Statement_Ast::print_xml(ostream & file_buffer) {
 	print_tabs(file_buffer, tab_counter);
 	file_buffer<<"</IterationStatement>\n";
 }
+
+void Basic_Loop_Ast::print(ostream & file_buffer) {
+	print_tabs(file_buffer, tab_counter);
+	file_buffer<<"for (";
+	variable->print(file_buffer);
+	file_buffer<<" = 0 to "<<limit<<" )";
+	file_buffer<<"{\n";
+	tab_counter++;
+	body->print(file_buffer);
+	tab_counter--;
+	print_tabs(file_buffer, tab_counter);
+	file_buffer<<"}\n";
+}
+
+void Basic_Loop_Ast::print_xml(ostream & file_buffer) {
+}
+
+
 
 template class Number_Ast<double>;
 template class Number_Ast<int>;

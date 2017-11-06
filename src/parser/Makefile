@@ -1,4 +1,4 @@
-AST_OBJ = ast.o ast-print.o
+AST_OBJ = ast.o ast-print.o ast-desugar.o
 PROG_OBJ = program.o
 OBJ_CORE = error-display.o main.o user-options.o
 OBJ_GEN = scanner.o parser.o
