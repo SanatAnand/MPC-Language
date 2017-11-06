@@ -186,3 +186,25 @@ Ast* Desugar_Ast::desugar_loops( Ast* root )
 
 	return d_root;
 }
+
+Ast* Desugar_Ast::get_party_port(Ast* root)
+{
+	if(root==NULL)
+		return NULL;
+	
+	if(typeid(root)==typeid(Term_Ast))
+	{
+		return NULL;
+	}
+}
+
+Ast* Desugar_Ast::desugar_send( Ast* root )
+{
+	if(root==NULL)
+		return NULL;
+	else if(typeid(*root) != typeid(Send_Ast))
+		return NULL;
+
+	Ast* new_lhs = desugar_send_lhs(((Send_Ast*)root)->lhs, get_party_port(((Send_Ast*)root)->rhs));
+	Ast* new_rhs = desugar_send_rhs(((Send_Ast*)root)->rhs, get_party_port(((Send_Ast*)root)->lhs));
+}
