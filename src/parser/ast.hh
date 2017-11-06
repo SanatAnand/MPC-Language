@@ -725,10 +725,10 @@ public:
 
 class Basic_Loop_Ast: public Ast{
 	Ast* variable;
-	int limit;
+	Ast* limit;
 	Ast* body;
 public:
-	Basic_Loop_Ast(Ast* variable, int limit, Ast* body);
+	Basic_Loop_Ast(Ast* variable, Ast* limit, Ast* body);
 	~Basic_Loop_Ast();
 
 	void print(ostream & file_buffer);
@@ -737,12 +737,28 @@ public:
 //	Ast* desugar_find_loop(Ast* ast);
 };
 
+class Array_Limit_Ast: public Ast{
+	string array;
+	int index;
+	
+public:
+	Array_Limit_Ast( string array, int index);
+	~Array_Limit_Ast();
+
+	void print(ostream & file_buffer);
+	void print_xml(ostream & file_buffer);
+
+};
+
 class Desugar_Ast{
-	static int get_limits( Ast* root, int index );
 	static string get_new_iterator_name();
-	static void find_hash_vars_and_build_assign_expr( Ast* root, std::vector<string>* var_list, std::vector<int>* limits_list );
+	static void find_hash_vars_and_build_assign_expr( Ast* root, std::vector<string>* var_list, std::vector<Ast*>* limits_list );
+
+
 public:
 	static Ast* desugar_loops( Ast* root );
+	static Ast* desugar_send( Ast* root );
+	static Ast* desugar_in( Ast* root );
 };
 
 #endif

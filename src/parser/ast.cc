@@ -560,7 +560,7 @@ Iteration_Statement_Ast::~Iteration_Statement_Ast() {
 	delete body;
 }
 
-Basic_Loop_Ast::Basic_Loop_Ast( Ast* variable, int limit, Ast* body)
+Basic_Loop_Ast::Basic_Loop_Ast( Ast* variable, Ast* limit, Ast* body)
 {
 	this->variable = variable;
 	this->limit = limit;
@@ -571,8 +571,16 @@ Basic_Loop_Ast::~Basic_Loop_Ast()
 {
 	delete this->variable;
 	delete this->body;
+	delete this->limit;
 }
 
+Array_Limit_Ast::Array_Limit_Ast( string array, int index)
+{
+	this->array = array;
+	this->index = index;
+}
+
+Array_Limit_Ast::~Array_Limit_Ast(){}
 
 template class Number_Ast<double>;
 template class Number_Ast<int>;

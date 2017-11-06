@@ -7,37 +7,14 @@ using namespace std;
 
 #include "ast.hh"
 
-int Desugar_Ast::get_limits( Ast* root, int index )
-{
-	//given a variable ast "root" and a index "index", return the limit of the dimention "index" of array "root"
-	if(dynamic_cast<Term_Ast*>(root))
-	{
-		if(((Term_Ast*)root)->t == variable && ((Term_Ast*)root)->dim_list !=NULL)
-		{
-			//TODO
-			//get the limits of dim "index" from symbol table?
-			return -1;
-		}
-		else
-		{
-			//throw error?
-		}
-	}
-	else
-	{
-		//throw error?
-	}
-}
-
 string Desugar_Ast::get_new_iterator_name()
 {
-	return "sanat";
 	//TODO
 	//return a new iterator name
-	//lookup in symbol table to get next new name ?
+	//lookup in symbol table to get next new name ?	
 }
 
-void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<string>* var_list, std::vector<int>* limits_list )
+void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<string>* var_list, std::vector<Ast*>* limits_list )
 {
 	//given a ast "root", find all #vars appropriately inside the dimentions of some var
 	//insert the #vars into list "var_list" and its limits to the list "limits_list"
@@ -57,7 +34,7 @@ void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<s
 						string name = get_new_iterator_name();
 						(*var_list).push_back(name);
 						//insert into limits_list
-						(*limits_list).push_back(get_limits(root, counter));
+						(*limits_list).push_back(new Array_Limit_Ast( ((Name_Ast*)(((Term_Ast*)root)->child))->name, counter));
 						//construct ast for the new iterator variable and assign appropriately
 						((Term_Ast*)root)->dim_list->insert(i,new Term_Ast(new Name_Ast(name,root->lineno), NULL, variable, root->lineno));
 					}
@@ -68,7 +45,7 @@ void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<s
 							//insert into var_list
 							(*var_list).push_back(((Name_Ast*)(((Term_Ast*)(*i))->child))->name);
 							//insert into limits_list
-							(*limits_list).push_back(get_limits(root, counter));
+							(*limits_list).push_back(new Array_Limit_Ast( ((Name_Ast*)(((Term_Ast*)root)->child))->name, counter));
 							//convert to variable type
 							((Term_Ast*)(*i))->t = variable;
 						}
@@ -143,14 +120,14 @@ Ast* Desugar_Ast::desugar_loops( Ast* root )
 	// search for all "# variable" terms in root->each_block->expression and put in an array
 	// convert all "#variable" terms to "variable" terms  in root
 	std::vector<string> var_list;
-	std::vector<int> limits_list;
+	std::vector<Ast*> limits_list;
 	find_hash_vars_and_build_assign_expr( ((Each_Statement_Ast*)((Iteration_Statement_Ast*)root)->each_block)->expression, &var_list, &limits_list);
 	// construct the basic for loops from the lists
 	// TODO, appropriate line numbering...for now 0
 	// Innermost loop:
 	
 	std::vector<string>::reverse_iterator iter_names = var_list.rbegin();
-	std::vector<int>::reverse_iterator iter_limits = limits_list.rbegin();
+	std::vector<Ast*>::reverse_iterator iter_limits = limits_list.rbegin();
 	
 	//construct the innermost loop body referenced as iter_body
 	Each_Statement_Ast* each_blk_stmt = ((Each_Statement_Ast*)((Iteration_Statement_Ast*)root)->each_block);
