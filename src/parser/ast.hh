@@ -104,7 +104,6 @@ class Ast {
 	virtual void print_attribute(ostream & file_buffer, const char* name, Ast* value);
 	virtual void print_attribute(ostream & file_buffer, const char* name, list<Ast*>* value);		
 
-//	virtual Ast* desugar_find_loop( Ast* ) = 0;
 };
 
 class Sequence_Ast: public Ast{
@@ -118,7 +117,6 @@ class Sequence_Ast: public Ast{
 	void print_xml(ostream & file_buffer);
 	void print_comma(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 
@@ -135,7 +133,6 @@ class Protocol_Decl_Ast: public Ast {
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Protocol_Ast: public Ast {
@@ -151,7 +148,6 @@ class Protocol_Ast: public Ast {
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Assignment_Ast:public Ast
@@ -166,7 +162,6 @@ class Assignment_Ast:public Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Tying_Ast:public Ast
@@ -181,7 +176,6 @@ class Tying_Ast:public Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Forward_Ast:public Ast
@@ -196,7 +190,6 @@ class Forward_Ast:public Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 /////////////// DONE WITH SEND ////////////////////
@@ -213,7 +206,6 @@ class Party_Ast:public Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 ///////////////////////////////////////////////
@@ -231,7 +223,6 @@ class Term_Ast:public Ast
 	void print(ostream & file_buffer);	
 	void print_xml(ostream & file_buffer);	
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 ///////////////////////////////////////////////
@@ -248,7 +239,6 @@ public:
 	void print(ostream & file_buffer);	
 	void print_xml(ostream & file_buffer);	
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 ///////////////////////////////////////////////
@@ -266,7 +256,6 @@ class Argument_Ast:public Ast
 	void print(ostream & file_buffer);	
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Prot_Arg_Ast:public Ast
@@ -280,7 +269,6 @@ class Prot_Arg_Ast:public Ast
 	void print(ostream & file_buffer);	
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 ///////////////////////////////////////////////
@@ -296,23 +284,21 @@ class Name_Ast:public Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 //////////////  SEND STATEMENT ////////////////////
 class Send_Ast:public Ast
 {
+public:
 	Ast * lhs;
 	Ast * rhs;
 
-  public:
 	Send_Ast(Ast * temp_lhs, Ast * temp_rhs, int line);
 	~Send_Ast();
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Decl_Ast:public Ast
@@ -329,7 +315,6 @@ class Decl_Ast:public Ast
 	void print_xml(ostream & file_buffer);
 	void print_comma(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class In_Ast:public Ast {
@@ -343,7 +328,6 @@ class In_Ast:public Ast {
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class With_Ast:public Ast {
@@ -357,7 +341,6 @@ class With_Ast:public Ast {
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Seq_Ast:public Ast {
@@ -372,7 +355,6 @@ class Seq_Ast:public Ast {
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Connect_Ast:public Ast {
@@ -386,7 +368,6 @@ class Connect_Ast:public Ast {
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Port_Clause_Ast:public Ast {
@@ -402,7 +383,6 @@ public:
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 template <class T>
@@ -416,7 +396,6 @@ class Number_Ast:public Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Arithmetic_Expr_Ast:public Ast
@@ -432,7 +411,6 @@ class Arithmetic_Expr_Ast:public Ast
 	virtual void print(ostream & file_buffer) = 0;
 	void print_xml(ostream & file_buffer) = 0;
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Plus_Ast:public Arithmetic_Expr_Ast
@@ -444,7 +422,6 @@ class Plus_Ast:public Arithmetic_Expr_Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Minus_Ast:public Arithmetic_Expr_Ast
@@ -456,7 +433,6 @@ class Minus_Ast:public Arithmetic_Expr_Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Divide_Ast:public Arithmetic_Expr_Ast
@@ -468,7 +444,6 @@ class Divide_Ast:public Arithmetic_Expr_Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 	
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Modulo_Ast:public Arithmetic_Expr_Ast
@@ -480,7 +455,6 @@ class Modulo_Ast:public Arithmetic_Expr_Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Mult_Ast:public Arithmetic_Expr_Ast
@@ -492,7 +466,6 @@ class Mult_Ast:public Arithmetic_Expr_Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class UMinus_Ast: public Arithmetic_Expr_Ast
@@ -504,7 +477,6 @@ class UMinus_Ast: public Arithmetic_Expr_Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 ///////////////
 
@@ -522,7 +494,6 @@ class Relational_Expr_Ast:public Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Boolean_Expr_Ast:public Ast
@@ -539,7 +510,6 @@ class Boolean_Expr_Ast:public Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Port_Expr_Ast:public Ast
@@ -555,7 +525,6 @@ public:
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Party_Expr_Ast:public Ast
@@ -571,7 +540,6 @@ public:
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class From_Expr_Ast:public Ast
@@ -587,7 +555,6 @@ public:
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 	
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Expression_List_Ast:public Ast
@@ -602,7 +569,6 @@ public:
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Session_call_Ast:public Ast
@@ -619,7 +585,6 @@ class Session_call_Ast:public Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Set_Ast:public Ast
@@ -635,7 +600,6 @@ class Set_Ast:public Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Abort_Ast:public Ast
@@ -648,7 +612,6 @@ class Abort_Ast:public Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Wrap_Ast:public Ast
@@ -662,7 +625,6 @@ public:
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Start_Ast:public Ast
@@ -675,7 +637,6 @@ class Start_Ast:public Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Selection_Statement_Ast: public Ast {
@@ -690,7 +651,6 @@ class Selection_Statement_Ast: public Ast {
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Each_Statement_Ast: public Ast {
@@ -706,7 +666,6 @@ class Each_Statement_Ast: public Ast {
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Iteration_Statement_Ast: public Ast {
@@ -720,7 +679,6 @@ public:
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Basic_Loop_Ast: public Ast{
@@ -734,7 +692,6 @@ public:
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 
-//	Ast* desugar_find_loop(Ast* ast);
 };
 
 class Array_Limit_Ast: public Ast{
@@ -750,10 +707,26 @@ public:
 
 };
 
+class Send_Assignment_Ast:public Ast
+{
+	Ast * lhs;
+	Ast * rhs;
+
+  public:
+	Send_Assignment_Ast(Ast * temp_lhs, Ast * temp_rhs, int line);
+	~Send_Assignment_Ast();
+
+	void print(ostream & file_buffer);
+	void print_xml(ostream & file_buffer);
+
+};
+
 class Desugar_Ast{
 	static string get_new_iterator_name();
 	static void find_hash_vars_and_build_assign_expr( Ast* root, std::vector<string>* var_list, std::vector<Ast*>* limits_list );
-
+	static Ast* get_party_port(Ast* root, int flag);
+	static Ast* desugar_send_lhs(Ast* root, Ast* rhs_port, int flag);
+	static Ast* desugar_send_rhs(Ast* root, Ast* lhs_port, int flag);
 
 public:
 	static Ast* desugar_loops( Ast* root );

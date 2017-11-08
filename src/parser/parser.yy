@@ -757,7 +757,7 @@ exp:
 	}
 	}
 |
-	exp '|' term
+	term '|' term
 	{
 	if(NOT_ONLY_PARSE)
 	{

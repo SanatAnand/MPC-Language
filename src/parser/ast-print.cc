@@ -169,11 +169,13 @@ void Sequence_Ast::print_xml(ostream & file_buffer) {
 
 
 void Send_Ast::print(ostream & file_buffer) {
-	print_tabs(file_buffer, tab_counter);
-	lhs->print(file_buffer);
-	file_buffer<<" => ";
-	rhs->print(file_buffer);
-	file_buffer<<";\n";
+	Desugar_Ast d;
+	(d.desugar_send(this))->print(file_buffer);
+	//print_tabs(file_buffer, tab_counter);
+	//lhs->print(file_buffer);
+	//file_buffer<<" => ";
+	//rhs->print(file_buffer);
+	//file_buffer<<";\n";
 }
 
 void Send_Ast::print_xml(ostream & file_buffer) {
@@ -1243,6 +1245,18 @@ void Array_Limit_Ast::print(ostream & file_buffer) {
 }
 
 void Array_Limit_Ast::print_xml(ostream & file_buffer) {
+}
+
+void Send_Assignment_Ast::print(ostream & file_buffer) {
+	print_tabs(file_buffer, tab_counter);
+	lhs->print(file_buffer);
+	file_buffer<<" => ";
+	rhs->print(file_buffer);
+	file_buffer<<";\n";
+
+}
+
+void Send_Assignment_Ast::print_xml(ostream & file_buffer) {
 }
 
 
