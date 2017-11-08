@@ -722,7 +722,7 @@ class Send_Assignment_Ast:public Ast
 };
 
 class Desugar_Ast{
-	static string get_new_variable_name();
+	static string get_new_iterator_name();
 	static void find_hash_vars_and_build_assign_expr( Ast* root, std::vector<string>* var_list, std::vector<Ast*>* limits_list );
 	static Ast* get_party_port(Ast* root, int flag);
 	static Ast* desugar_send_lhs(Ast* root, Ast* rhs_port, int flag);
