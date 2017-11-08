@@ -7,7 +7,7 @@ using namespace std;
 
 #include "ast.hh"
 
-string Desugar_Ast::get_new_variable_name()
+string Desugar_Ast::get_new_iterator_name()
 {
 	return "i0";
 	//TODO
@@ -32,7 +32,7 @@ void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<s
 					{
 						//variable is not specified
 						//generate new iterator name and insert into var_list
-						string name = get_new_variable_name();
+						string name = get_new_iterator_name();
 						(*var_list).push_back(name);
 						//insert into limits_list
 						(*limits_list).push_back(new Array_Limit_Ast( ((Name_Ast*)(((Term_Ast*)root)->child))->name, counter));
