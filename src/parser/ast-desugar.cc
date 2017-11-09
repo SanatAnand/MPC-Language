@@ -195,10 +195,8 @@ Ast* Desugar_Ast::get_party_port(Ast* root, int flag)
 
 	if(typeid(*root)==typeid(Term_Ast))
 	{
-			// Ast* name_ast = new Name_Ast(((Name_Ast*)(((Term_Ast*)root)->child))->name, ((Term_Ast*)root)->lineno);
-			// return new Term_Ast(name_ast, ((Term_Ast*)root)->dim_list, ((Term_Ast*)root)->t, ((Term_Ast*)root)->lineno);
-			Ast* term_ast = new Term_Ast(NULL, NULL, env_port, ((Term_Ast*)root)->lineno);
-			return new Send_Assignment_Ast(root, term_ast, ((Term_Ast*)root)->lineno);
+			Ast* name_ast = new Name_Ast(((Name_Ast*)(((Term_Ast*)root)->child))->name, ((Term_Ast*)root)->lineno);
+			return new Term_Ast(name_ast, ((Term_Ast*)root)->dim_list, ((Term_Ast*)root)->t, ((Term_Ast*)root)->lineno);
 	}
 	else if(typeid(*root)==typeid(Port_Expr_Ast))
 	{
@@ -220,15 +218,16 @@ Ast* Desugar_Ast::desugar_send_lhs(Ast* root, Ast* rhs_port, int flag)
 		if(flag==0)
 		{
 			//port/var only;
-			//write to rhs_port directly
-			return new Send_Assignment_Ast(root, rhs_port, ((Term_Ast*)root)->lineno);
-					
+			//return null, since already constructed from rhs
+			return NULL;
+			
 		}
 		else
 		{
 			//cascade send up to the super-party;
 			//assign to env port, construct corresponding ast
-			Ast* term_ast = new Term_Ast(NULL, NULL, env_port, ((Term_Ast*)root)->lineno);
+			Ast* name_ast = new Name_Ast("env", ((Term_Ast*)root)->lineno);
+			Ast* term_ast = new Term_Ast(name_ast, NULL, env_port, ((Term_Ast*)root)->lineno);
 			return new Send_Assignment_Ast(root, term_ast, ((Term_Ast*)root)->lineno);
 		}
 	}
@@ -236,55 +235,67 @@ Ast* Desugar_Ast::desugar_send_lhs(Ast* root, Ast* rhs_port, int flag)
 	{
 		//lhs of root will be single party, rhs will be port
 		//construct assign from port to env
-		Ast* tmp;
-		if(flag==0)
-		{
-			//outer most party, send to rhs_port	
-			tmp = new Send_Assignment_Ast(((Port_Expr_Ast*)root)->rhs, rhs_port, ((Port_Expr_Ast*)root)->lineno);
-		}
-		else
-		{
-			Ast* term_ast = new Term_Ast(NULL, NULL, env_port, ((Port_Expr_Ast*)root)->lineno);
-			tmp = new Send_Assignment_Ast(((Port_Expr_Ast*)root)->rhs, term_ast, ((Port_Expr_Ast*)root)->lineno);
-		
-		}
+		Ast* name_ast = new Name_Ast("env", ((Port_Expr_Ast*)root)->lineno);
+		Ast* term_ast = new Term_Ast(name_ast, NULL, env_port, ((Port_Expr_Ast*)root)->lineno);
+		Ast* tmp = new Send_Assignment_Ast(((Port_Expr_Ast*)root)->rhs, term_ast, ((Port_Expr_Ast*)root)->lineno);
 		//put inside in block of party lhs
 		Ast* tmp2 = new In_Ast(tmp, ((Port_Expr_Ast*)root)->lhs, false, ((Port_Expr_Ast*)root)->lineno);
-		return tmp2;	
+		Ast* tmp_final;		
+		if(flag==0)
+		{
+			//outer most level
+			//read from child party root, send to rhs_port
+			//construct sequence of above
+			//construct sequence of read and write
+			Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
+			//add tmp2 to the sequence
+			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp2);
+			//read from child party root and send to rhs_port
+			Ast* tmp3 = new Send_Assignment_Ast(get_party_port((Party_Expr_Ast*)root, 0), rhs_port, ((Party_Expr_Ast*)root)->lineno);
+			//add to sequence
+			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp3);
+			//return it
+			tmp_final = tmp_seq;
+		}
+		else
+			tmp_final = tmp2;
+		return tmp_final;	
 	}
 	else if(typeid(*root)==typeid(Party_Expr_Ast))
 	{				
 		//construct sequence of recursion, read and write
 		Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
 		//recurse on rhs
-		if(typeid(*((Party_Expr_Ast*)root)->rhs)==typeid(Term_Ast))
-		{}
-		else
-		{
-			Ast* tmp = desugar_send_lhs(((Party_Expr_Ast*)root)->rhs, rhs_port, 1);
-			//add to sequence
-			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp);
-		
-		}
-		
-		Ast* tmp2;
-		if(flag==0)
-		{
-			//outer most party, read from child-party and send to rhs_port
-			tmp2 = new Send_Assignment_Ast(get_party_port(((Party_Expr_Ast*)root)->rhs, 0), rhs_port, ((Party_Expr_Ast*)root)->lineno);
-		}
-		else
-		{
-			//read from child party and cascade up to super-party by writing to env
-			Ast* term_ast = new Term_Ast(NULL, NULL, env_port, ((Party_Expr_Ast*)root)->lineno);
-			tmp2 = new Send_Assignment_Ast(get_party_port(((Party_Expr_Ast*)root)->rhs, 0), term_ast, ((Party_Expr_Ast*)root)->lineno);
-		}
+		Ast* tmp = desugar_send_lhs(((Party_Expr_Ast*)root)->rhs, rhs_port, 1);
+		//add to sequence
+		((Sequence_Ast*)tmp_seq)->ast_push_back(tmp);
+		//read from child party and cascade up to super-party by writing to env
+		Ast* name_ast = new Name_Ast("env", ((Party_Expr_Ast*)root)->lineno);
+		Ast* term_ast = new Term_Ast(name_ast, NULL, env_port, ((Party_Expr_Ast*)root)->lineno);
+		Ast* tmp2 = new Send_Assignment_Ast(get_party_port(((Party_Expr_Ast*)root)->rhs, 0), term_ast, ((Party_Expr_Ast*)root)->lineno);
 		//add to sequence
 		((Sequence_Ast*)tmp_seq)->ast_push_back(tmp2);
 		//put inside in block of party lhs
 		Ast* tmp3 = new In_Ast(tmp_seq, ((Party_Expr_Ast*)root)->lhs, false, ((Party_Expr_Ast*)root)->lineno);
 		Ast* tmp_final;
-		return tmp3;
+		if(flag==0)
+		{
+			//outer most level
+			//read from child party root, send to rhs_port
+			//construct sequence of above
+			Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
+			//add tmp3 to the sequence
+			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp3);
+			//read from child party root and send to rhs_port
+			Ast* tmp4 = new Send_Assignment_Ast(get_party_port((Party_Expr_Ast*)root, 0), rhs_port, ((Party_Expr_Ast*)root)->lineno);
+			//add to sequence
+			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp4);
+			//return it
+			tmp_final = tmp_seq;
+		}		
+		else
+			tmp_final = tmp3;
+		return tmp_final;
 	}
 	else
 	{
@@ -299,67 +310,81 @@ Ast* Desugar_Ast::desugar_send_rhs(Ast* root, Ast* lhs_port, int flag)
 		if(flag==0)
 		{
 			//port/var only
-			//read from lhs_port and write to root
-			return new Send_Assignment_Ast(lhs_port, root, ((Term_Ast*)root)->lineno);
+			//return null, since already constructed from lhs
+			return NULL;
 		}
 		else
 		{
 			//read from env (connected to super-party)
 			//assign to root, construct corresponding ast
-			Ast* term_ast = new Term_Ast(NULL, NULL, env_port, ((Term_Ast*)root)->lineno);
+			Ast* name_ast = new Name_Ast("env", ((Term_Ast*)root)->lineno);
+			Ast* term_ast = new Term_Ast(name_ast, NULL, env_port, ((Term_Ast*)root)->lineno);
 			return new Send_Assignment_Ast(term_ast, root, ((Term_Ast*)root)->lineno);
 		}
 	}
 	else if(typeid(*root)==typeid(Port_Expr_Ast))
 	{
-		Ast* tmp;
-		if(flag==0)
-		{
-			//outermost party, read from lhs_port, send to rhs
-			tmp = new Send_Assignment_Ast(lhs_port, ((Port_Expr_Ast*)root)->rhs, ((Port_Expr_Ast*)root)->lineno);
-		}
-		else
-		{
-			//lhs of root will be single party, rhs will be port
-			//construct assign from env to port
-			Ast* term_ast = new Term_Ast(NULL, NULL, env_port, ((Port_Expr_Ast*)root)->lineno);
-			tmp = new Send_Assignment_Ast(term_ast, ((Port_Expr_Ast*)root)->rhs, ((Port_Expr_Ast*)root)->lineno);
-		}
+		//lhs of root will be single party, rhs will be port
+		//construct assign from env to port
+		Ast* name_ast = new Name_Ast("env", ((Port_Expr_Ast*)root)->lineno);
+		Ast* term_ast = new Term_Ast(name_ast, NULL, env_port, ((Port_Expr_Ast*)root)->lineno);
+		Ast* tmp = new Send_Assignment_Ast(term_ast, ((Port_Expr_Ast*)root)->rhs, ((Port_Expr_Ast*)root)->lineno);
 		//put inside in block of party lhs
 		Ast* tmp2 = new In_Ast(tmp, ((Port_Expr_Ast*)root)->lhs, false, ((Port_Expr_Ast*)root)->lineno);
-		return tmp2;
+		Ast* tmp_final;
+		if(flag==0)
+		{
+			//outer most level
+			//read from lhs_port and send to child-party root->lhs
+			//construct sequence of above
+			Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
+			Ast* tmp3 = new Send_Assignment_Ast(lhs_port, get_party_port((Port_Expr_Ast*)root, 0), ((Party_Expr_Ast*)root)->lineno);
+			//add to sequence
+			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp3);
+			//add tmp2 to the sequence
+			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp2);
+			//return it
+			tmp_final = tmp_seq;
+		}		
+		else
+			tmp_final = tmp2;
+		return tmp_final;
 		
 	}
 	else if(typeid(*root)==typeid(Party_Expr_Ast))
 	{				
 		//construct sequence of read, write, recursion
 		Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
-		Ast* tmp;
-		if(flag==0)
-		{
-			//outermost party, read from lhs_port
-			tmp = new Send_Assignment_Ast(lhs_port, get_party_port(((Party_Expr_Ast*)root)->rhs, 0), ((Party_Expr_Ast*)root)->lineno);
-		}
-		else
-		{
-			//read from env (connected to super-party) and send to port of child-party
-			Ast* tmp_env_term_ast = new Term_Ast(NULL, NULL, env_port, ((Party_Expr_Ast*)root)->lineno);
-			tmp = new Send_Assignment_Ast(tmp_env_term_ast, get_party_port(((Party_Expr_Ast*)root)->rhs, 0), ((Party_Expr_Ast*)root)->lineno);
-		}
+		//read from env (connected to super-party) and send to port of child-party
+		Ast* tmp_env_name_ast = new Name_Ast("env", ((Party_Expr_Ast*)root)->lineno);
+		Ast* tmp_env_term_ast = new Term_Ast(tmp_env_name_ast, NULL, env_port, ((Party_Expr_Ast*)root)->lineno);
+		Ast* tmp = new Send_Assignment_Ast(tmp_env_term_ast, get_party_port(((Party_Expr_Ast*)root)->rhs, 0), ((Party_Expr_Ast*)root)->lineno);
 		//add to sequence
 		((Sequence_Ast*)tmp_seq)->ast_push_back(tmp);
 		//recurse on rhs
-		if(typeid(*((Party_Expr_Ast*)root)->rhs)==typeid(Term_Ast))
-		{}
-		else
-		{	
-			Ast* tmp2 = desugar_send_rhs(((Party_Expr_Ast*)root)->rhs, lhs_port, 1);
-			//add to sequence
-			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp2);
-		}
+		Ast* tmp2 = desugar_send_rhs(((Party_Expr_Ast*)root)->rhs, lhs_port, 1);
+		//add to sequence
+		((Sequence_Ast*)tmp_seq)->ast_push_back(tmp2);
 		//put inside in block of party lhs
 		Ast* tmp3 = new In_Ast(tmp_seq, ((Party_Expr_Ast*)root)->lhs, false, ((Party_Expr_Ast*)root)->lineno);
-		return tmp3;
+		Ast* tmp_final;
+		if(flag==0)
+		{
+			//outer most level
+			//read from lhs_port and send to child-party root
+			//construct sequence of above
+			Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
+			Ast* tmp4 = new Send_Assignment_Ast(lhs_port, get_party_port((Party_Expr_Ast*)root, 0), ((Party_Expr_Ast*)root)->lineno);
+			//add to sequence
+			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp4);
+			//add tmp3 to the sequence
+			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp3);
+			//return it
+			tmp_final = tmp_seq;
+		}		
+		else
+			tmp_final = tmp3;
+		return tmp_final;
 	}
 	else
 	{
