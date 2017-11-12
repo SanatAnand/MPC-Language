@@ -40,17 +40,6 @@ void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<s
 					//insert into limits_list
 					(*limits_list).push_back(new Array_Limit_Ast( ((Name_Ast*)(((Term_Ast*)root)->child))->name, counter));
 					//construct ast for the new iterator variable and assign appropriately
-					((Term_Ast*)root)->dim_list->insert(i,new Term_Ast(new Name_Ast(name,root->lineno), NULL, variable, root->lineno));
-				}
-				else if(dynamic_cast<Term_Ast*>((*i)))
-				{
-					//variable is not specified
-					//generate new iterator name and insert into var_list
-					string name = get_new_iterator_name();
-					(*var_list).push_back(name);
-					//insert into limits_list
-					(*limits_list).push_back(new Array_Limit_Ast( ((Name_Ast*)(((Term_Ast*)root)->child))->name, counter));
-					//construct ast for the new iterator variable and assign appropriately
 					// ((Term_Ast*)root)->dim_list->insert(i,new Term_Ast(new Name_Ast(name,root->lineno), NULL, variable, root->lineno));
 					(*i) = new Term_Ast(new Name_Ast(name,root->lineno), NULL, variable, root->lineno);
 				}
@@ -216,23 +205,9 @@ Ast* Desugar_Ast::get_party_port(Ast* root)
 		//construct new term_ast and return
 		//using remove_hashes to clone
 		//TODO create clone_ast and use instead
-	/*	Ast* name_ast = new Name_Ast(((Name_Ast*)(((Term_Ast*)root)->child))->name, ((Term_Ast*)root)->lineno);
-		list<Ast*> *temp_dim_list = new list<Ast*>();
-		Ast* temp_elem;
-		int counter = 0;
-		for(auto i= ((Term_Ast*)root)->dim_list->begin(); i!= ((Term_Ast*)root)->dim_list->end(); i++, counter++)
-		{
-			temp_elem = remove_hashes(*i);
-			temp_dim_list->push_back(temp_elem);
-		}
-		return new Term_Ast(name_ast, temp_dim_list, ((Term_Ast*)root)->t, ((Term_Ast*)root)->lineno);
-		*/
-		Ast *res;
-		
+		Ast *res;		
 		res = remove_hashes(root);
-		// cout<<"there"<<endl;
-		return res;
-		// return root;
+		return res;		
 	}
 	else if(typeid(*root)==typeid(Port_Expr_Ast))
 	{
@@ -247,7 +222,7 @@ Ast* Desugar_Ast::get_party_port(Ast* root)
 	else 
 		//could be expr...check further or ?
 		//TODO clone root
-		return root;
+		return remove_hashes(root);
 }
 
 Ast* Desugar_Ast::desugar_send_lhs(Ast* root, Ast* rhs_port)
@@ -462,8 +437,9 @@ Ast* Desugar_Ast::remove_hashes(Ast* root)
 			temp_child = new Number_Ast<int>(((Number_Ast<int>*)(((Term_Ast*)root)->child))->constant, (((Term_Ast*)root)->child)->lineno);
 		else if((((Term_Ast*)root)->child) == NULL) 
 			temp_child = NULL;
-		else{
-			cout<<"SOMETHINH IS SERIOUSLY WRONG"<<endl;
+		else
+		{
+			//error ?
 		}
 		
 
@@ -497,21 +473,11 @@ Ast* Desugar_Ast::remove_hashes(Ast* root)
 
 					Term_Type elem_type = ((Term_Ast*)(*i))->t;
 					if(((Term_Ast*)(*i))->t == iterator_variable){
-						cout<<"here"<<endl;
-						cout<<(((Name_Ast*)((Term_Ast*)root)->child)->name)<<" "<<root->lineno<<endl;
-						
 						elem_type = variable;
 						temp_elem = new Term_Ast(elem_child,elem_dim_list,elem_type,(*i)->lineno);
-					
-						cout<<"there"<<endl;
 					}
 					else{
-						cout<<"here1423423"<<endl;
-						cout<<(((Name_Ast*)((Term_Ast*)root)->child)->name)<<" "<<root->lineno<<endl;
-
 						temp_elem = remove_hashes(*i);
-
-						cout<<"there1423423"<<endl;		
 					}
 
 				}
