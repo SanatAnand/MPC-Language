@@ -734,10 +734,12 @@ public:
 
 class Desugar_Ast{
 	static string get_new_iterator_name();
+
 	static void find_hash_vars_and_build_assign_expr( Ast* root, std::vector<string>* var_list, std::vector<Ast*>* limits_list );
-	static Ast* get_party_port(Ast* root, int flag);
-	static Ast* desugar_send_lhs(Ast* root, Ast* rhs_port, int flag);
-	static Ast* desugar_send_rhs(Ast* root, Ast* lhs_port, int flag);
+
+	static Ast* get_party_port(Ast* root);
+	static Ast* desugar_send_lhs(Ast* root, Ast* rhs_port);
+	static Ast* desugar_send_rhs(Ast* root, Ast* lhs_port);
 	
 	static void resolve_addr(Ast* party, list<Ast*>* res);
 	static Ast* remove_hashes(Ast* root);

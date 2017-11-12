@@ -1,0 +1,47 @@
+
+/* Runtime configuration (for test on Alice's side, using stdin/stdout):
+ * session-identifier: <e.g., a (64*n)-bit string> where n=2 is the # parties
+ * localhost-port: 672
+ * field FF: primefield(37) 
+ * protocol: test(FF)
+ * party Alice: localhost
+ * party Bob: remotehostaddress:672
+ */
+
+// environment expected by the test protocol:
+// Alice's local environment: 
+//  give an F value z to Alice, and obtain an output from Alice.
+// Bob's local environment: 
+//  give an F value pair (x,y) to Bob, and obtain an output from Bob.
+
+
+
+
+/* a subprotocol, that will be used in test below, in two ways */
+protocol add(field F) : party A, B {
+	in A {
+		F a;
+		environ => a;
+	}
+
+	in B {
+		F b, c;
+		environ => b;
+	}
+
+	A.a => B.c;
+
+	in B {
+		c = b+c;
+	}
+
+	B.c => A.a;
+
+	in A{
+		a => environ;
+	}
+
+	in B{
+		c => environ;
+	}
+}
