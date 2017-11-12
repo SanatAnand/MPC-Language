@@ -279,15 +279,17 @@ void Forward_Ast::print_xml(ostream & file_buffer) {
 ///////////////////////////////////////////////////
 void In_Ast::print(ostream & file_buffer) {
 	//WRITE THIS
-	print_tabs(file_buffer, tab_counter);
-	file_buffer<<"in ";
-	party->print(file_buffer);
-	file_buffer<<"{\n";
-	tab_counter++;
-	s_list->print(file_buffer);
-	tab_counter--;
-	print_tabs(file_buffer, tab_counter);
-	file_buffer<<"}\n";
+	Desugar_Ast d;
+	(d.desugar_in(this))->print(file_buffer);
+	// print_tabs(file_buffer, tab_counter);
+	// file_buffer<<"in ";
+	// party->print(file_buffer);
+	// file_buffer<<"{\n";
+	// tab_counter++;
+	// s_list->print(file_buffer);
+	// tab_counter--;
+	// print_tabs(file_buffer, tab_counter);
+	// file_buffer<<"}\n";
 }
 
 void In_Ast::print_xml(ostream & file_buffer) {
@@ -1247,6 +1249,7 @@ void Array_Limit_Ast::print(ostream & file_buffer) {
 void Array_Limit_Ast::print_xml(ostream & file_buffer) {
 }
 
+<<<<<<< HEAD
 void Send_Assignment_Ast::print(ostream & file_buffer) {
 	print_tabs(file_buffer, tab_counter);
 	lhs->print(file_buffer);
@@ -1259,6 +1262,23 @@ void Send_Assignment_Ast::print(ostream & file_buffer) {
 void Send_Assignment_Ast::print_xml(ostream & file_buffer) {
 }
 
+=======
+void CheckPartyID_Ast::print(ostream & file_buffer){
+	//TODO
+	file_buffer<<"party_id == ";
+	list<Ast*>::iterator it1 = party_addr->begin();
+	it1++;
+	for (list<Ast*>::iterator it = party_addr->begin();it!=party_addr->end();it++,it1++){
+		(*it)->print(file_buffer);
+		if(it1!=party_addr->end())
+			file_buffer<<".";
+	}
+}
+
+void CheckPartyID_Ast::print_xml(ostream & file_buffer){
+
+}
+>>>>>>> desugar_in
 
 template class Number_Ast<double>;
 template class Number_Ast<int>;

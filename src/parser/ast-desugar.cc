@@ -7,11 +7,18 @@ using namespace std;
 
 #include "ast.hh"
 
+int dummy_var_counter = 0;
+
 string Desugar_Ast::get_new_iterator_name()
 {
+<<<<<<< HEAD
 	return "i0";
+=======
+	return "__dummy_" + to_string(dummy_var_counter++);
+>>>>>>> desugar_in
 	//TODO
 	//return a new iterator name
+	//ENSURE THAT ALL THESE VARIABLES ARE DECLARED AS INT SOMEWHERE IN THE PROGRAM AS THEY REFER TO LOOP INDICES
 	//lookup in symbol table to get next new name ?	
 }
 
@@ -29,6 +36,7 @@ void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<s
 			for(auto i= ((Term_Ast*)root)->dim_list->begin(); i!= ((Term_Ast*)root)->dim_list->end(); i++, counter++)
 			{
 				if((*i) == NULL)
+<<<<<<< HEAD
 				{
 					//variable is not specified
 					//generate new iterator name and insert into var_list
@@ -41,6 +49,21 @@ void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<s
 				}
 				else if(dynamic_cast<Term_Ast*>((*i)))
 				{
+=======
+				{
+					//variable is not specified
+					//generate new iterator name and insert into var_list
+					string name = get_new_iterator_name();
+					(*var_list).push_back(name);
+					//insert into limits_list
+					(*limits_list).push_back(new Array_Limit_Ast( ((Name_Ast*)(((Term_Ast*)root)->child))->name, counter));
+					//construct ast for the new iterator variable and assign appropriately
+					// ((Term_Ast*)root)->dim_list->insert(i,new Term_Ast(new Name_Ast(name,root->lineno), NULL, variable, root->lineno));
+					(*i) = new Term_Ast(new Name_Ast(name,root->lineno), NULL, variable, root->lineno);
+				}
+				else if(dynamic_cast<Term_Ast*>((*i)))
+				{
+>>>>>>> desugar_in
 					if(((Term_Ast*)(*i))->t == iterator_variable)
 					{
 						//insert into var_list
@@ -50,6 +73,13 @@ void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<s
 						//convert to variable type
 						((Term_Ast*)(*i))->t = variable;
 					}
+<<<<<<< HEAD
+=======
+					else if(((Term_Ast*)(*i))->t == variable)
+					{
+						find_hash_vars_and_build_assign_expr( (*i), var_list, limits_list);
+					}
+>>>>>>> desugar_in
 				}
 				else
 					find_hash_vars_and_build_assign_expr( (*i), var_list, limits_list);
@@ -187,6 +217,7 @@ Ast* Desugar_Ast::desugar_loops( Ast* root )
 	return d_root;
 }
 
+<<<<<<< HEAD
 Ast* Desugar_Ast::get_party_port(Ast* root, int flag)
 {
 	if(root==NULL)
@@ -392,12 +423,217 @@ Ast* Desugar_Ast::desugar_send_rhs(Ast* root, Ast* lhs_port, int flag)
 }
 
 Ast* Desugar_Ast::desugar_send( Ast* root )
+=======
+/*	For Desugaring In Statements */
+void Desugar_Ast::add_hashes(Ast* root)
+{
+	if(dynamic_cast<Term_Ast*>(root))
+	{
+		if(((Term_Ast*)root)->t == variable && ((Term_Ast*)root)->dim_list !=NULL)
+		{
+			int counter = 0;
+			for(auto i= ((Term_Ast*)root)->dim_list->begin(); i!= ((Term_Ast*)root)->dim_list->end(); i++, counter++)
+			{
+				if((*i) == NULL)
+				{
+					string name = get_new_iterator_name();
+					// ((Term_Ast*)root)->dim_list->insert(i,new Term_Ast(new Name_Ast(name,root->lineno), NULL, iterator_variable, root->lineno));
+					(*i) = new Term_Ast(new Name_Ast(name,root->lineno), NULL, variable, root->lineno);
+				}
+				else
+					add_hashes(*i);
+			}
+		}
+	}
+	else if(dynamic_cast<Boolean_Expr_Ast*>(root))
+	{
+		//recurse
+		add_hashes( ((Boolean_Expr_Ast*)root)->lhs_op);
+		if(((Boolean_Expr_Ast*)root)->bool_op != boolean_not)
+			add_hashes( ((Boolean_Expr_Ast*)root)->rhs_op);
+	}	
+	else if(dynamic_cast<Arithmetic_Expr_Ast*>(root))
+	{
+		//recurse
+		add_hashes( ((Arithmetic_Expr_Ast*)root)->lhs);
+		add_hashes( ((Arithmetic_Expr_Ast*)root)->rhs);
+	}
+	else if(dynamic_cast<Relational_Expr_Ast*>(root))
+	{
+		//recurse
+		add_hashes( ((Relational_Expr_Ast*)root)->lhs_condition);
+		add_hashes( ((Relational_Expr_Ast*)root)->rhs_condition);
+	}
+	else if(dynamic_cast<Port_Expr_Ast*>(root))
+	{
+		//recurse
+		add_hashes( ((Port_Expr_Ast*)root)->lhs);
+		add_hashes( ((Port_Expr_Ast*)root)->rhs);
+	}
+	else if(dynamic_cast<Party_Expr_Ast*>(root))
+	{
+		//recurse
+		add_hashes( ((Party_Expr_Ast*)root)->lhs);
+		add_hashes( ((Party_Expr_Ast*)root)->rhs);
+	}
+	else if(dynamic_cast<From_Expr_Ast*>(root))
+	{
+		//recurse
+		add_hashes( ((From_Expr_Ast*)root)->lhs_op);
+		add_hashes( ((From_Expr_Ast*)root)->rhs_op);
+	}
+	else if(dynamic_cast<Expression_List_Ast*>(root))
+	{
+		//recurse
+		//careful with list iterator conversion to list object
+		for(auto i= ((Expression_List_Ast*)root)->exp_list->begin(); i!= ((Expression_List_Ast*)root)->exp_list->end(); i++)
+			add_hashes(*i);
+	}
+	else
+	{
+		//throw error?
+	}
+}
+
+Ast* Desugar_Ast::remove_hashes(Ast* root)
+{
+	if(dynamic_cast<Term_Ast*>(root))
+	{
+		Term_Type temp_type = ((Term_Ast*)root)->t;
+		list<Ast*> *temp_dim_list = NULL;
+		Ast* temp_child = new Name_Ast(((Name_Ast*)(((Term_Ast*)root)->child))->name, ((Name_Ast*)(((Term_Ast*)root)->child))->lineno);
+		
+		if(((Term_Ast*)root)->t == variable && ((Term_Ast*)root)->dim_list !=NULL)
+		{
+			// Root is an array
+			temp_dim_list = new list<Ast*>();
+			Ast* temp_elem;
+			int counter = 0;
+			for(auto i= ((Term_Ast*)root)->dim_list->begin(); i!= ((Term_Ast*)root)->dim_list->end(); i++, counter++)
+			{
+				if(dynamic_cast<Term_Ast*>((*i)))
+				{
+					//Array index
+					list<Ast*> *elem_dim_list = NULL;
+					Ast* elem_child = new Name_Ast(((Name_Ast*)(((Term_Ast*)(*i))->child))->name, ((Name_Ast*)(((Term_Ast*)(*i))->child))->lineno);
+					Term_Type elem_type = ((Term_Ast*)(*i))->t;
+					if(((Term_Ast*)(*i))->t == iterator_variable){
+						elem_type = variable;
+						temp_elem = new Term_Ast(elem_child,elem_dim_list,elem_type,(*i)->lineno);
+					}
+					else{
+						temp_elem = remove_hashes(*i);
+					}
+				}
+				else
+					temp_elem = remove_hashes(*i);
+
+				temp_dim_list->push_back(temp_elem);
+			}
+		}
+		return new Term_Ast(temp_child,temp_dim_list,temp_type,root->lineno);
+	}
+	else if(dynamic_cast<Boolean_Expr_Ast*>(root))
+	{
+		//recurse
+		Ast* lhs_ast = remove_hashes( ((Boolean_Expr_Ast*)root)->lhs_op);
+		Ast* rhs_ast = NULL;
+		if(((Boolean_Expr_Ast*)root)->bool_op != boolean_not)
+			rhs_ast = remove_hashes( ((Boolean_Expr_Ast*)root)->rhs_op);
+		return new Boolean_Expr_Ast(lhs_ast, ((Boolean_Expr_Ast*)root)->bool_op, rhs_ast, root->lineno);
+	}
+	else if(dynamic_cast<Arithmetic_Expr_Ast*>(root))
+	{
+		//recurse
+		Ast* lhs_ast = remove_hashes( ((Arithmetic_Expr_Ast*)root)->lhs);
+		Ast* rhs_ast = remove_hashes( ((Arithmetic_Expr_Ast*)root)->rhs);
+		if(dynamic_cast<Plus_Ast*>(root))
+			return new Plus_Ast(lhs_ast, rhs_ast, root->lineno);
+		else if(dynamic_cast<Minus_Ast*>(root))
+			return new Minus_Ast(lhs_ast, rhs_ast, root->lineno);
+		else if(dynamic_cast<Mult_Ast*>(root))
+			return new Mult_Ast(lhs_ast, rhs_ast, root->lineno);
+		else if(dynamic_cast<Divide_Ast*>(root))
+			return new Divide_Ast(lhs_ast, rhs_ast, root->lineno);
+		else if(dynamic_cast<Modulo_Ast*>(root))
+			return new Modulo_Ast(lhs_ast, rhs_ast, root->lineno);
+		else if(dynamic_cast<UMinus_Ast*>(root))
+			return new UMinus_Ast(lhs_ast, rhs_ast, root->lineno);
+		else{
+			//error
+			return NULL;
+		}
+	}
+	else if(dynamic_cast<Relational_Expr_Ast*>(root))
+	{
+		//recurse
+		Ast* lhs_ast = remove_hashes( ((Relational_Expr_Ast*)root)->lhs_condition);
+		Ast* rhs_ast = remove_hashes( ((Relational_Expr_Ast*)root)->rhs_condition);
+		return new Relational_Expr_Ast(lhs_ast, ((Relational_Expr_Ast*)root)->rel_op, rhs_ast, root->lineno);
+	}
+	else if(dynamic_cast<Port_Expr_Ast*>(root))
+	{
+		//recurse
+		Ast* lhs_ast = remove_hashes( ((Port_Expr_Ast*)root)->lhs);
+		Ast* rhs_ast = remove_hashes( ((Port_Expr_Ast*)root)->rhs);
+		return new Port_Expr_Ast(lhs_ast, rhs_ast, root->lineno);
+	}
+	else if(dynamic_cast<Party_Expr_Ast*>(root))
+	{
+		//recurse
+		Ast* lhs_ast = remove_hashes( ((Party_Expr_Ast*)root)->lhs);
+		Ast* rhs_ast = remove_hashes( ((Party_Expr_Ast*)root)->rhs);
+		return new Party_Expr_Ast(lhs_ast, rhs_ast, root->lineno);
+	}
+	else if(dynamic_cast<From_Expr_Ast*>(root))
+	{
+		//recurse
+		Ast* lhs_ast = remove_hashes( ((From_Expr_Ast*)root)->lhs_op);
+		Ast* rhs_ast = remove_hashes( ((From_Expr_Ast*)root)->rhs_op);
+		return new From_Expr_Ast(lhs_ast, rhs_ast, root->lineno);
+	}
+	else if(dynamic_cast<Expression_List_Ast*>(root))
+	{
+		//recurse
+		//careful with list iterator conversion to list object
+		list<Ast*> *temp_list = new list<Ast*>();
+		for(auto i= ((Expression_List_Ast*)root)->exp_list->begin(); i!= ((Expression_List_Ast*)root)->exp_list->end(); i++)
+			temp_list->push_back(remove_hashes(*i));
+		return new Expression_List_Ast(temp_list, root->lineno);
+	}
+	else
+	{
+		//throw error?
+	}
+}
+
+void Desugar_Ast::resolve_addr(Ast* party, list<Ast*>* res)
+{
+	if(dynamic_cast<Party_Expr_Ast*>(party))
+	{
+		resolve_addr(((Party_Expr_Ast*)party)->lhs,res);
+		resolve_addr(((Party_Expr_Ast*)party)->rhs,res);
+	}
+	else if(dynamic_cast<Term_Ast*>(party))
+	{
+		res->push_back(party);
+	}
+	else
+	{
+		//Syntax error: Report it - Not a valid party
+		return;
+	}
+}
+
+Ast* Desugar_Ast::desugar_in(Ast* root)
+>>>>>>> desugar_in
 {
 	if(root==NULL)
 		return NULL;
-	else if(typeid(*root) != typeid(Send_Ast))
+	else if(typeid(*root) != typeid(In_Ast))
 		return NULL;
 
+<<<<<<< HEAD
 	Ast *lhs_port, *rhs_port;
 	Ast *new_lhs, *new_rhs;
 	if(typeid(*(((Send_Ast*)root)->lhs))==typeid(Term_Ast) && typeid(*(((Send_Ast*)root)->rhs))==typeid(Term_Ast))
@@ -427,5 +663,43 @@ Ast* Desugar_Ast::desugar_send( Ast* root )
 			//null if rhs is a port/var, no need to construct
 			((Sequence_Ast*)tmp_seq)->ast_push_back(new_rhs);
 		return tmp_seq;
+=======
+	Ast* body = ((In_Ast*)root)->s_list;
+	Ast* party = ((In_Ast*)root)->party;
+
+	if(!(((In_Ast*)root)->each))
+	{
+		if(!(dynamic_cast<Party_Expr_Ast*>(party) || dynamic_cast<Term_Ast*>(party) )|| !dynamic_cast<Sequence_Ast*>(body))
+		{
+			//error
+			return NULL;
+		}
+
+		list<Ast*>* res = new list<Ast*>();
+		resolve_addr(party,res);
+		Ast * cond = new CheckPartyID_Ast(res);
+		Ast * if_stmt = new Selection_Statement_Ast(cond,body,NULL,root->lineno);
+		return if_stmt;
+	}
+	else
+	{
+		if(!dynamic_cast<Each_Statement_Ast*>(party) || !dynamic_cast<Sequence_Ast*>(body))
+		{
+			//error
+			return NULL;
+		}
+
+		Ast * new_body = new Sequence_Ast(body->lineno);
+		add_hashes(((Each_Statement_Ast*)party)->expression);
+		Ast* party_in_body = remove_hashes(((Each_Statement_Ast*)party)->expression);
+		
+		list<Ast*>* res = new list<Ast*>();
+		resolve_addr(party_in_body,res);
+		Ast * cond = new CheckPartyID_Ast(res);
+		Ast * if_stmt = new Selection_Statement_Ast(cond,body,NULL,root->lineno);
+		((Sequence_Ast*)new_body)->ast_push_back(if_stmt);
+		Ast * iter_stmt = new Iteration_Statement_Ast(party, new_body, root->lineno);
+		return iter_stmt;
+>>>>>>> desugar_in
 	}
 }
