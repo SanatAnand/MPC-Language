@@ -11,11 +11,7 @@ int dummy_var_counter = 0;
 
 string Desugar_Ast::get_new_iterator_name()
 {
-<<<<<<< HEAD
-	return "i0";
-=======
 	return "__dummy_" + to_string(dummy_var_counter++);
->>>>>>> desugar_in
 	//TODO
 	//return a new iterator name
 	//ENSURE THAT ALL THESE VARIABLES ARE DECLARED AS INT SOMEWHERE IN THE PROGRAM AS THEY REFER TO LOOP INDICES
@@ -36,7 +32,6 @@ void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<s
 			for(auto i= ((Term_Ast*)root)->dim_list->begin(); i!= ((Term_Ast*)root)->dim_list->end(); i++, counter++)
 			{
 				if((*i) == NULL)
-<<<<<<< HEAD
 				{
 					//variable is not specified
 					//generate new iterator name and insert into var_list
@@ -48,8 +43,6 @@ void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<s
 					((Term_Ast*)root)->dim_list->insert(i,new Term_Ast(new Name_Ast(name,root->lineno), NULL, variable, root->lineno));
 				}
 				else if(dynamic_cast<Term_Ast*>((*i)))
-				{
-=======
 				{
 					//variable is not specified
 					//generate new iterator name and insert into var_list
@@ -63,7 +56,6 @@ void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<s
 				}
 				else if(dynamic_cast<Term_Ast*>((*i)))
 				{
->>>>>>> desugar_in
 					if(((Term_Ast*)(*i))->t == iterator_variable)
 					{
 						//insert into var_list
@@ -73,13 +65,10 @@ void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<s
 						//convert to variable type
 						((Term_Ast*)(*i))->t = variable;
 					}
-<<<<<<< HEAD
-=======
 					else if(((Term_Ast*)(*i))->t == variable)
 					{
 						find_hash_vars_and_build_assign_expr( (*i), var_list, limits_list);
 					}
->>>>>>> desugar_in
 				}
 				else
 					find_hash_vars_and_build_assign_expr( (*i), var_list, limits_list);
@@ -217,7 +206,6 @@ Ast* Desugar_Ast::desugar_loops( Ast* root )
 	return d_root;
 }
 
-<<<<<<< HEAD
 Ast* Desugar_Ast::get_party_port(Ast* root, int flag)
 {
 	if(root==NULL)
@@ -423,7 +411,6 @@ Ast* Desugar_Ast::desugar_send_rhs(Ast* root, Ast* lhs_port, int flag)
 }
 
 Ast* Desugar_Ast::desugar_send( Ast* root )
-=======
 /*	For Desugaring In Statements */
 void Desugar_Ast::add_hashes(Ast* root)
 {

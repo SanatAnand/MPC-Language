@@ -582,7 +582,6 @@ Array_Limit_Ast::Array_Limit_Ast( string array, int index)
 
 Array_Limit_Ast::~Array_Limit_Ast(){}
 
-<<<<<<< HEAD
 Send_Assignment_Ast::Send_Assignment_Ast(Ast* lhs, Ast* rhs, int line) {
 	this->lhs = lhs;
 	this->rhs = rhs;
@@ -593,14 +592,13 @@ Send_Assignment_Ast::~Send_Assignment_Ast() {
 	delete lhs;
 	delete rhs;
 }
-=======
+
 CheckPartyID_Ast::CheckPartyID_Ast(list<Ast*>* party_addr)
 {
 	this->party_addr = party_addr;
 }
 
 CheckPartyID_Ast::~CheckPartyID_Ast(){}
->>>>>>> desugar_in
 
 template class Number_Ast<double>;
 template class Number_Ast<int>;
