@@ -23,43 +23,42 @@ void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<s
 		return;
 	else if(dynamic_cast<Term_Ast*>(root))
 	{
-			if(((Term_Ast*)root)->t == variable && ((Term_Ast*)root)->dim_list !=NULL)
+		if(((Term_Ast*)root)->t == variable && ((Term_Ast*)root)->dim_list !=NULL)
+		{
+			int counter = 0;
+			for(auto i= ((Term_Ast*)root)->dim_list->begin(); i!= ((Term_Ast*)root)->dim_list->end(); i++, counter++)
 			{
-				int counter = 0;
-				for(auto i= ((Term_Ast*)root)->dim_list->begin(); i!= ((Term_Ast*)root)->dim_list->end(); i++, counter++)
+				if((*i) == NULL)
 				{
-					if((*i) == NULL)
+					//variable is not specified
+					//generate new iterator name and insert into var_list
+					string name = get_new_iterator_name();
+					(*var_list).push_back(name);
+					//insert into limits_list
+					(*limits_list).push_back(new Array_Limit_Ast( ((Name_Ast*)(((Term_Ast*)root)->child))->name, counter));
+					//construct ast for the new iterator variable and assign appropriately
+					((Term_Ast*)root)->dim_list->insert(i,new Term_Ast(new Name_Ast(name,root->lineno), NULL, variable, root->lineno));
+				}
+				else if(dynamic_cast<Term_Ast*>((*i)))
+				{
+					if(((Term_Ast*)(*i))->t == iterator_variable)
 					{
-						//variable is not specified
-						//generate new iterator name and insert into var_list
-						string name = get_new_iterator_name();
-						(*var_list).push_back(name);
+						//insert into var_list
+						(*var_list).push_back(((Name_Ast*)(((Term_Ast*)(*i))->child))->name);
 						//insert into limits_list
 						(*limits_list).push_back(new Array_Limit_Ast( ((Name_Ast*)(((Term_Ast*)root)->child))->name, counter));
-						//construct ast for the new iterator variable and assign appropriately
-						((Term_Ast*)root)->dim_list->insert(i,new Term_Ast(new Name_Ast(name,root->lineno), NULL, variable, root->lineno));
+						//convert to variable type
+						((Term_Ast*)(*i))->t = variable;
 					}
-					else if(dynamic_cast<Term_Ast*>((*i)))
-					{
-						if(((Term_Ast*)(*i))->t == iterator_variable)
-						{
-							//insert into var_list
-							(*var_list).push_back(((Name_Ast*)(((Term_Ast*)(*i))->child))->name);
-							//insert into limits_list
-							(*limits_list).push_back(new Array_Limit_Ast( ((Name_Ast*)(((Term_Ast*)root)->child))->name, counter));
-							//convert to variable type
-							((Term_Ast*)(*i))->t = variable;
-						}
-
-					}
-					else
-						find_hash_vars_and_build_assign_expr( (*i), var_list, limits_list);
 				}
+				else
+					find_hash_vars_and_build_assign_expr( (*i), var_list, limits_list);
 			}
-			else if(((Term_Ast*)root)->t == iterator_variable)
-			{
-				//throw error? #t not in dimlist of some variable
-			}
+		}
+		else if(((Term_Ast*)root)->t == iterator_variable)
+		{
+			//throw error? #t not in dimlist of some variable
+		}
 	}
 	else if(dynamic_cast<Boolean_Expr_Ast*>(root))
 	{
