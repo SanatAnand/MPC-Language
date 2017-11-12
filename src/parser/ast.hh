@@ -390,8 +390,9 @@ public:
 template <class T>
 class Number_Ast:public Ast
 {
+public:
 	T constant;
-  public:
+	
 	Number_Ast(T number, int line);
 	~Number_Ast();
 

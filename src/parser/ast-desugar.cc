@@ -227,7 +227,12 @@ Ast* Desugar_Ast::get_party_port(Ast* root)
 		}
 		return new Term_Ast(name_ast, temp_dim_list, ((Term_Ast*)root)->t, ((Term_Ast*)root)->lineno);
 		*/
-		return root;
+		Ast *res;
+		
+		res = remove_hashes(root);
+		// cout<<"there"<<endl;
+		return res;
+		// return root;
 	}
 	else if(typeid(*root)==typeid(Port_Expr_Ast))
 	{
@@ -449,35 +454,73 @@ Ast* Desugar_Ast::remove_hashes(Ast* root)
 	{
 		Term_Type temp_type = ((Term_Ast*)root)->t;
 		list<Ast*> *temp_dim_list = NULL;
-		Ast* temp_child = new Name_Ast(((Name_Ast*)(((Term_Ast*)root)->child))->name, ((Name_Ast*)(((Term_Ast*)root)->child))->lineno);
+		Ast* temp_child;
+
+		if(dynamic_cast<Name_Ast*>((((Term_Ast*)root)->child)))
+			temp_child = new Name_Ast(((Name_Ast*)(((Term_Ast*)root)->child))->name, ((Name_Ast*)(((Term_Ast*)root)->child))->lineno);
+		else if(dynamic_cast<Number_Ast<int>*>((((Term_Ast*)root)->child)))
+			temp_child = new Number_Ast<int>(((Number_Ast<int>*)(((Term_Ast*)root)->child))->constant, (((Term_Ast*)root)->child)->lineno);
+		else if((((Term_Ast*)root)->child) == NULL) 
+			temp_child = NULL;
+		else{
+			cout<<"SOMETHINH IS SERIOUSLY WRONG"<<endl;
+		}
 		
+
 		if(((Term_Ast*)root)->t == variable && ((Term_Ast*)root)->dim_list !=NULL)
-		{
+		{			
 			// Root is an array
+			
 			temp_dim_list = new list<Ast*>();
 			Ast* temp_elem;
 			int counter = 0;
+			
+
 			for(auto i= ((Term_Ast*)root)->dim_list->begin(); i!= ((Term_Ast*)root)->dim_list->end(); i++, counter++)
 			{
+				
 				if(dynamic_cast<Term_Ast*>((*i)))
 				{
+
 					//Array index
 					list<Ast*> *elem_dim_list = NULL;
-					Ast* elem_child = new Name_Ast(((Name_Ast*)(((Term_Ast*)(*i))->child))->name, ((Name_Ast*)(((Term_Ast*)(*i))->child))->lineno);
+					Ast* elem_child;
+					if(dynamic_cast<Name_Ast*>((((Term_Ast*)(*i))->child)))
+					{
+						elem_child = new Name_Ast(((Name_Ast*)(((Term_Ast*)(*i))->child))->name, (((Term_Ast*)(*i))->child)->lineno);
+					}
+					else if(dynamic_cast<Number_Ast<int>*>((((Term_Ast*)(*i))->child)))
+					{
+						elem_child = new Number_Ast<int>(((Number_Ast<int>*)(((Term_Ast*)(*i))->child))->constant, (((Term_Ast*)(*i))->child)->lineno);
+					}
+					
+
 					Term_Type elem_type = ((Term_Ast*)(*i))->t;
 					if(((Term_Ast*)(*i))->t == iterator_variable){
+						cout<<"here"<<endl;
+						cout<<(((Name_Ast*)((Term_Ast*)root)->child)->name)<<" "<<root->lineno<<endl;
+						
 						elem_type = variable;
 						temp_elem = new Term_Ast(elem_child,elem_dim_list,elem_type,(*i)->lineno);
+					
+						cout<<"there"<<endl;
 					}
 					else{
+						cout<<"here1423423"<<endl;
+						cout<<(((Name_Ast*)((Term_Ast*)root)->child)->name)<<" "<<root->lineno<<endl;
+
 						temp_elem = remove_hashes(*i);
+
+						cout<<"there1423423"<<endl;		
 					}
+
 				}
 				else
 					temp_elem = remove_hashes(*i);
 
 				temp_dim_list->push_back(temp_elem);
 			}
+
 		}
 		return new Term_Ast(temp_child,temp_dim_list,temp_type,root->lineno);
 	}
