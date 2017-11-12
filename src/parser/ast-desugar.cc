@@ -7,11 +7,14 @@ using namespace std;
 
 #include "ast.hh"
 
+int dummy_var_counter = 0;
+
 string Desugar_Ast::get_new_iterator_name()
 {
-	return "i0";
+	return "__dummy_" + to_string(dummy_var_counter++);
 	//TODO
 	//return a new iterator name
+	//ENSURE THAT ALL THESE VARIABLES ARE DECLARED AS INT SOMEWHERE IN THE PROGRAM AS THEY REFER TO LOOP INDICES
 	//lookup in symbol table to get next new name ?	
 }
 
@@ -37,7 +40,8 @@ void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<s
 					//insert into limits_list
 					(*limits_list).push_back(new Array_Limit_Ast( ((Name_Ast*)(((Term_Ast*)root)->child))->name, counter));
 					//construct ast for the new iterator variable and assign appropriately
-					((Term_Ast*)root)->dim_list->insert(i,new Term_Ast(new Name_Ast(name,root->lineno), NULL, variable, root->lineno));
+					// ((Term_Ast*)root)->dim_list->insert(i,new Term_Ast(new Name_Ast(name,root->lineno), NULL, variable, root->lineno));
+					(*i) = new Term_Ast(new Name_Ast(name,root->lineno), NULL, variable, root->lineno);
 				}
 				else if(dynamic_cast<Term_Ast*>((*i)))
 				{
@@ -50,7 +54,10 @@ void Desugar_Ast::find_hash_vars_and_build_assign_expr( Ast* root, std::vector<s
 						//convert to variable type
 						((Term_Ast*)(*i))->t = variable;
 					}
-
+					else if(((Term_Ast*)(*i))->t == variable)
+					{
+						find_hash_vars_and_build_assign_expr( (*i), var_list, limits_list);
+					}
 				}
 				else
 					find_hash_vars_and_build_assign_expr( (*i), var_list, limits_list);
@@ -188,114 +195,76 @@ Ast* Desugar_Ast::desugar_loops( Ast* root )
 	return d_root;
 }
 
-Ast* Desugar_Ast::get_party_port(Ast* root, int flag)
+Ast* Desugar_Ast::get_party_port(Ast* root)
 {
 	if(root==NULL)
 		return NULL;
 
 	if(typeid(*root)==typeid(Term_Ast))
 	{
-			Ast* name_ast = new Name_Ast(((Name_Ast*)(((Term_Ast*)root)->child))->name, ((Term_Ast*)root)->lineno);
-			return new Term_Ast(name_ast, ((Term_Ast*)root)->dim_list, ((Term_Ast*)root)->t, ((Term_Ast*)root)->lineno);
+		//construct new term_ast and return
+		//using remove_hashes to clone
+		//TODO create clone_ast and use instead
+		Ast *res;		
+		res = remove_hashes(root);
+		return res;		
 	}
 	else if(typeid(*root)==typeid(Port_Expr_Ast))
 	{
-		//recurse with flag 1, i.e.. not super-party
-		return get_party_port(((Port_Expr_Ast*)root)->lhs, 1);
+		//recurse 
+		return get_party_port(((Port_Expr_Ast*)root)->lhs);
 	}
 	else if(typeid(*root)==typeid(Party_Expr_Ast))
 	{
-		//recurse with flag 1, i.e.. not super-party
-		return get_party_port(((Party_Expr_Ast*)root)->lhs, 1);
+		//recurse 
+		return get_party_port(((Party_Expr_Ast*)root)->lhs);
 	}
+	else 
+		//could be expr...check further or ?
+		//TODO clone root
+		return remove_hashes(root);
 }
 
-Ast* Desugar_Ast::desugar_send_lhs(Ast* root, Ast* rhs_port, int flag)
+Ast* Desugar_Ast::desugar_send_lhs(Ast* root, Ast* rhs_port)
 {
 
 	if(typeid(*root)==typeid(Term_Ast))
-	{
-		if(flag==0)
-		{
-			//port/var only;
-			//return null, since already constructed from rhs
-			return NULL;
-			
-		}
-		else
-		{
-			//cascade send up to the super-party;
-			//assign to env port, construct corresponding ast
-			Ast* name_ast = new Name_Ast("env", ((Term_Ast*)root)->lineno);
-			Ast* term_ast = new Term_Ast(name_ast, NULL, env_port, ((Term_Ast*)root)->lineno);
-			return new Send_Assignment_Ast(root, term_ast, ((Term_Ast*)root)->lineno);
-		}
-	}
+		//cannot send as not a party
+		return NULL;
 	else if(typeid(*root)==typeid(Port_Expr_Ast))
 	{
-		//lhs of root will be single party, rhs will be port
-		//construct assign from port to env
-		Ast* name_ast = new Name_Ast("env", ((Port_Expr_Ast*)root)->lineno);
-		Ast* term_ast = new Term_Ast(name_ast, NULL, env_port, ((Port_Expr_Ast*)root)->lineno);
-		Ast* tmp = new Send_Assignment_Ast(((Port_Expr_Ast*)root)->rhs, term_ast, ((Port_Expr_Ast*)root)->lineno);
+		//construct sequence of read and write
+		Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
+		//read from child and write to rhs_port (will be env if inside another party) 
+		//child is a variable, will assign variable to rhs_port 
+		Ast* tmp2 = new Send_Assignment_Ast(get_party_port(((Port_Expr_Ast*)root)->rhs), rhs_port, ((Port_Expr_Ast*)root)->lineno);
+		//add to sequence
+		((Sequence_Ast*)tmp_seq)->ast_push_back(tmp2);
 		//put inside in block of party lhs
-		Ast* tmp2 = new In_Ast(tmp, ((Port_Expr_Ast*)root)->lhs, false, ((Port_Expr_Ast*)root)->lineno);
-		Ast* tmp_final;		
-		if(flag==0)
-		{
-			//outer most level
-			//read from child party root, send to rhs_port
-			//construct sequence of above
-			//construct sequence of read and write
-			Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
-			//add tmp2 to the sequence
-			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp2);
-			//read from child party root and send to rhs_port
-			Ast* tmp3 = new Send_Assignment_Ast(get_party_port((Party_Expr_Ast*)root, 0), rhs_port, ((Party_Expr_Ast*)root)->lineno);
-			//add to sequence
-			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp3);
-			//return it
-			tmp_final = tmp_seq;
-		}
-		else
-			tmp_final = tmp2;
-		return tmp_final;	
+		Ast* tmp3 = new In_Ast(tmp_seq, ((Port_Expr_Ast*)root)->lhs, false, ((Port_Expr_Ast*)root)->lineno);
+		return tmp3;
 	}
 	else if(typeid(*root)==typeid(Party_Expr_Ast))
 	{				
 		//construct sequence of recursion, read and write
 		Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
-		//recurse on rhs
-		Ast* tmp = desugar_send_lhs(((Party_Expr_Ast*)root)->rhs, rhs_port, 1);
-		//add to sequence
-		((Sequence_Ast*)tmp_seq)->ast_push_back(tmp);
-		//read from child party and cascade up to super-party by writing to env
-		Ast* name_ast = new Name_Ast("env", ((Party_Expr_Ast*)root)->lineno);
-		Ast* term_ast = new Term_Ast(name_ast, NULL, env_port, ((Party_Expr_Ast*)root)->lineno);
-		Ast* tmp2 = new Send_Assignment_Ast(get_party_port(((Party_Expr_Ast*)root)->rhs, 0), term_ast, ((Party_Expr_Ast*)root)->lineno);
+		if(typeid(*(((Party_Expr_Ast*)root)->rhs))==(typeid(Party_Expr_Ast)) || typeid(*(((Party_Expr_Ast*)root)->rhs))==(typeid(Port_Expr_Ast))) 
+		{
+			//recurse on rhs if child(rhs) is a party (not a variable)
+			//rhs_port for child will be env
+			Ast* term_ast = new Term_Ast(NULL, NULL, env_port, ((Party_Expr_Ast*)root)->lineno);
+			Ast* tmp = desugar_send_lhs(((Party_Expr_Ast*)root)->rhs, term_ast);
+			//add to sequence
+			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp);
+		}
+		//read from child and write to rhs_port (will be env if inside another party) 
+		//if child is a variable, will assign variable to rhs_port 
+		Ast* tmp2 = new Send_Assignment_Ast(get_party_port(((Party_Expr_Ast*)root)->rhs), rhs_port, ((Party_Expr_Ast*)root)->lineno);
 		//add to sequence
 		((Sequence_Ast*)tmp_seq)->ast_push_back(tmp2);
 		//put inside in block of party lhs
 		Ast* tmp3 = new In_Ast(tmp_seq, ((Party_Expr_Ast*)root)->lhs, false, ((Party_Expr_Ast*)root)->lineno);
-		Ast* tmp_final;
-		if(flag==0)
-		{
-			//outer most level
-			//read from child party root, send to rhs_port
-			//construct sequence of above
-			Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
-			//add tmp3 to the sequence
-			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp3);
-			//read from child party root and send to rhs_port
-			Ast* tmp4 = new Send_Assignment_Ast(get_party_port((Party_Expr_Ast*)root, 0), rhs_port, ((Party_Expr_Ast*)root)->lineno);
-			//add to sequence
-			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp4);
-			//return it
-			tmp_final = tmp_seq;
-		}		
-		else
-			tmp_final = tmp3;
-		return tmp_final;
+		return tmp3;
 	}
 	else
 	{
@@ -303,93 +272,46 @@ Ast* Desugar_Ast::desugar_send_lhs(Ast* root, Ast* rhs_port, int flag)
 	}
 }
 
-Ast* Desugar_Ast::desugar_send_rhs(Ast* root, Ast* lhs_port, int flag)
+Ast* Desugar_Ast::desugar_send_rhs(Ast* root, Ast* lhs_port)
 {
 	if(typeid(*root)==typeid(Term_Ast))
-	{
-		if(flag==0)
-		{
-			//port/var only
-			//return null, since already constructed from lhs
-			return NULL;
-		}
-		else
-		{
-			//read from env (connected to super-party)
-			//assign to root, construct corresponding ast
-			Ast* name_ast = new Name_Ast("env", ((Term_Ast*)root)->lineno);
-			Ast* term_ast = new Term_Ast(name_ast, NULL, env_port, ((Term_Ast*)root)->lineno);
-			return new Send_Assignment_Ast(term_ast, root, ((Term_Ast*)root)->lineno);
-		}
-	}
+		//cannot receive as not a party
+		return NULL;
 	else if(typeid(*root)==typeid(Port_Expr_Ast))
 	{
-		//lhs of root will be single party, rhs will be port
-		//construct assign from env to port
-		Ast* name_ast = new Name_Ast("env", ((Port_Expr_Ast*)root)->lineno);
-		Ast* term_ast = new Term_Ast(name_ast, NULL, env_port, ((Port_Expr_Ast*)root)->lineno);
-		Ast* tmp = new Send_Assignment_Ast(term_ast, ((Port_Expr_Ast*)root)->rhs, ((Port_Expr_Ast*)root)->lineno);
-		//put inside in block of party lhs
-		Ast* tmp2 = new In_Ast(tmp, ((Port_Expr_Ast*)root)->lhs, false, ((Port_Expr_Ast*)root)->lineno);
-		Ast* tmp_final;
-		if(flag==0)
-		{
-			//outer most level
-			//read from lhs_port and send to child-party root->lhs
-			//construct sequence of above
-			Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
-			Ast* tmp3 = new Send_Assignment_Ast(lhs_port, get_party_port((Port_Expr_Ast*)root, 0), ((Party_Expr_Ast*)root)->lineno);
-			//add to sequence
-			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp3);
-			//add tmp2 to the sequence
-			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp2);
-			//return it
-			tmp_final = tmp_seq;
-		}		
-		else
-			tmp_final = tmp2;
-		return tmp_final;
-		
-	}
-	else if(typeid(*root)==typeid(Party_Expr_Ast))
-	{				
-		//construct sequence of read, write, recursion
+		//construct sequence of read and write
 		Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
-		//read from env (connected to super-party) and send to port of child-party
-		Ast* tmp_env_name_ast = new Name_Ast("env", ((Party_Expr_Ast*)root)->lineno);
-		Ast* tmp_env_term_ast = new Term_Ast(tmp_env_name_ast, NULL, env_port, ((Party_Expr_Ast*)root)->lineno);
-		Ast* tmp = new Send_Assignment_Ast(tmp_env_term_ast, get_party_port(((Party_Expr_Ast*)root)->rhs, 0), ((Party_Expr_Ast*)root)->lineno);
-		//add to sequence
-		((Sequence_Ast*)tmp_seq)->ast_push_back(tmp);
-		//recurse on rhs
-		Ast* tmp2 = desugar_send_rhs(((Party_Expr_Ast*)root)->rhs, lhs_port, 1);
+		//read from lhs_port  and write to child (lhs_port will be env if inside another party) 
+		//child is a variable, will assign lhs_port to variable 
+		Ast* tmp2 = new Send_Assignment_Ast(lhs_port, get_party_port(((Port_Expr_Ast*)root)->rhs), ((Port_Expr_Ast*)root)->lineno);
 		//add to sequence
 		((Sequence_Ast*)tmp_seq)->ast_push_back(tmp2);
 		//put inside in block of party lhs
 		Ast* tmp3 = new In_Ast(tmp_seq, ((Party_Expr_Ast*)root)->lhs, false, ((Party_Expr_Ast*)root)->lineno);
-		Ast* tmp_final;
-		if(flag==0)
-		{
-			//outer most level
-			//read from lhs_port and send to child-party root
-			//construct sequence of above
-			Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
-			Ast* tmp4 = new Send_Assignment_Ast(lhs_port, get_party_port((Party_Expr_Ast*)root, 0), ((Party_Expr_Ast*)root)->lineno);
-			//add to sequence
-			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp4);
-			//add tmp3 to the sequence
-			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp3);
-			//return it
-			tmp_final = tmp_seq;
-		}		
-		else
-			tmp_final = tmp3;
-		return tmp_final;
+		return tmp3;
 	}
-	else
-	{
-		//throw error ?
-	}	
+	else if(typeid(*root)==typeid(Party_Expr_Ast))
+	{	
+		//construct sequence of recursion, read and write
+		Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
+		//read from lhs_port  and write to child (lhs_port will be env if inside another party) 
+		//if child is a variable, will assign lhs_port to variable 
+		Ast* tmp2 = new Send_Assignment_Ast(lhs_port, get_party_port(((Party_Expr_Ast*)root)->rhs), ((Party_Expr_Ast*)root)->lineno);
+		//add to sequence
+		((Sequence_Ast*)tmp_seq)->ast_push_back(tmp2);
+		if(typeid(*(((Party_Expr_Ast*)root)->rhs))==(typeid(Party_Expr_Ast)) || typeid(*(((Party_Expr_Ast*)root)->rhs))==(typeid(Port_Expr_Ast))) 
+		{
+			//recurse on rhs if child(rhs) is a party (not a variable)
+			//lhs_port for child will be env
+			Ast* term_ast = new Term_Ast(NULL, NULL, env_port, ((Party_Expr_Ast*)root)->lineno);
+			Ast* tmp = desugar_send_lhs(term_ast, ((Party_Expr_Ast*)root)->rhs);
+			//add to sequence
+			((Sequence_Ast*)tmp_seq)->ast_push_back(tmp);
+		}
+		//put inside in block of party lhs
+		Ast* tmp3 = new In_Ast(tmp_seq, ((Party_Expr_Ast*)root)->lhs, false, ((Party_Expr_Ast*)root)->lineno);
+		return tmp3;
+	}
 }
 
 Ast* Desugar_Ast::desugar_send( Ast* root )
@@ -398,7 +320,6 @@ Ast* Desugar_Ast::desugar_send( Ast* root )
 		return NULL;
 	else if(typeid(*root) != typeid(Send_Ast))
 		return NULL;
-
 	Ast *lhs_port, *rhs_port;
 	Ast *new_lhs, *new_rhs;
 	if(typeid(*(((Send_Ast*)root)->lhs))==typeid(Term_Ast) && typeid(*(((Send_Ast*)root)->rhs))==typeid(Term_Ast))
@@ -414,19 +335,295 @@ Ast* Desugar_Ast::desugar_send( Ast* root )
 	else
 	{
 		//one of lhs and rhs has sub-parties
-		lhs_port = get_party_port(((Send_Ast*)root)->lhs, 0);
-		rhs_port = get_party_port(((Send_Ast*)root)->rhs, 0);
-	
-		new_lhs = desugar_send_lhs(((Send_Ast*)root)->lhs, rhs_port, 0);
-		new_rhs = desugar_send_rhs(((Send_Ast*)root)->rhs, lhs_port, 0);
+		lhs_port = get_party_port(((Send_Ast*)root)->lhs);
+		rhs_port = get_party_port(((Send_Ast*)root)->rhs);
+
+		new_lhs = desugar_send_lhs(((Send_Ast*)root)->lhs, rhs_port);
+		new_rhs = desugar_send_rhs(((Send_Ast*)root)->rhs, lhs_port);
 		//return sequence of above
 		Ast* tmp_seq = new Sequence_Ast(root->lineno);
 		if(new_lhs!=NULL)
 			//null if lhs is a port/var, no need to construct
-		((Sequence_Ast*)tmp_seq)->ast_push_back(new_lhs);
+			((Sequence_Ast*)tmp_seq)->ast_push_back(new_lhs);
 		if(new_rhs!=NULL)
 			//null if rhs is a port/var, no need to construct
 			((Sequence_Ast*)tmp_seq)->ast_push_back(new_rhs);
 		return tmp_seq;
+	}
+}
+
+/*	For Desugaring In Statements */
+void Desugar_Ast::add_hashes(Ast* root)
+{
+	if(dynamic_cast<Term_Ast*>(root))
+	{
+		if(((Term_Ast*)root)->t == variable && ((Term_Ast*)root)->dim_list !=NULL)
+		{
+			int counter = 0;
+			for(auto i= ((Term_Ast*)root)->dim_list->begin(); i!= ((Term_Ast*)root)->dim_list->end(); i++, counter++)
+			{
+				if((*i) == NULL)
+				{
+					string name = get_new_iterator_name();
+					// ((Term_Ast*)root)->dim_list->insert(i,new Term_Ast(new Name_Ast(name,root->lineno), NULL, iterator_variable, root->lineno));
+					(*i) = new Term_Ast(new Name_Ast(name,root->lineno), NULL, variable, root->lineno);
+				}
+				else
+					add_hashes(*i);
+			}
+		}
+	}
+	else if(dynamic_cast<Boolean_Expr_Ast*>(root))
+	{
+		//recurse
+		add_hashes( ((Boolean_Expr_Ast*)root)->lhs_op);
+		if(((Boolean_Expr_Ast*)root)->bool_op != boolean_not)
+			add_hashes( ((Boolean_Expr_Ast*)root)->rhs_op);
+	}	
+	else if(dynamic_cast<Arithmetic_Expr_Ast*>(root))
+	{
+		//recurse
+		add_hashes( ((Arithmetic_Expr_Ast*)root)->lhs);
+		add_hashes( ((Arithmetic_Expr_Ast*)root)->rhs);
+	}
+	else if(dynamic_cast<Relational_Expr_Ast*>(root))
+	{
+		//recurse
+		add_hashes( ((Relational_Expr_Ast*)root)->lhs_condition);
+		add_hashes( ((Relational_Expr_Ast*)root)->rhs_condition);
+	}
+	else if(dynamic_cast<Port_Expr_Ast*>(root))
+	{
+		//recurse
+		add_hashes( ((Port_Expr_Ast*)root)->lhs);
+		add_hashes( ((Port_Expr_Ast*)root)->rhs);
+	}
+	else if(dynamic_cast<Party_Expr_Ast*>(root))
+	{
+		//recurse
+		add_hashes( ((Party_Expr_Ast*)root)->lhs);
+		add_hashes( ((Party_Expr_Ast*)root)->rhs);
+	}
+	else if(dynamic_cast<From_Expr_Ast*>(root))
+	{
+		//recurse
+		add_hashes( ((From_Expr_Ast*)root)->lhs_op);
+		add_hashes( ((From_Expr_Ast*)root)->rhs_op);
+	}
+	else if(dynamic_cast<Expression_List_Ast*>(root))
+	{
+		//recurse
+		//careful with list iterator conversion to list object
+		for(auto i= ((Expression_List_Ast*)root)->exp_list->begin(); i!= ((Expression_List_Ast*)root)->exp_list->end(); i++)
+			add_hashes(*i);
+	}
+	else
+	{
+		//throw error?
+	}
+}
+
+Ast* Desugar_Ast::remove_hashes(Ast* root)
+{
+	if(dynamic_cast<Term_Ast*>(root))
+	{
+		Term_Type temp_type = ((Term_Ast*)root)->t;
+		list<Ast*> *temp_dim_list = NULL;
+		Ast* temp_child;
+
+		if(dynamic_cast<Name_Ast*>((((Term_Ast*)root)->child)))
+			temp_child = new Name_Ast(((Name_Ast*)(((Term_Ast*)root)->child))->name, ((Name_Ast*)(((Term_Ast*)root)->child))->lineno);
+		else if(dynamic_cast<Number_Ast<int>*>((((Term_Ast*)root)->child)))
+			temp_child = new Number_Ast<int>(((Number_Ast<int>*)(((Term_Ast*)root)->child))->constant, (((Term_Ast*)root)->child)->lineno);
+		else if((((Term_Ast*)root)->child) == NULL) 
+			temp_child = NULL;
+		else
+		{
+			//error ?
+		}
+		
+
+		if(((Term_Ast*)root)->t == variable && ((Term_Ast*)root)->dim_list !=NULL)
+		{			
+			// Root is an array
+			
+			temp_dim_list = new list<Ast*>();
+			Ast* temp_elem;
+			int counter = 0;
+			
+
+			for(auto i= ((Term_Ast*)root)->dim_list->begin(); i!= ((Term_Ast*)root)->dim_list->end(); i++, counter++)
+			{
+				
+				if(dynamic_cast<Term_Ast*>((*i)))
+				{
+
+					//Array index
+					list<Ast*> *elem_dim_list = NULL;
+					Ast* elem_child;
+					if(dynamic_cast<Name_Ast*>((((Term_Ast*)(*i))->child)))
+					{
+						elem_child = new Name_Ast(((Name_Ast*)(((Term_Ast*)(*i))->child))->name, (((Term_Ast*)(*i))->child)->lineno);
+					}
+					else if(dynamic_cast<Number_Ast<int>*>((((Term_Ast*)(*i))->child)))
+					{
+						elem_child = new Number_Ast<int>(((Number_Ast<int>*)(((Term_Ast*)(*i))->child))->constant, (((Term_Ast*)(*i))->child)->lineno);
+					}
+					
+
+					Term_Type elem_type = ((Term_Ast*)(*i))->t;
+					if(((Term_Ast*)(*i))->t == iterator_variable){
+						elem_type = variable;
+						temp_elem = new Term_Ast(elem_child,elem_dim_list,elem_type,(*i)->lineno);
+					}
+					else{
+						temp_elem = remove_hashes(*i);
+					}
+
+				}
+				else
+					temp_elem = remove_hashes(*i);
+
+				temp_dim_list->push_back(temp_elem);
+			}
+
+		}
+		return new Term_Ast(temp_child,temp_dim_list,temp_type,root->lineno);
+	}
+	else if(dynamic_cast<Boolean_Expr_Ast*>(root))
+	{
+		//recurse
+		Ast* lhs_ast = remove_hashes( ((Boolean_Expr_Ast*)root)->lhs_op);
+		Ast* rhs_ast = NULL;
+		if(((Boolean_Expr_Ast*)root)->bool_op != boolean_not)
+			rhs_ast = remove_hashes( ((Boolean_Expr_Ast*)root)->rhs_op);
+		return new Boolean_Expr_Ast(lhs_ast, ((Boolean_Expr_Ast*)root)->bool_op, rhs_ast, root->lineno);
+	}
+	else if(dynamic_cast<Arithmetic_Expr_Ast*>(root))
+	{
+		//recurse
+		Ast* lhs_ast = remove_hashes( ((Arithmetic_Expr_Ast*)root)->lhs);
+		Ast* rhs_ast = remove_hashes( ((Arithmetic_Expr_Ast*)root)->rhs);
+		if(dynamic_cast<Plus_Ast*>(root))
+			return new Plus_Ast(lhs_ast, rhs_ast, root->lineno);
+		else if(dynamic_cast<Minus_Ast*>(root))
+			return new Minus_Ast(lhs_ast, rhs_ast, root->lineno);
+		else if(dynamic_cast<Mult_Ast*>(root))
+			return new Mult_Ast(lhs_ast, rhs_ast, root->lineno);
+		else if(dynamic_cast<Divide_Ast*>(root))
+			return new Divide_Ast(lhs_ast, rhs_ast, root->lineno);
+		else if(dynamic_cast<Modulo_Ast*>(root))
+			return new Modulo_Ast(lhs_ast, rhs_ast, root->lineno);
+		else if(dynamic_cast<UMinus_Ast*>(root))
+			return new UMinus_Ast(lhs_ast, rhs_ast, root->lineno);
+		else{
+			//error
+			return NULL;
+		}
+	}
+	else if(dynamic_cast<Relational_Expr_Ast*>(root))
+	{
+		//recurse
+		Ast* lhs_ast = remove_hashes( ((Relational_Expr_Ast*)root)->lhs_condition);
+		Ast* rhs_ast = remove_hashes( ((Relational_Expr_Ast*)root)->rhs_condition);
+		return new Relational_Expr_Ast(lhs_ast, ((Relational_Expr_Ast*)root)->rel_op, rhs_ast, root->lineno);
+	}
+	else if(dynamic_cast<Port_Expr_Ast*>(root))
+	{
+		//recurse
+		Ast* lhs_ast = remove_hashes( ((Port_Expr_Ast*)root)->lhs);
+		Ast* rhs_ast = remove_hashes( ((Port_Expr_Ast*)root)->rhs);
+		return new Port_Expr_Ast(lhs_ast, rhs_ast, root->lineno);
+	}
+	else if(dynamic_cast<Party_Expr_Ast*>(root))
+	{
+		//recurse
+		Ast* lhs_ast = remove_hashes( ((Party_Expr_Ast*)root)->lhs);
+		Ast* rhs_ast = remove_hashes( ((Party_Expr_Ast*)root)->rhs);
+		return new Party_Expr_Ast(lhs_ast, rhs_ast, root->lineno);
+	}
+	else if(dynamic_cast<From_Expr_Ast*>(root))
+	{
+		//recurse
+		Ast* lhs_ast = remove_hashes( ((From_Expr_Ast*)root)->lhs_op);
+		Ast* rhs_ast = remove_hashes( ((From_Expr_Ast*)root)->rhs_op);
+		return new From_Expr_Ast(lhs_ast, rhs_ast, root->lineno);
+	}
+	else if(dynamic_cast<Expression_List_Ast*>(root))
+	{
+		//recurse
+		//careful with list iterator conversion to list object
+		list<Ast*> *temp_list = new list<Ast*>();
+		for(auto i= ((Expression_List_Ast*)root)->exp_list->begin(); i!= ((Expression_List_Ast*)root)->exp_list->end(); i++)
+			temp_list->push_back(remove_hashes(*i));
+		return new Expression_List_Ast(temp_list, root->lineno);
+	}
+	else
+	{
+		//throw error?
+	}
+}
+
+void Desugar_Ast::resolve_addr(Ast* party, list<Ast*>* res)
+{
+	if(dynamic_cast<Party_Expr_Ast*>(party))
+	{
+		resolve_addr(((Party_Expr_Ast*)party)->lhs,res);
+		resolve_addr(((Party_Expr_Ast*)party)->rhs,res);
+	}
+	else if(dynamic_cast<Term_Ast*>(party))
+	{
+		res->push_back(party);
+	}
+	else
+	{
+		//Syntax error: Report it - Not a valid party
+		return;
+	}
+}
+
+Ast* Desugar_Ast::desugar_in(Ast* root)
+{
+	if(root==NULL)
+		return NULL;
+	else if(typeid(*root) != typeid(In_Ast))
+		return NULL;
+
+	Ast* body = ((In_Ast*)root)->s_list;
+	Ast* party = ((In_Ast*)root)->party;
+
+	if(!(((In_Ast*)root)->each))
+	{
+		if(!(dynamic_cast<Party_Expr_Ast*>(party) || dynamic_cast<Term_Ast*>(party) )|| !dynamic_cast<Sequence_Ast*>(body))
+		{
+			//error
+			return NULL;
+		}
+
+		list<Ast*>* res = new list<Ast*>();
+		resolve_addr(party,res);
+		Ast * cond = new CheckPartyID_Ast(res);
+		Ast * if_stmt = new Selection_Statement_Ast(cond,body,NULL,root->lineno);
+		return if_stmt;
+	}
+	else
+	{
+		if(!dynamic_cast<Each_Statement_Ast*>(party) || !dynamic_cast<Sequence_Ast*>(body))
+		{
+			//error
+			return NULL;
+		}
+
+		Ast * new_body = new Sequence_Ast(body->lineno);
+		add_hashes(((Each_Statement_Ast*)party)->expression);
+		Ast* party_in_body = remove_hashes(((Each_Statement_Ast*)party)->expression);
+		
+		list<Ast*>* res = new list<Ast*>();
+		resolve_addr(party_in_body,res);
+		Ast * cond = new CheckPartyID_Ast(res);
+		Ast * if_stmt = new Selection_Statement_Ast(cond,body,NULL,root->lineno);
+		((Sequence_Ast*)new_body)->ast_push_back(if_stmt);
+		Ast * iter_stmt = new Iteration_Statement_Ast(party, new_body, root->lineno);
+		return iter_stmt;
 	}
 }

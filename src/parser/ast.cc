@@ -593,5 +593,12 @@ Send_Assignment_Ast::~Send_Assignment_Ast() {
 	delete rhs;
 }
 
+CheckPartyID_Ast::CheckPartyID_Ast(list<Ast*>* party_addr)
+{
+	this->party_addr = party_addr;
+}
+
+CheckPartyID_Ast::~CheckPartyID_Ast(){}
+
 template class Number_Ast<double>;
 template class Number_Ast<int>;

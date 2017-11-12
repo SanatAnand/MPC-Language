@@ -64,7 +64,7 @@ typedef enum {
 typedef enum {
 	environment,
 	ideal,
-	rand_port, 
+	rand_port,
 	env_port,
 	variable,
 	wrapper,
@@ -318,10 +318,12 @@ class Decl_Ast:public Ast
 };
 
 class In_Ast:public Ast {
+
+public:
 	Ast * s_list;
 	Ast * party;
 	bool each;
-  public:
+  
 	In_Ast(Ast * temp_lhs, Ast * party, bool each, int line);
 	~In_Ast();
 
@@ -388,8 +390,9 @@ public:
 template <class T>
 class Number_Ast:public Ast
 {
+public:
 	T constant;
-  public:
+	
 	Number_Ast(T number, int line);
 	~Number_Ast();
 
@@ -712,21 +715,36 @@ class Send_Assignment_Ast:public Ast
 	Ast * lhs;
 	Ast * rhs;
 
-  public:
+public:
 	Send_Assignment_Ast(Ast * temp_lhs, Ast * temp_rhs, int line);
 	~Send_Assignment_Ast();
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
+};
 
+class CheckPartyID_Ast: public Ast{
+public:
+	list<Ast*>* party_addr;
+	CheckPartyID_Ast(list<Ast*>* party_addr);
+	~CheckPartyID_Ast();
+
+	void print(ostream & file_buffer);
+	void print_xml(ostream & file_buffer);
 };
 
 class Desugar_Ast{
 	static string get_new_iterator_name();
+
 	static void find_hash_vars_and_build_assign_expr( Ast* root, std::vector<string>* var_list, std::vector<Ast*>* limits_list );
-	static Ast* get_party_port(Ast* root, int flag);
-	static Ast* desugar_send_lhs(Ast* root, Ast* rhs_port, int flag);
-	static Ast* desugar_send_rhs(Ast* root, Ast* lhs_port, int flag);
+
+	static Ast* get_party_port(Ast* root);
+	static Ast* desugar_send_lhs(Ast* root, Ast* rhs_port);
+	static Ast* desugar_send_rhs(Ast* root, Ast* lhs_port);
+	
+	static void resolve_addr(Ast* party, list<Ast*>* res);
+	static Ast* remove_hashes(Ast* root);
+	static void add_hashes(Ast* root);
 
 public:
 	static Ast* desugar_loops( Ast* root );
