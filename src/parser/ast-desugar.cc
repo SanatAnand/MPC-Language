@@ -216,7 +216,7 @@ Ast* Desugar_Ast::get_party_port(Ast* root)
 		//construct new term_ast and return
 		//using remove_hashes to clone
 		//TODO create clone_ast and use instead
-		Ast* name_ast = new Name_Ast(((Name_Ast*)(((Term_Ast*)root)->child))->name, ((Term_Ast*)root)->lineno);
+	/*	Ast* name_ast = new Name_Ast(((Name_Ast*)(((Term_Ast*)root)->child))->name, ((Term_Ast*)root)->lineno);
 		list<Ast*> *temp_dim_list = new list<Ast*>();
 		Ast* temp_elem;
 		int counter = 0;
@@ -226,6 +226,8 @@ Ast* Desugar_Ast::get_party_port(Ast* root)
 			temp_dim_list->push_back(temp_elem);
 		}
 		return new Term_Ast(name_ast, temp_dim_list, ((Term_Ast*)root)->t, ((Term_Ast*)root)->lineno);
+		*/
+		return root;
 	}
 	else if(typeid(*root)==typeid(Port_Expr_Ast))
 	{
@@ -237,6 +239,10 @@ Ast* Desugar_Ast::get_party_port(Ast* root)
 		//recurse 
 		return get_party_port(((Party_Expr_Ast*)root)->lhs);
 	}
+	else 
+		//could be expr...check further or ?
+		//TODO clone root
+		return root;
 }
 
 Ast* Desugar_Ast::desugar_send_lhs(Ast* root, Ast* rhs_port)
@@ -262,7 +268,7 @@ Ast* Desugar_Ast::desugar_send_lhs(Ast* root, Ast* rhs_port)
 	{				
 		//construct sequence of recursion, read and write
 		Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
-		if(typeid(*(((Party_Expr_Ast*)root)->rhs))!=(typeid(Term_Ast)))
+		if(typeid(*(((Party_Expr_Ast*)root)->rhs))==(typeid(Party_Expr_Ast)) || typeid(*(((Party_Expr_Ast*)root)->rhs))==(typeid(Port_Expr_Ast))) 
 		{
 			//recurse on rhs if child(rhs) is a party (not a variable)
 			//rhs_port for child will be env
@@ -313,7 +319,7 @@ Ast* Desugar_Ast::desugar_send_rhs(Ast* root, Ast* lhs_port)
 		Ast* tmp2 = new Send_Assignment_Ast(lhs_port, get_party_port(((Party_Expr_Ast*)root)->rhs), ((Party_Expr_Ast*)root)->lineno);
 		//add to sequence
 		((Sequence_Ast*)tmp_seq)->ast_push_back(tmp2);
-		if(typeid(*(((Party_Expr_Ast*)root)->rhs))!=(typeid(Term_Ast)))
+		if(typeid(*(((Party_Expr_Ast*)root)->rhs))==(typeid(Party_Expr_Ast)) || typeid(*(((Party_Expr_Ast*)root)->rhs))==(typeid(Port_Expr_Ast))) 
 		{
 			//recurse on rhs if child(rhs) is a party (not a variable)
 			//lhs_port for child will be env
