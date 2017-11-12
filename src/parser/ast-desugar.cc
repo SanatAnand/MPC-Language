@@ -411,6 +411,43 @@ Ast* Desugar_Ast::desugar_send_rhs(Ast* root, Ast* lhs_port, int flag)
 }
 
 Ast* Desugar_Ast::desugar_send( Ast* root )
+{
+	if(root==NULL)
+		return NULL;
+	else if(typeid(*root) != typeid(Send_Ast))
+		return NULL;
+	Ast *lhs_port, *rhs_port;
+	Ast *new_lhs, *new_rhs;
+	if(typeid(*(((Send_Ast*)root)->lhs))==typeid(Term_Ast) && typeid(*(((Send_Ast*)root)->rhs))==typeid(Term_Ast))
+	{
+		//port/var to port/var inside current party only
+		//port/var remain as it is
+		lhs_port = ((Send_Ast*)root)->lhs;
+		rhs_port = ((Send_Ast*)root)->rhs;
+		//only need to construct one send assignment ast
+		return new Send_Assignment_Ast(lhs_port, rhs_port, ((Term_Ast*)root)->lineno);
+
+	}		
+	else
+	{
+		//one of lhs and rhs has sub-parties
+		lhs_port = get_party_port(((Send_Ast*)root)->lhs, 0);
+		rhs_port = get_party_port(((Send_Ast*)root)->rhs, 0);
+	
+		new_lhs = desugar_send_lhs(((Send_Ast*)root)->lhs, rhs_port, 0);
+		new_rhs = desugar_send_rhs(((Send_Ast*)root)->rhs, lhs_port, 0);
+		//return sequence of above
+		Ast* tmp_seq = new Sequence_Ast(root->lineno);
+		if(new_lhs!=NULL)
+			//null if lhs is a port/var, no need to construct
+		((Sequence_Ast*)tmp_seq)->ast_push_back(new_lhs);
+		if(new_rhs!=NULL)
+			//null if rhs is a port/var, no need to construct
+			((Sequence_Ast*)tmp_seq)->ast_push_back(new_rhs);
+		return tmp_seq;
+	}
+}
+
 /*	For Desugaring In Statements */
 void Desugar_Ast::add_hashes(Ast* root)
 {
@@ -613,44 +650,12 @@ void Desugar_Ast::resolve_addr(Ast* party, list<Ast*>* res)
 }
 
 Ast* Desugar_Ast::desugar_in(Ast* root)
->>>>>>> desugar_in
 {
 	if(root==NULL)
 		return NULL;
 	else if(typeid(*root) != typeid(In_Ast))
 		return NULL;
 
-<<<<<<< HEAD
-	Ast *lhs_port, *rhs_port;
-	Ast *new_lhs, *new_rhs;
-	if(typeid(*(((Send_Ast*)root)->lhs))==typeid(Term_Ast) && typeid(*(((Send_Ast*)root)->rhs))==typeid(Term_Ast))
-	{
-		//port/var to port/var inside current party only
-		//port/var remain as it is
-		lhs_port = ((Send_Ast*)root)->lhs;
-		rhs_port = ((Send_Ast*)root)->rhs;
-		//only need to construct one send assignment ast
-		return new Send_Assignment_Ast(lhs_port, rhs_port, ((Term_Ast*)root)->lineno);
-
-	}		
-	else
-	{
-		//one of lhs and rhs has sub-parties
-		lhs_port = get_party_port(((Send_Ast*)root)->lhs, 0);
-		rhs_port = get_party_port(((Send_Ast*)root)->rhs, 0);
-	
-		new_lhs = desugar_send_lhs(((Send_Ast*)root)->lhs, rhs_port, 0);
-		new_rhs = desugar_send_rhs(((Send_Ast*)root)->rhs, lhs_port, 0);
-		//return sequence of above
-		Ast* tmp_seq = new Sequence_Ast(root->lineno);
-		if(new_lhs!=NULL)
-			//null if lhs is a port/var, no need to construct
-		((Sequence_Ast*)tmp_seq)->ast_push_back(new_lhs);
-		if(new_rhs!=NULL)
-			//null if rhs is a port/var, no need to construct
-			((Sequence_Ast*)tmp_seq)->ast_push_back(new_rhs);
-		return tmp_seq;
-=======
 	Ast* body = ((In_Ast*)root)->s_list;
 	Ast* party = ((In_Ast*)root)->party;
 
@@ -687,6 +692,5 @@ Ast* Desugar_Ast::desugar_in(Ast* root)
 		((Sequence_Ast*)new_body)->ast_push_back(if_stmt);
 		Ast * iter_stmt = new Iteration_Statement_Ast(party, new_body, root->lineno);
 		return iter_stmt;
->>>>>>> desugar_in
 	}
 }

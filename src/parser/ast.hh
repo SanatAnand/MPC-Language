@@ -720,7 +720,7 @@ public:
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-}
+};
 
 class CheckPartyID_Ast: public Ast{
 public:
