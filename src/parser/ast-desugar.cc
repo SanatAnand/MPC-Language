@@ -213,8 +213,19 @@ Ast* Desugar_Ast::get_party_port(Ast* root)
 
 	if(typeid(*root)==typeid(Term_Ast))
 	{
-			Ast* name_ast = new Name_Ast(((Name_Ast*)(((Term_Ast*)root)->child))->name, ((Term_Ast*)root)->lineno);
-			return new Term_Ast(name_ast, ((Term_Ast*)root)->dim_list, ((Term_Ast*)root)->t, ((Term_Ast*)root)->lineno);
+		//construct new term_ast and return
+		//using remove_hashes to clone
+		//TODO create clone_ast and use instead
+		Ast* name_ast = new Name_Ast(((Name_Ast*)(((Term_Ast*)root)->child))->name, ((Term_Ast*)root)->lineno);
+		list<Ast*> *temp_dim_list = new list<Ast*>();
+		Ast* temp_elem;
+		int counter = 0;
+		for(auto i= ((Term_Ast*)root)->dim_list->begin(); i!= ((Term_Ast*)root)->dim_list->end(); i++, counter++)
+		{
+			temp_elem = remove_hashes(*i);
+			temp_dim_list->push_back(temp_elem);
+		}
+		return new Term_Ast(name_ast, temp_dim_list, ((Term_Ast*)root)->t, ((Term_Ast*)root)->lineno);
 	}
 	else if(typeid(*root)==typeid(Port_Expr_Ast))
 	{
@@ -233,14 +244,18 @@ Ast* Desugar_Ast::desugar_send_lhs(Ast* root, Ast* rhs_port)
 
 	if(typeid(*root)==typeid(Term_Ast))
 		//cannot send as not a party
-			return NULL;
+		return NULL;
 	else if(typeid(*root)==typeid(Port_Expr_Ast))
 	{
+		//construct sequence of read and write
+		Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
 		//read from child and write to rhs_port (will be env if inside another party) 
 		//child is a variable, will assign variable to rhs_port 
-		Ast* tmp2 = new Send_Assignment_Ast(get_party_port(((Party_Expr_Ast*)root)->rhs), rhs_port, ((Party_Expr_Ast*)root)->lineno);
+		Ast* tmp2 = new Send_Assignment_Ast(get_party_port(((Port_Expr_Ast*)root)->rhs), rhs_port, ((Port_Expr_Ast*)root)->lineno);
+		//add to sequence
+		((Sequence_Ast*)tmp_seq)->ast_push_back(tmp2);
 		//put inside in block of party lhs
-		Ast* tmp3 = new In_Ast(tmp2, ((Party_Expr_Ast*)root)->lhs, false, ((Party_Expr_Ast*)root)->lineno);
+		Ast* tmp3 = new In_Ast(tmp_seq, ((Port_Expr_Ast*)root)->lhs, false, ((Port_Expr_Ast*)root)->lineno);
 		return tmp3;
 	}
 	else if(typeid(*root)==typeid(Party_Expr_Ast))
@@ -278,11 +293,15 @@ Ast* Desugar_Ast::desugar_send_rhs(Ast* root, Ast* lhs_port)
 		return NULL;
 	else if(typeid(*root)==typeid(Port_Expr_Ast))
 	{
+		//construct sequence of read and write
+		Ast* tmp_seq = new Sequence_Ast(((Party_Expr_Ast*)root)->lineno);
 		//read from lhs_port  and write to child (lhs_port will be env if inside another party) 
 		//child is a variable, will assign lhs_port to variable 
-		Ast* tmp2 = new Send_Assignment_Ast(lhs_port, get_party_port(((Party_Expr_Ast*)root)->rhs), ((Party_Expr_Ast*)root)->lineno);
+		Ast* tmp2 = new Send_Assignment_Ast(lhs_port, get_party_port(((Port_Expr_Ast*)root)->rhs), ((Port_Expr_Ast*)root)->lineno);
+		//add to sequence
+		((Sequence_Ast*)tmp_seq)->ast_push_back(tmp2);
 		//put inside in block of party lhs
-		Ast* tmp3 = new In_Ast(tmp2, ((Party_Expr_Ast*)root)->lhs, false, ((Party_Expr_Ast*)root)->lineno);
+		Ast* tmp3 = new In_Ast(tmp_seq, ((Party_Expr_Ast*)root)->lhs, false, ((Party_Expr_Ast*)root)->lineno);
 		return tmp3;
 	}
 	else if(typeid(*root)==typeid(Party_Expr_Ast))
@@ -332,7 +351,7 @@ Ast* Desugar_Ast::desugar_send( Ast* root )
 		//one of lhs and rhs has sub-parties
 		lhs_port = get_party_port(((Send_Ast*)root)->lhs);
 		rhs_port = get_party_port(((Send_Ast*)root)->rhs);
-	
+
 		new_lhs = desugar_send_lhs(((Send_Ast*)root)->lhs, rhs_port);
 		new_rhs = desugar_send_rhs(((Send_Ast*)root)->rhs, lhs_port);
 		//return sequence of above

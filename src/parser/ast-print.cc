@@ -281,15 +281,15 @@ void In_Ast::print(ostream & file_buffer) {
 	//WRITE THIS
 	Desugar_Ast d;
 	(d.desugar_in(this))->print(file_buffer);
-	// print_tabs(file_buffer, tab_counter);
-	// file_buffer<<"in ";
-	// party->print(file_buffer);
-	// file_buffer<<"{\n";
-	// tab_counter++;
-	// s_list->print(file_buffer);
-	// tab_counter--;
-	// print_tabs(file_buffer, tab_counter);
-	// file_buffer<<"}\n";
+	//print_tabs(file_buffer, tab_counter);
+	//file_buffer<<"in ";
+	//party->print(file_buffer);
+	//file_buffer<<"{\n";
+	//tab_counter++;
+	//s_list->print(file_buffer);
+	//tab_counter--;
+	//print_tabs(file_buffer, tab_counter);
+	//file_buffer<<"}\n";
 }
 
 void In_Ast::print_xml(ostream & file_buffer) {
