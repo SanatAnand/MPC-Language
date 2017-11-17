@@ -138,6 +138,7 @@ class Protocol_Decl_Ast: public Ast {
 class Protocol_Ast: public Ast {
 	Sequence_Ast * sequence_ast;
 	list<Ast*> * uses_ast;
+	Symbol_Table * table;
 	Protocol_Decl_Ast * protocol_decl;
 	
   public:

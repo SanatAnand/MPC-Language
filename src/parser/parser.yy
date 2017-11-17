@@ -170,6 +170,7 @@ protocol:
 	if(NOT_ONLY_PARSE)
 	{
 		CHECK_INVARIANT(($1 != NULL), "Protocol declaration cannot be null");
+		_curr_table = new Symbol_Table(_curr_table);
 	}
 	}
 	opt_uses 
@@ -836,7 +837,7 @@ opt_uses:
 	{
 	if(NOT_ONLY_PARSE)
 	{
-		CHECK_INVARIANT(($2 != NULL), "Declaration list cannot be null");		
+		CHECK_INVARIANT(($2 != NULL), "Declaration list cannot be null");
 		$$ = $2;
 	}
 	}
@@ -847,7 +848,7 @@ prot_decl_list:
 	{
 	if(NOT_ONLY_PARSE)
 	{
-		CHECK_INVARIANT(($1 != NULL), "Declaration cannot be null");		
+		CHECK_INVARIANT(($1 != NULL), "Declaration cannot be null");
 		list<Ast*>* protocol_decl_list = new list<Ast*>();
 		protocol_decl_list->push_back($1);
 		$$ = protocol_decl_list;
@@ -858,8 +859,8 @@ prot_decl_list:
 	{
 	if(NOT_ONLY_PARSE)
 	{
-		CHECK_INVARIANT(($2 != NULL), "Declaration cannot be null");		
-		CHECK_INVARIANT(($1 != NULL), "Declaration list cannot be null");		
+		CHECK_INVARIANT(($2 != NULL), "Declaration cannot be null");
+		CHECK_INVARIANT(($1 != NULL), "Declaration list cannot be null");
 		list<Ast*>* protocol_decl_list = $1;
 		protocol_decl_list->push_back($2);		
 		$$ = protocol_decl_list;
