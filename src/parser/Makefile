@@ -1,13 +1,14 @@
-AST_OBJ = ast.o ast-print.o ast-desugar.o
+AST_OBJ = ast.o ast-print.o ast-desugar.o ast-semantics.o
 PROG_OBJ = program.o
 OBJ_CORE = error-display.o main.o user-options.o
 OBJ_GEN = scanner.o parser.o
+SYM_OBJ = symbol-table.o
 
-HEADERS_CORE = error-display.hh user-options.hh ast.hh program.hh common-classes.hh
+HEADERS_CORE = error-display.hh user-options.hh ast.hh program.hh common-classes.hh symbol-table.hh
 HEADERS_GEN = parser.h parser.ih parserbase.h scanner.h scanner.ih scannerbase.h
 
 HEADERS = $(HEADERS_CORE) $(HEADERS_GEN)
-OBJ = $(OBJ_GEN) $(OBJ_CORE) $(AST_OBJ) $(PROC_OBJ) $(PROG_OBJ)
+OBJ = $(OBJ_GEN) $(OBJ_CORE) $(AST_OBJ) $(PROC_OBJ) $(PROG_OBJ) $(SYM_OBJ)
 
 CPP = g++
 BISONCPP = bisonc++

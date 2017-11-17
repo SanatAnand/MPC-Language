@@ -16,8 +16,6 @@
 
 // Procedure * current_procedure = NULL;
 
-Symbol_Table* _curr_table = NULL;
-
 bool currently_in_block = false;
 
 //////////////////////////////////////////////////////////////////////

@@ -170,7 +170,7 @@ protocol:
 	if(NOT_ONLY_PARSE)
 	{
 		CHECK_INVARIANT(($1 != NULL), "Protocol declaration cannot be null");
-		_curr_table = new Symbol_Table(_curr_table);
+
 	}
 	}
 	opt_uses 

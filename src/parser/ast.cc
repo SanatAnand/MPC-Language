@@ -232,16 +232,6 @@ Name_Ast::Name_Ast(string name, int line) {
 
 Name_Ast::~Name_Ast() {}
 
-void Name_Ast::print(ostream & file_buffer) {
-	//ADD CODE HERE
-	file_buffer<<this->name;
-}
-
-void Name_Ast::print_xml(ostream & file_buffer) {
-	print_tabs(file_buffer, tab_counter);
-	file_buffer<<"<Variable name=\""<<this->name<<"\"/>\n";
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 
 template <class DATA_TYPE>

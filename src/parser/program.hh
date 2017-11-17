@@ -26,6 +26,8 @@ public:
 	void add_protocol(Protocol_Ast * protocol, string protocol_name, int line);
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
+
+	void check_semantics();
 };
 
 #endif

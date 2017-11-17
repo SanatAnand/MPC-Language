@@ -1,6 +1,7 @@
 #include "ast.hh"
 #include "common-classes.hh"
 #include "program.hh"
+#include "symbol-table.hh"
 // #include "procedure.hh"
 //extern map<string,string> global_strings;
 Program::Program(){
@@ -22,6 +23,14 @@ void Program::print(ostream & file_buffer){
 void Program::print_xml(ostream & file_buffer){
 	for(auto ele : *protocols)
 		ele.second->print_xml(file_buffer);
+}
+
+void Program::check_semantics(){
+	for(auto ele : *protocols)
+	{
+		Symbol_Table* child_table = new Symbol_Table(PROTOCOL_SCOPE, NULL);
+		ele.second->check_semantics(child_table);
+	}
 }
 
 Program program_object;
