@@ -27,10 +27,7 @@ void Program::print_xml(ostream & file_buffer){
 
 void Program::check_semantics(){
 	for(auto ele : *protocols)
-	{
-		Symbol_Table* child_table = new Symbol_Table(PROTOCOL_SCOPE, NULL);
-		ele.second->check_semantics(child_table);
-	}
+		ele.second->check_semantics(NULL, "");	
 }
 
 Program program_object;

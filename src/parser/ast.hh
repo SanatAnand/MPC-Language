@@ -20,20 +20,6 @@ using namespace std;
 //extern map<string,string> global_strings;
 class Ast;
 
-// typedef enum {
-// 	session_data_type,
-// 	int_data_type,
-// 	party_data_type, 
-// 	unknown_data_type,
-// 	port_data_type,
-// 	inport_data_type,
-// 	outport_data_type,
-// 	bool_data_type,
-// 	field_data_type,
-// 	other_data_type
-// } Data_Type;
-//defined in symbol-table.hh
-
 typedef enum {
 	except,
 	where,
@@ -108,7 +94,7 @@ class Ast {
 	virtual void print_attribute(ostream & file_buffer, const char* name, Ast* value);
 	virtual void print_attribute(ostream & file_buffer, const char* name, list<Ast*>* value);
 
-	virtual bool check_semantics(Symbol_Table* symbol_table) = 0;
+	virtual bool check_semantics(Symbol_Table* symbol_table, string tag) = 0;
 };
 
 class Sequence_Ast: public Ast{
@@ -121,7 +107,7 @@ class Sequence_Ast: public Ast{
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 	void print_comma(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 
@@ -137,7 +123,7 @@ class Protocol_Decl_Ast: public Ast {
 	string get_protocol_name();
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Protocol_Ast: public Ast {
@@ -152,7 +138,7 @@ class Protocol_Ast: public Ast {
   	void set_sequence_ast(Sequence_Ast & sa);
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Assignment_Ast:public Ast
@@ -166,7 +152,7 @@ class Assignment_Ast:public Ast
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Tying_Ast:public Ast
@@ -180,7 +166,7 @@ class Tying_Ast:public Ast
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Forward_Ast:public Ast
@@ -194,7 +180,7 @@ class Forward_Ast:public Ast
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 /////////////// DONE WITH SEND ////////////////////
@@ -210,7 +196,7 @@ class Party_Ast:public Ast
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 ///////////////////////////////////////////////
@@ -227,7 +213,7 @@ class Term_Ast:public Ast
 
 	void print(ostream & file_buffer);	
 	void print_xml(ostream & file_buffer);	
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 ///////////////////////////////////////////////
@@ -243,7 +229,7 @@ public:
 
 	void print(ostream & file_buffer);	
 	void print_xml(ostream & file_buffer);	
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 ///////////////////////////////////////////////
@@ -260,7 +246,7 @@ class Argument_Ast:public Ast
 
 	void print(ostream & file_buffer);	
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Prot_Arg_Ast:public Ast
@@ -273,7 +259,7 @@ class Prot_Arg_Ast:public Ast
 
 	void print(ostream & file_buffer);	
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 ///////////////////////////////////////////////
@@ -288,7 +274,7 @@ class Name_Ast:public Ast
 	
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 //////////////  SEND STATEMENT ////////////////////
@@ -303,7 +289,7 @@ public:
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Decl_Ast:public Ast
@@ -319,7 +305,7 @@ class Decl_Ast:public Ast
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
 	void print_comma(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class In_Ast:public Ast {
@@ -334,7 +320,7 @@ public:
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class With_Ast:public Ast {
@@ -347,7 +333,7 @@ class With_Ast:public Ast {
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Seq_Ast:public Ast {
@@ -361,7 +347,7 @@ class Seq_Ast:public Ast {
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Connect_Ast:public Ast {
@@ -374,7 +360,7 @@ class Connect_Ast:public Ast {
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Port_Clause_Ast:public Ast {
@@ -389,7 +375,7 @@ public:
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 template <class T>
@@ -403,7 +389,7 @@ public:
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Arithmetic_Expr_Ast:public Ast
@@ -418,7 +404,7 @@ class Arithmetic_Expr_Ast:public Ast
 
 	virtual void print(ostream & file_buffer) = 0;
 	void print_xml(ostream & file_buffer) = 0;
-	// virtual bool check_semantics(Symbol_Table* symbol_table);
+	// virtual bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Plus_Ast:public Arithmetic_Expr_Ast
@@ -429,7 +415,7 @@ class Plus_Ast:public Arithmetic_Expr_Ast
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Minus_Ast:public Arithmetic_Expr_Ast
@@ -440,7 +426,7 @@ class Minus_Ast:public Arithmetic_Expr_Ast
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Divide_Ast:public Arithmetic_Expr_Ast
@@ -451,7 +437,7 @@ class Divide_Ast:public Arithmetic_Expr_Ast
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Modulo_Ast:public Arithmetic_Expr_Ast
@@ -462,7 +448,7 @@ class Modulo_Ast:public Arithmetic_Expr_Ast
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Mult_Ast:public Arithmetic_Expr_Ast
@@ -473,7 +459,7 @@ class Mult_Ast:public Arithmetic_Expr_Ast
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class UMinus_Ast: public Arithmetic_Expr_Ast
@@ -484,7 +470,7 @@ class UMinus_Ast: public Arithmetic_Expr_Ast
 	
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 ///////////////
 
@@ -501,7 +487,7 @@ class Relational_Expr_Ast:public Ast
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Boolean_Expr_Ast:public Ast
@@ -517,7 +503,7 @@ class Boolean_Expr_Ast:public Ast
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Port_Expr_Ast:public Ast
@@ -532,7 +518,7 @@ public:
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Party_Expr_Ast:public Ast
@@ -547,7 +533,7 @@ public:
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class From_Expr_Ast:public Ast
@@ -562,7 +548,7 @@ public:
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Expression_List_Ast:public Ast
@@ -576,7 +562,7 @@ public:
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Session_call_Ast:public Ast
@@ -592,7 +578,7 @@ class Session_call_Ast:public Ast
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Set_Ast:public Ast
@@ -607,7 +593,7 @@ class Set_Ast:public Ast
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Abort_Ast:public Ast
@@ -619,7 +605,7 @@ class Abort_Ast:public Ast
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Wrap_Ast:public Ast
@@ -632,7 +618,7 @@ public:
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Start_Ast:public Ast
@@ -644,7 +630,7 @@ class Start_Ast:public Ast
 	
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Selection_Statement_Ast: public Ast {
@@ -658,7 +644,7 @@ class Selection_Statement_Ast: public Ast {
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Each_Statement_Ast: public Ast {
@@ -673,7 +659,7 @@ class Each_Statement_Ast: public Ast {
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Iteration_Statement_Ast: public Ast {
@@ -686,7 +672,7 @@ public:
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Basic_Loop_Ast: public Ast{
@@ -699,7 +685,7 @@ public:
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Array_Limit_Ast: public Ast{
@@ -712,7 +698,7 @@ public:
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Send_Assignment_Ast:public Ast
@@ -726,7 +712,7 @@ public:
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class CheckPartyID_Ast: public Ast{
@@ -737,7 +723,7 @@ public:
 
 	void print(ostream & file_buffer);
 	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table);
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
 class Desugar_Ast{

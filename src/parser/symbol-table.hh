@@ -7,12 +7,6 @@
 using namespace std;
 
 typedef enum {
-	PROTOCOL_SCOPE,
-	PARTY_SCOPE,
-	LOCAL_SCOPE
-} scope_type;
-
-typedef enum {
 	session_data_type,
 	int_data_type,
 	party_data_type, 
@@ -30,17 +24,18 @@ class Symbol_Table_Entry;
 
 //////////////////////////////////////////////////////////////
 
+
 class Symbol_Table
-{
+{	
 public:
-	scope_type scope;
 	std::map<string, Symbol_Table_Entry*>* table;
 	Symbol_Table* parent_table;
-
-	Symbol_Table(scope_type sc, Symbol_Table* parent_table);
+	
+	Symbol_Table(Symbol_Table* parent_table);
 	~Symbol_Table();
-	Symbol_Table_Entry* find(string name);
-	void insert(string variable_name, Data_Type variable_data_type, Symbol_Table* table);
+	static string build_tag(string tag1, string tag2);	
+	Symbol_Table_Entry* find(string name, string var_tag);
+	void insert(string variable_name, Data_Type variable_data_type, string var_tag);
 };
 
 class Symbol_Table_Entry
@@ -48,9 +43,9 @@ class Symbol_Table_Entry
 public:
 	string variable_name;
 	Data_Type variable_data_type;
-	Symbol_Table* table;	//maintains pointer to party symbol table, if entry is a party
-
-	Symbol_Table_Entry(string variable_name, Data_Type variable_data_type, Symbol_Table* table);
+	string var_tag;
+	
+	Symbol_Table_Entry(string variable_name, Data_Type variable_data_type, string var_tag);
 	~Symbol_Table_Entry();
 };
 
