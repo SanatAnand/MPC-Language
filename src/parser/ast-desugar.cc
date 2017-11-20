@@ -435,6 +435,8 @@ Ast* Desugar_Ast::remove_hashes(Ast* root)
 			temp_child = new Name_Ast(((Name_Ast*)(((Term_Ast*)root)->child))->name, ((Name_Ast*)(((Term_Ast*)root)->child))->lineno);
 		else if(dynamic_cast<Number_Ast<int>*>((((Term_Ast*)root)->child)))
 			temp_child = new Number_Ast<int>(((Number_Ast<int>*)(((Term_Ast*)root)->child))->constant, (((Term_Ast*)root)->child)->lineno);
+		else if(dynamic_cast<Number_Ast<bool>*>((((Term_Ast*)root)->child)))
+			temp_child = new Number_Ast<bool>(((Number_Ast<bool>*)(((Term_Ast*)root)->child))->constant, (((Term_Ast*)root)->child)->lineno);
 		else if((((Term_Ast*)root)->child) == NULL) 
 			temp_child = NULL;
 		else
@@ -468,6 +470,10 @@ Ast* Desugar_Ast::remove_hashes(Ast* root)
 					else if(dynamic_cast<Number_Ast<int>*>((((Term_Ast*)(*i))->child)))
 					{
 						elem_child = new Number_Ast<int>(((Number_Ast<int>*)(((Term_Ast*)(*i))->child))->constant, (((Term_Ast*)(*i))->child)->lineno);
+					}
+					else if(dynamic_cast<Number_Ast<bool>*>((((Term_Ast*)(*i))->child)))
+					{
+						elem_child = new Number_Ast<bool>(((Number_Ast<bool>*)(((Term_Ast*)(*i))->child))->constant, (((Term_Ast*)(*i))->child)->lineno);
 					}
 					
 

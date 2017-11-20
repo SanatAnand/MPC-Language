@@ -214,21 +214,21 @@ void Assignment_Ast::print_xml(ostream & file_buffer) {
 
 /////////////////////////////////////////////////////
 
-void Party_Ast::print(ostream &file_buffer) {
-	file_buffer<<party_name;
-}
+// void Party_Ast::print(ostream &file_buffer) {
+// 	file_buffer<<party_name;
+// }
 
-void Party_Ast::print_xml(ostream &file_buffer) {
-	print_tabs(file_buffer, tab_counter);
-	file_buffer<<"<Party>\n";
-	tab_counter++;
-	print_attribute(file_buffer, "Name", this->party_name);
-	print_attribute(file_buffer, "Type", this->party_type);
-	// print_attribute(file_buffer, "LineNo", this->lineno);
-	tab_counter--;
-	print_tabs(file_buffer, tab_counter);
-	file_buffer<<"</Party>\n";
-}
+// void Party_Ast::print_xml(ostream &file_buffer) {
+// 	print_tabs(file_buffer, tab_counter);
+// 	file_buffer<<"<Party>\n";
+// 	tab_counter++;
+// 	print_attribute(file_buffer, "Name", this->party_name);
+// 	print_attribute(file_buffer, "Type", this->party_type);
+// 	// print_attribute(file_buffer, "LineNo", this->lineno);
+// 	tab_counter--;
+// 	print_tabs(file_buffer, tab_counter);
+// 	file_buffer<<"</Party>\n";
+// }
 
 ////////////////////////////////////////////////////
 
@@ -1285,5 +1285,5 @@ void CheckPartyID_Ast::print_xml(ostream & file_buffer){
 
 }
 
-template class Number_Ast<double>;
+template class Number_Ast<bool>;
 template class Number_Ast<int>;

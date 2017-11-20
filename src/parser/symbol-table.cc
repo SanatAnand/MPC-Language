@@ -1,4 +1,3 @@
-
 #include <string>
 #include <iostream>
 
@@ -35,7 +34,7 @@ Symbol_Table_Entry* Symbol_Table::find(string name, string var_tag)
 		return (*res).second;	
 	else
 	{
-		str::size_t found = var_tag.find(".");
+		std::size_t found = var_tag.find(".");
 		found = var_tag.find(".");
 		if(found == std::string::npos)
 		{
@@ -54,15 +53,22 @@ Symbol_Table_Entry* Symbol_Table::find(string name, string var_tag)
 		return this->parent_table->find(name, var_tag);
 }
 
-void Symbol_Table::insert(string variable_name, Data_Type variable_data_type, string var_tag)
+void Symbol_Table::insert(string variable_name, int no_of_dim, Data_Type variable_data_type, string field_name, string var_tag)
 {
-	Symbol_Table_Entry* ste = new Symbol_Table_Entry( variable_name, variable_data_type, var_tag );
-	this->table->insert( std::pair<string, Symbol_Table_Entry*> (build_tag(var_tag, variable_name), ste ));
+	Symbol_Table_Entry* ste = new Symbol_Table_Entry( variable_name, no_of_dim, variable_data_type, field_name, var_tag );
+
+	std::pair<std::map<string,Symbol_Table_Entry*>::iterator,bool> res = this->table->insert( std::pair<string, Symbol_Table_Entry*> (build_tag(var_tag, variable_name), ste ));
+	if(!res.second)
+	{		
+		//throw error ? variable already in map
+	}
 }
 
-Symbol_Table_Entry::Symbol_Table_Entry(string variable_name, Data_Type variable_data_type, string var_tag)
+Symbol_Table_Entry::Symbol_Table_Entry(string variable_name, int no_of_dim, Data_Type variable_data_type, string field_name, string var_tag)
 {
 	this->variable_name = variable_name;
+	this->no_of_dim = no_of_dim;
+	this->field_name = field_name;
 	this->variable_data_type = variable_data_type;
 	this->var_tag = var_tag;
 }

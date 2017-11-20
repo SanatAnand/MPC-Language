@@ -185,38 +185,22 @@ class Forward_Ast:public Ast
 
 /////////////// DONE WITH SEND ////////////////////
 
-class Party_Ast:public Ast
-{
-	string party_name;
-	int party_type;
+// class Party_Ast:public Ast
+// {
+// 	string party_name;
+// 	int party_type;
 
-  public:
-	Party_Ast(string party_name, int party_type, int line);
-	~Party_Ast();
+//   public:
+// 	Party_Ast(string party_name, int party_type, int line);
+// 	~Party_Ast();
 
-	void print(ostream & file_buffer);
-	void print_xml(ostream & file_buffer);
-	bool check_semantics(Symbol_Table* symbol_table, string tag);
-};
-
-///////////////////////////////////////////////
-
-class Term_Ast:public Ast
-{
-  public:
-	Term_Type t;
-	list<Ast*> *dim_list;
-	Ast* child;
-
-	Term_Ast(Ast *c, list<Ast*> *dim, Term_Type type, int line);
-	~Term_Ast();
-
-	void print(ostream & file_buffer);	
-	void print_xml(ostream & file_buffer);	
-	bool check_semantics(Symbol_Table* symbol_table, string tag);
-};
+// 	void print(ostream & file_buffer);
+// 	void print_xml(ostream & file_buffer);
+// 	bool check_semantics(Symbol_Table* symbol_table, string tag);
+// };
 
 ///////////////////////////////////////////////
+
 class Decl_Term_Ast:public Ast
 {
 	bool port_clause_exists;
@@ -378,12 +362,40 @@ public:
 	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
+///////////////////////////////////////////////
+
+class Expr_Ast:public Ast
+{
+public:
+	Data_Type data_type;
+	string data_type_name;
+
+	void print(ostream & file_buffer) = 0;
+	void print_xml(ostream & file_buffer) = 0;
+	// virtual bool check_semantics(Symbol_Table* symbol_table, string tag);
+};
+
+class Term_Ast:public Expr_Ast
+{
+  public:
+	Term_Type t;
+	list<Ast*> *dim_list;
+	Ast* child;
+
+	Term_Ast(Ast *c, list<Ast*> *dim, Term_Type type, int line);
+	~Term_Ast();
+
+	void print(ostream & file_buffer);	
+	void print_xml(ostream & file_buffer);	
+	bool check_semantics(Symbol_Table* symbol_table, string tag);
+};
+
 template <class T>
-class Number_Ast:public Ast
+class Number_Ast:public Expr_Ast
 {
 public:
 	T constant;
-	
+		
 	Number_Ast(T number, int line);
 	~Number_Ast();
 
@@ -392,13 +404,12 @@ public:
 	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
-class Arithmetic_Expr_Ast:public Ast
+class Arithmetic_Expr_Ast:public Expr_Ast
 {
   public:
 	Ast * lhs;
 	Ast * rhs;
-
-
+	
 	Arithmetic_Expr_Ast() {}
 	~Arithmetic_Expr_Ast();
 
@@ -474,14 +485,13 @@ class UMinus_Ast: public Arithmetic_Expr_Ast
 };
 ///////////////
 
-class Relational_Expr_Ast:public Ast
+class Relational_Expr_Ast:public Expr_Ast
 {
   public:
 	Ast * lhs_condition;
 	Ast * rhs_condition;
 	Relational_Op rel_op;
-
-
+	
 	Relational_Expr_Ast(Ast * lhs, Relational_Op rop, Ast * rhs, int line);
 	~Relational_Expr_Ast();
 
@@ -490,14 +500,13 @@ class Relational_Expr_Ast:public Ast
 	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
-class Boolean_Expr_Ast:public Ast
+class Boolean_Expr_Ast:public Expr_Ast
 {
   public:
 	Ast * lhs_op;
 	Ast * rhs_op;
 	Boolean_Op bool_op;
-
-
+	
 	Boolean_Expr_Ast(Ast * lhs, Boolean_Op bop, Ast * rhs, int line);
 	~Boolean_Expr_Ast();
 
@@ -506,13 +515,12 @@ class Boolean_Expr_Ast:public Ast
 	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
-class Port_Expr_Ast:public Ast
+class Port_Expr_Ast:public Expr_Ast
 {
 public:
 	Ast * lhs;
 	Ast * rhs;
-
-
+	
 	Port_Expr_Ast(Ast * lhs, Ast * rhs, int line);
 	~Port_Expr_Ast();
 
@@ -521,13 +529,12 @@ public:
 	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
-class Party_Expr_Ast:public Ast
+class Party_Expr_Ast:public Expr_Ast
 {
 public:
 	Ast * lhs;
 	Ast * rhs;
-
-
+	
 	Party_Expr_Ast(Ast * lhs, Ast * rhs, int line);
 	~Party_Expr_Ast();
 
@@ -536,13 +543,12 @@ public:
 	bool check_semantics(Symbol_Table* symbol_table, string tag);
 };
 
-class From_Expr_Ast:public Ast
+class From_Expr_Ast:public Expr_Ast
 {
 public:
 	Ast * lhs_op;
 	Ast * rhs_op;
-
-
+	
 	From_Expr_Ast(Ast * lhs, Ast * rhs, int line);
 	~From_Expr_Ast();
 
@@ -555,7 +561,6 @@ class Expression_List_Ast:public Ast
 {
 public:
 	list<Ast*> *exp_list;
-
 
 	Expression_List_Ast(list<Ast*> *exp_list, int line);
 	~Expression_List_Ast();

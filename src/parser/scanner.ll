@@ -50,6 +50,16 @@ abort	{
 	return Parser::ABORTING;
 }
 
+true	{
+	store_token_name("TRUE");
+	return Parser::TRUE;
+}
+
+false	{
+	store_token_name("FALSE");
+	return Parser::FALSE;
+}
+
 party	{
 	store_token_name("PARTY");
 	return Parser::PARTY;

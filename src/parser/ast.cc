@@ -98,13 +98,13 @@ Assignment_Ast::~Assignment_Ast() {
 
 /////////////////////////////////////////////////////
 
-Party_Ast::Party_Ast(string party_name, int party_type, int line) {
-	this->party_name = party_name;
-	this->party_type = party_type;
-	this->lineno = line;
-}
+// Party_Ast::Party_Ast(string party_name, int party_type, int line) {
+// 	this->party_name = party_name;
+// 	this->party_type = party_type;
+// 	this->lineno = line;
+// }
 
-Party_Ast::~Party_Ast() {}
+// Party_Ast::~Party_Ast() {}
 
 ////////////////////////////////////////////////////
 
@@ -240,6 +240,16 @@ Number_Ast<DATA_TYPE>::Number_Ast(DATA_TYPE number, int line) {
 	//ADD CODE HERE
 	constant = number;
 	lineno = line;
+	if(typeid(DATA_TYPE) == typeid(bool))
+	{
+		data_type = bool_data_type;
+		data_type_name = "BOOL";
+	}
+	else if(typeid(DATA_TYPE) == typeid(int))
+	{
+		data_type = int_data_type;
+		data_type_name = "INTEGER";
+	}
 }
 
 template <class DATA_TYPE>
@@ -309,6 +319,7 @@ Relational_Expr_Ast::Relational_Expr_Ast(Ast* l, Relational_Op rop, Ast* r, int 
 	this->rhs_condition = r;
 	this->rel_op = rop;
 	this->lineno = line;
+	this->data_type = bool_data_type;
 }
 
 Relational_Expr_Ast::~Relational_Expr_Ast(){
@@ -323,6 +334,7 @@ Boolean_Expr_Ast::Boolean_Expr_Ast(Ast * l, Boolean_Op bop, Ast * r, int line) {
 	rhs_op = r;
 	bool_op = bop;
 	lineno = line;
+	this->data_type = bool_data_type;
 }
 
 Boolean_Expr_Ast::~Boolean_Expr_Ast() {
@@ -336,6 +348,7 @@ Port_Expr_Ast::Port_Expr_Ast(Ast* l, Ast* r, int line) {
 	lhs = l;
 	rhs = r;
 	lineno = line;
+	this->data_type = port_data_type;
 }
 
 Port_Expr_Ast::~Port_Expr_Ast() {
@@ -349,6 +362,7 @@ Party_Expr_Ast::Party_Expr_Ast(Ast* l, Ast* r, int line) {
 	lhs = l;
 	rhs = r;
 	lineno = line;
+	this->data_type = party_data_type;
 }
 
 Party_Expr_Ast::~Party_Expr_Ast() {
@@ -362,6 +376,7 @@ From_Expr_Ast::From_Expr_Ast(Ast * l, Ast * r, int line) {
 	this->lhs_op = l;
 	this->rhs_op = r;
 	this->lineno = line;
+	this->data_type = bool_data_type;
 }
 
 From_Expr_Ast::~From_Expr_Ast() {
@@ -590,5 +605,5 @@ CheckPartyID_Ast::CheckPartyID_Ast(list<Ast*>* party_addr)
 
 CheckPartyID_Ast::~CheckPartyID_Ast(){}
 
-template class Number_Ast<double>;
+template class Number_Ast<bool>;
 template class Number_Ast<int>;

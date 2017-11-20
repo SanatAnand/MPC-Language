@@ -42,7 +42,7 @@
 %token USES ABORTING WRAP START BEFORE
 %token AFTER EACH SESSION UNKNOWN PORT INPORT OUTPORT
 %token FOR OF EXCEPT WHERE IF SET CONNECT TO FORWARD AND
-%token ENV_PORT RAND_PORT BOOL PARTIAL WITH
+%token ENV_PORT RAND_PORT BOOL PARTIAL WITH TRUE FALSE
 
 %token DOUBLE_COLON DOUBLE_DOT
 
@@ -232,7 +232,7 @@ p_list:
 ;
 
 p_list_elem:
-	exp opt_port_clause
+	term opt_port_clause
 	{
 	if(NOT_ONLY_PARSE)
 	{
@@ -432,15 +432,6 @@ term:
 	}
 	}
 |
-	'@'
-	{
-	if(NOT_ONLY_PARSE)
-	{
-		list<Ast*> *dim = NULL;
-		$$ = new Term_Ast(NULL, dim, wrapper, get_line_number());
-	}
-	}
-|
 	RAND
 	{
 	if(NOT_ONLY_PARSE)
@@ -455,18 +446,9 @@ term:
 	if(NOT_ONLY_PARSE)
 	{
 		CHECK_INVARIANT(($1 != NULL), "Constant cannot be null in term");
-		Ast* name_ast = $1;
+		Ast* number_ast = $1;
 		list<Ast*> *dim = NULL;
-		$$ = new Term_Ast(name_ast, dim, constant, get_line_number());
-	}
-	}
-|
-	ENV
-	{
-	if(NOT_ONLY_PARSE)
-	{
-		list<Ast*> *dim = NULL;
-		$$ = new Term_Ast(NULL, dim, environment, get_line_number());
+		$$ = new Term_Ast(number_ast, dim, constant, get_line_number());
 	}
 	}
 |
@@ -1741,6 +1723,26 @@ constant:
 	{
 		int cons = $1;
 		Ast * number_ast = new Number_Ast<int>(cons, get_line_number());
+		$$ = number_ast;
+	}
+	}
+|
+	TRUE
+	{
+	if(NOT_ONLY_PARSE)
+	{
+		bool val = true;
+		Ast * number_ast = new Number_Ast<bool>(val, get_line_number());
+		$$ = number_ast;
+	}
+	}
+|
+	FALSE
+	{
+	if(NOT_ONLY_PARSE)
+	{
+		bool val = false;
+		Ast * number_ast = new Number_Ast<bool>(val, get_line_number());
 		$$ = number_ast;
 	}
 	}
