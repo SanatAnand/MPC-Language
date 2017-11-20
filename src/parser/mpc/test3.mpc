@@ -1,6 +1,3 @@
-
 protocol add(field F) : party A, B {
-	for each A[#i]{
-		a = A[i];
-	}
+	a = 7;
 }

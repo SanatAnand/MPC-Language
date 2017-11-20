@@ -31,7 +31,7 @@ Symbol_Table_Entry* Symbol_Table::find(string name, string var_tag)
 {
 	map<string, Symbol_Table_Entry*>::iterator res = this->table->find(build_tag(var_tag, name));
 	if(res != this->table->end())
-		return (*res).second;	
+		return (*res).second;
 	else
 	{
 		std::size_t found = var_tag.find(".");

@@ -811,7 +811,7 @@ opt_uses:
 	{
 	if(NOT_ONLY_PARSE)
 	{
-		$$ = NULL;
+		$$ = new list<Ast*>();
 	}
 	}
 |
