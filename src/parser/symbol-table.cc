@@ -34,11 +34,23 @@ Symbol_Table_Entry* Symbol_Table::find(string name)
 	else
 	{
 		//TODO : Goto parent
+		if(this->scope == PROTOCOL_SCOPE || this->parent_table==NULL)
+		{
+			//throw error ? symbol not found
+			return NULL;
+		}
+		else
+		{
+			return this->parent_table->find(name);
+		}
 	}
 }
 
 void Symbol_Table::insert(string variable_name, Data_Type variable_data_type, Symbol_Table* table)
-{}
+{
+	Symbol_Table_Entry* ste = new Symbol_Table_Entry( variable_name, variable_data_type, table );
+	this->table->insert( std::pair<string, Symbol_Table_Entry*>(variable_name, ste ));
+}
 
 Symbol_Table_Entry::Symbol_Table_Entry(string variable_name, Data_Type variable_data_type, Symbol_Table* table)
 {
