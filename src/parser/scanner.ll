@@ -2,7 +2,7 @@
 %lex-source="scanner.cc"
 
 digit [0-9]
-operator [\(\)\{\};\,\.@:\[\]|#\%]
+operator [\(\)\{\};\,\.:\[\]|#\%]
 alphabet [a-zA-Z]
 arith [-+\?\:*/]
 comparators [<>=]
@@ -133,11 +133,6 @@ random	{
 field	{
 	store_token_name("FIELD");
 	return Parser::FIELD;
-}
-
-env	{
-	store_token_name("ENVIRONMENT");
-	return Parser::ENV;
 }
 
 ideal	{

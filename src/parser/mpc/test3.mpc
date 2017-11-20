@@ -1,3 +1,3 @@
 protocol add(field F) : party A, B {
-	a = 7;
+	A.a => B.b;
 }

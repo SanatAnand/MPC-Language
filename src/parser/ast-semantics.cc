@@ -607,7 +607,55 @@ bool Basic_Loop_Ast::check_semantics(Symbol_Table* symbol_table, string tag) {
 bool Array_Limit_Ast::check_semantics(Symbol_Table* symbol_table, string tag) {
 }
 
-bool Send_Assignment_Ast::check_semantics(Symbol_Table* symbol_table, string tag) {
+bool Send_Assignment_Ast::check_semantics(Symbol_Table* symbol_table, string tag)
+{
+	bool b1 = true;
+	//rhs must be a term_ast
+	CHECK_INPUT( typeid(*(this->rhs))==typeid(Term_Ast), "rhs of send not a term", this->lineno);
+	if(!(typeid(*(this->rhs))==typeid(Term_Ast)))
+		return false;
+	//rhs must be a mutable
+	CHECK_INPUT(((Term_Ast*)(this->rhs))->t == variable || ((Term_Ast*)(this->rhs))->t == rand_port || ((Term_Ast*)(this->rhs))->t == env_port || ((Term_Ast*)(this->rhs))->t == ideal,
+		"Cannot send to RHS", this->lineno);
+	if(!(((Term_Ast*)(this->rhs))->t == variable || ((Term_Ast*)(this->rhs))->t == rand_port || ((Term_Ast*)(this->rhs))->t == env_port || ((Term_Ast*)(this->rhs))->t == ideal))
+		return false;
+	//check semantics of rhs and set data_type in its term_ast
+	//TODO: rhs is an indexed array variable (out of bounds check)
+	b1 = b1 && this->rhs->check_semantics(symbol_table, tag);
+	
+	if(typeid(*(this->lhs))==typeid(Term_Ast))
+	{
+		//if rhs is a random sample, lhs must be other_data_type
+		CHECK_INPUT(((Term_Ast*)(this->lhs))->t == rand_port || ((Term_Ast*)(this->lhs))->t == env_port || ((Term_Ast*)(this->lhs))->t == variable || ((Term_Ast*)(this->lhs))->t == constant || ((Term_Ast*)(this->lhs))->t == ideal,
+			"Invalid type for LHS", this->lineno);
+		if(!(((Term_Ast*)(this->lhs))->t == rand_port || ((Term_Ast*)(this->lhs))->t == env_port || ((Term_Ast*)(this->lhs))->t == variable || ((Term_Ast*)(this->lhs))->t == constant || ((Term_Ast*)(this->lhs))->t == ideal))
+			return false;
+	}
+	//check semantics of rhs and set data_type in its expr_ast
+	b1 = b1 && this->lhs->check_semantics(symbol_table, tag);
+
+	//check data_types of lhs and rhs are equal and appropriate
+	Data_Type temp1 = ((Expr_Ast*)(this->lhs))->data_type;
+	Data_Type temp2 = ((Term_Ast*)(this->rhs))->data_type;
+
+	string temp1_name = ((Expr_Ast*)(this->lhs))->data_type_name;
+	string temp2_name = ((Term_Ast*)(this->rhs))->data_type_name;
+
+	CHECK_INPUT(temp1 == port_data_type || temp2 == port_data_type, "Use assignement instead", this->lineno);
+	if(!(temp1 == port_data_type || temp2 == port_data_type))
+		return false;
+
+	CHECK_INPUT((temp1 == int_data_type || temp1 == bool_data_type || temp1 == other_data_type || temp1 == port_data_type)
+		&& (temp2 == int_data_type || temp2 == bool_data_type || temp2 == other_data_type || temp2 == port_data_type),
+		"Invalid type on either side of send", this->lineno);
+	
+	if(!((temp1 == int_data_type || temp1 == bool_data_type || temp1 == other_data_type || temp1 == port_data_type)
+		&& (temp2 == int_data_type || temp2 == bool_data_type || temp2 == other_data_type || temp2 == port_data_type)))
+	{
+		return false;
+	}
+	
+	return b1;
 }
 
 bool CheckPartyID_Ast::check_semantics(Symbol_Table* symbol_table, string tag){
