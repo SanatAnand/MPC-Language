@@ -532,6 +532,7 @@ bool Set_Ast::check_semantics(Symbol_Table* symbol_table, string tag) {
 }
 
 bool Term_Ast::check_semantics(Symbol_Table* symbol_table, string tag) {
+	bool b1 = true;
 	if(this->t == variable)
 	{
 		Symbol_Table_Entry* res = symbol_table->find(((Name_Ast*)(this->child))->name, tag);
@@ -541,6 +542,19 @@ bool Term_Ast::check_semantics(Symbol_Table* symbol_table, string tag) {
 		CHECK_INPUT(this->dim_list->size() == res->no_of_dim, "Dimension mismatch", this->lineno);
 		if(!(this->dim_list->size() == res->no_of_dim))
 			return false;
+		for(auto ele : *(this->dim_list))
+		{
+			if(typeid(*ele) == typeid(Term_Ast))
+			{
+				CHECK_INPUT(((Term_Ast*)ele)->t==constant || ((Term_Ast*)ele)->t==variable,"Incorrect term in array",this->lineno );
+				if(!(((Term_Ast*)ele)->t==constant || ((Term_Ast*)ele)->t==variable))
+					return false;
+			}
+			b1 = b1 && ele->check_semantics(symbol_table, tag);
+			CHECK_INPUT( ((Expr_Ast*)ele)->data_type == int_data_type, "Array index must be integer", this->lineno);
+			if(((Expr_Ast*)ele)->data_type != int_data_type)
+				return false;
+		}
 		this->data_type = res->variable_data_type;
 		this->data_type_name = res->field_name;
 	}
@@ -571,7 +585,7 @@ bool Term_Ast::check_semantics(Symbol_Table* symbol_table, string tag) {
 	else if(this->t == double_dot)
 		;
 	
-	return true;
+	return b1;
 }
 
 bool Decl_Term_Ast::check_semantics(Symbol_Table* symbol_table, string tag) {
@@ -623,15 +637,16 @@ bool Send_Assignment_Ast::check_semantics(Symbol_Table* symbol_table, string tag
 	//TODO: rhs is an indexed array variable (out of bounds check)
 	b1 = b1 && this->rhs->check_semantics(symbol_table, tag);
 	
+	//lhs need not be term_ast, can be expr_ast
 	if(typeid(*(this->lhs))==typeid(Term_Ast))
 	{
-		//if rhs is a random sample, lhs must be other_data_type
+		//lhs can only be rand_port, variable, constant or ideal
 		CHECK_INPUT(((Term_Ast*)(this->lhs))->t == rand_port || ((Term_Ast*)(this->lhs))->t == env_port || ((Term_Ast*)(this->lhs))->t == variable || ((Term_Ast*)(this->lhs))->t == constant || ((Term_Ast*)(this->lhs))->t == ideal,
 			"Invalid type for LHS", this->lineno);
 		if(!(((Term_Ast*)(this->lhs))->t == rand_port || ((Term_Ast*)(this->lhs))->t == env_port || ((Term_Ast*)(this->lhs))->t == variable || ((Term_Ast*)(this->lhs))->t == constant || ((Term_Ast*)(this->lhs))->t == ideal))
 			return false;
 	}
-	//check semantics of rhs and set data_type in its expr_ast
+	//check semantics of lhs and set data_type in its expr_ast
 	b1 = b1 && this->lhs->check_semantics(symbol_table, tag);
 
 	//check data_types of lhs and rhs are equal and appropriate
@@ -641,14 +656,15 @@ bool Send_Assignment_Ast::check_semantics(Symbol_Table* symbol_table, string tag
 	string temp1_name = ((Expr_Ast*)(this->lhs))->data_type_name;
 	string temp2_name = ((Term_Ast*)(this->rhs))->data_type_name;
 
+	//1 of lhs and rhs must be a port
 	CHECK_INPUT(temp1 == port_data_type || temp2 == port_data_type, "Use assignement instead", this->lineno);
 	if(!(temp1 == port_data_type || temp2 == port_data_type))
 		return false;
 
+	//lhs and rhs must be int, bool or a field element(other_data_type)
 	CHECK_INPUT((temp1 == int_data_type || temp1 == bool_data_type || temp1 == other_data_type || temp1 == port_data_type)
 		&& (temp2 == int_data_type || temp2 == bool_data_type || temp2 == other_data_type || temp2 == port_data_type),
 		"Invalid type on either side of send", this->lineno);
-	
 	if(!((temp1 == int_data_type || temp1 == bool_data_type || temp1 == other_data_type || temp1 == port_data_type)
 		&& (temp2 == int_data_type || temp2 == bool_data_type || temp2 == other_data_type || temp2 == port_data_type)))
 	{

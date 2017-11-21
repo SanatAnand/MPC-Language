@@ -30,10 +30,9 @@ int main(int argc, char * argv[])
 	if (command_options.not_only_parse)
 	{
 		// if ((error_status() == false) && (command_options.is_show_ast_selected()))
+		program_object.desugar();
 		program_object.check_semantics();
 		program_object.print(out_file);
-		// program_object.print_xml(xml_file);
-
 		// spim_file.close();
 		xml_file.close();
 	}

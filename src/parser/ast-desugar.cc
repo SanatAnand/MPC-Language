@@ -7,6 +7,424 @@ using namespace std;
 
 #include "ast.hh"
 
+//////////////////////////////////////////////////////////////////////////////////////////
+
+Ast* Protocol_Decl_Ast::desugar () {
+	list<Ast*>::iterator pit = arg_list->begin();
+	for(;pit!=arg_list->end();pit++)
+	{
+		list<Ast*>::iterator pit_temp = pit;
+		pit_temp++;
+		*pit = (*pit) ->desugar();		
+	}	
+	for(pit = party_list->begin();pit!=party_list->end();pit++)
+	{
+		list<Ast*>::iterator pit_temp = pit;
+		pit_temp++;
+		*pit = (*pit) ->desugar();
+	}
+	return this;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+Ast* Protocol_Ast::desugar () {
+	protocol_decl = (Protocol_Decl_Ast*) protocol_decl ->desugar();
+	if(uses_ast!=NULL)
+	{
+		for(list<Ast*>::iterator pit = uses_ast->begin();pit!=uses_ast->end();pit++)
+		{
+			(*pit) = (*pit) ->desugar();
+		}
+	}
+	sequence_ast = (Sequence_Ast*) sequence_ast ->desugar();
+	return this;
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+Ast* Sequence_Ast::desugar () {
+	for (auto ele = this->statement_list.begin(); ele != this->statement_list.end(); ele++)
+	    (*ele) = (*ele) ->desugar();
+	return this;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////////////////
+
+
+Ast* Send_Ast::desugar () {
+	Ast* res = Desugar_Ast::desugar_send(this);
+	res ->desugar();
+	return res;
+}
+
+///////////////////////////////////////////////////////////////
+
+Ast* Assignment_Ast::desugar () {
+	lhs = lhs ->desugar();
+	rhs = rhs ->desugar();
+	return this;
+}
+
+/////////////////////////////////////////////////////
+
+Ast* Tying_Ast::desugar() {
+	lhs = lhs ->desugar();
+	rhs = rhs ->desugar();	
+	return this;
+}
+
+///////////////////////////////////////////////////
+
+Ast* Forward_Ast::desugar () {
+	lhs = lhs ->desugar();
+	rhs = rhs ->desugar();	
+	return this;
+}
+
+///////////////////////////////////////////////////
+Ast* In_Ast::desugar () {
+	Ast* res = Desugar_Ast::desugar_in(this);
+	res ->desugar();
+	return res;
+}
+
+////////////////////////////////////////////////////////
+
+Ast* With_Ast::desugar () {
+	party = party ->desugar();
+
+	list<pair<pair<Data_Type, string> *, Ast*> *>::iterator pit = s_list->begin();
+	for(;pit!=s_list->end();pit++)
+	{
+		list<pair<pair<Data_Type, string> *, Ast*> *>::iterator pit_temp = pit;
+		pit_temp++;
+		pair<pair<Data_Type, string> *, Ast*> * decl = (*pit);
+		decl->second = decl->second ->desugar();
+	}
+	return this;
+}
+
+////////////////////////////////////////////////////////
+
+Ast* Seq_Ast::desugar () {
+	cond = cond ->desugar();
+	addendum = addendum ->desugar();
+	return this;
+}
+
+////////////////////////////////////////////////////////
+
+Ast* Connect_Ast::desugar () {
+	from = from ->desugar();
+	to = to ->desugar();
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+Ast* Port_Clause_Ast::desugar (){
+	party = party ->desugar();
+	if(is_clause_present){
+		list<pair<pair<Data_Type, string> *, Ast*> *>::iterator pit = seq->begin();
+		for(;pit!=seq->end();pit++)
+		{
+			list<pair<pair<Data_Type, string> *, Ast*> *>::iterator pit_temp = pit;
+			pit_temp++;
+			pair<pair<Data_Type, string> *, Ast*> * decl = (*pit);
+			decl->second = decl->second ->desugar();
+		}
+	}
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+Ast* Decl_Ast::desugar () {
+	list<Ast*>::iterator pit = name_list->begin();
+	for(;pit!=name_list->end();pit++)
+	{
+		list<Ast*>::iterator pit_temp = pit;
+		pit_temp++;
+		(*pit) = (*pit) ->desugar();
+	}
+	return this;
+}
+
+/////////////////////////////////////////////////////////////////
+
+template <class DATA_TYPE>
+Ast* Number_Ast<DATA_TYPE>::desugar () {
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+
+Ast* Plus_Ast::desugar() {
+	lhs = lhs ->desugar();
+	rhs = rhs ->desugar();
+	return this;
+}
+
+/////////////////////////////////////////////////////////////////
+
+Ast* Minus_Ast::desugar () {
+	lhs = lhs ->desugar();
+	rhs = rhs ->desugar();	
+	return this;
+}
+
+//////////////////////////////////////////////////////////////////
+
+Ast* Mult_Ast::desugar () {
+	lhs = lhs ->desugar();
+	rhs = rhs ->desugar();
+	return this;
+}
+
+////////////////////////////////////////////////////////////////////
+
+Ast* Divide_Ast::desugar () {
+	lhs = lhs ->desugar();
+	rhs = rhs ->desugar();
+	return this;
+}
+
+//////////////////////////////////////////////////////////////////////
+
+Ast* Modulo_Ast::desugar () {
+	lhs = lhs ->desugar();
+	rhs = rhs ->desugar();
+	return this;
+}
+
+//////////////////////////////////////////////////////////////////////
+
+Ast* UMinus_Ast::desugar () {
+	lhs = lhs ->desugar();	
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+Ast* Relational_Expr_Ast::desugar () {
+	lhs_condition = lhs_condition ->desugar();
+	rhs_condition = rhs_condition ->desugar();
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+Ast* Boolean_Expr_Ast::desugar () {
+	lhs_op = lhs_op ->desugar();
+	rhs_op = rhs_op ->desugar();
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+Ast* Port_Expr_Ast::desugar () {
+	lhs = lhs ->desugar();
+	rhs = rhs ->desugar();
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+Ast* Party_Expr_Ast::desugar () {
+	lhs = lhs ->desugar();
+	rhs = rhs ->desugar();
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+Ast* From_Expr_Ast::desugar () {
+	lhs_op = lhs_op ->desugar();
+	rhs_op = rhs_op ->desugar();
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+Ast* Expression_List_Ast::desugar () {
+	list<Ast*>::iterator pit = exp_list->begin();
+	for(;pit!=exp_list->end();pit++)
+	{
+		list<Ast*>::iterator pit_temp = pit;
+		pit_temp++;
+		(*pit) = (*pit) ->desugar();
+	}
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+Ast* Session_call_Ast::desugar () {
+	session_name = session_name ->desugar();
+	list<Ast*>::iterator pit = arg_list->begin();
+	for(;pit!=arg_list->end();pit++)
+	{
+		list<Ast*>::iterator pit_temp = pit;
+		pit_temp++;
+		(*pit) = (*pit) ->desugar();
+	}
+	seq = seq ->desugar();	
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+Ast* Set_Ast::desugar () {
+	source = source ->desugar();
+	list<Ast*>::iterator pit = arg_list->begin();
+	for(;pit!=arg_list->end();pit++)
+	{
+		list<Ast*>::iterator pit_temp = pit;
+		pit_temp++;
+		(*pit) = (*pit) ->desugar();
+	}
+	dest = dest ->desugar();
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+Ast* Term_Ast::desugar () {
+	if(child != NULL) 
+		child = child ->desugar();
+	if(dim_list!=NULL){
+		list<Ast*>::iterator pit = dim_list->begin();
+		for(;pit!=dim_list->end();pit++)
+		{
+			if((*pit)!=NULL)
+				(*pit) = (*pit) ->desugar();
+		}
+	}
+	return this;
+}
+
+Ast* Name_Ast::desugar () {
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////////
+
+Ast* Decl_Term_Ast::desugar () {
+	term = term ->desugar();
+	if(port_clause_exists)
+	{
+		list<pair<pair<Data_Type, string> *, Ast*> *>::iterator pit = port_clause->begin();
+		for(;pit!=port_clause->end();pit++)
+		{
+			list<pair<pair<Data_Type, string> *, Ast*> *>::iterator pit_temp = pit;
+			pit_temp++;
+			pair<pair<Data_Type, string> *, Ast*> * decl = (*pit);
+			decl->second = decl->second ->desugar();
+		}
+	}
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+Ast* Abort_Ast::desugar () {
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+Ast* Argument_Ast::desugar () {
+	term = term ->desugar();
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+
+Ast* Prot_Arg_Ast::desugar () {
+	prot_decl = prot_decl ->desugar();
+	return this;
+}
+
+///////////////////////////////////////////////////////////////////////
+
+Ast* Wrap_Ast::desugar () {
+	stmt = stmt ->desugar();
+	return this;
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+Ast* Start_Ast::desugar () {
+	party_exp = party_exp ->desugar();
+	return this;
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+Ast* Selection_Statement_Ast::desugar (){
+	cond = cond ->desugar();
+	then_part = then_part ->desugar();
+	if(else_part!=NULL)
+	{	
+		else_part = else_part ->desugar();
+	}
+	return this;
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+Ast* Each_Statement_Ast::desugar () {
+	if(variable!=NULL) {
+		variable = variable ->desugar();
+	}
+	expression = expression ->desugar();
+	if(cond!=NULL){
+		cond = cond ->desugar();
+	}
+	return this;
+}
+
+/////////////////////////////////////////////////////////////////////////
+
+
+Ast* Iteration_Statement_Ast::desugar () {
+	Ast* res = Desugar_Ast::desugar_loops(this);
+	res->desugar();
+	return res;
+}
+
+Ast* Basic_Loop_Ast::desugar () {
+	variable= variable ->desugar();
+	limit = limit ->desugar();
+	body = body ->desugar();
+	return this;
+}
+
+Ast* Array_Limit_Ast::desugar () {
+	return this;
+}
+
+Ast* Send_Assignment_Ast::desugar () {
+	lhs = lhs ->desugar();
+	rhs = rhs ->desugar();
+	return this;
+}
+
+Ast* CheckPartyID_Ast::desugar (){
+	list<Ast*>::iterator it1 = party_addr->begin();
+	it1++;
+	for (list<Ast*>::iterator it = party_addr->begin();it!=party_addr->end();it++,it1++){
+		(*it) = (*it) ->desugar();
+	}
+	return this;
+}
+
+template class Number_Ast<bool>;
+template class Number_Ast<int>;
+
 int dummy_var_counter = 0;
 
 string Desugar_Ast::get_new_iterator_name()

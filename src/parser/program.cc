@@ -34,4 +34,9 @@ void Program::check_semantics(){
 		ele.second->check_semantics(NULL, "");	
 }
 
+void Program::desugar(){
+	for(auto ele : *protocols)
+		ele.second->desugar();		
+}
+
 Program program_object;

@@ -1291,7 +1291,7 @@ id_list:
 ;
 
 tying_statement:
-	exp ':' exp ';'
+	term ':' term ';'
 	{
 	if(NOT_ONLY_PARSE)
 	{

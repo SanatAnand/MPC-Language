@@ -169,13 +169,11 @@ void Sequence_Ast::print_xml(ostream & file_buffer) {
 
 
 void Send_Ast::print(ostream & file_buffer) {
-	Desugar_Ast d;
-	(d.desugar_send(this))->print(file_buffer);
-	//print_tabs(file_buffer, tab_counter);
-	//lhs->print(file_buffer);
-	//file_buffer<<" => ";
-	//rhs->print(file_buffer);
-	//file_buffer<<";\n";
+	print_tabs(file_buffer, tab_counter);
+	lhs->print(file_buffer);
+	file_buffer<<" => ";
+	rhs->print(file_buffer);
+	file_buffer<<";\n";
 }
 
 void Send_Ast::print_xml(ostream & file_buffer) {
@@ -278,18 +276,15 @@ void Forward_Ast::print_xml(ostream & file_buffer) {
 
 ///////////////////////////////////////////////////
 void In_Ast::print(ostream & file_buffer) {
-	//WRITE THIS
-	Desugar_Ast d;
-	(d.desugar_in(this))->print(file_buffer);
-	//print_tabs(file_buffer, tab_counter);
-	//file_buffer<<"in ";
-	//party->print(file_buffer);
-	//file_buffer<<"{\n";
-	//tab_counter++;
-	//s_list->print(file_buffer);
-	//tab_counter--;
-	//print_tabs(file_buffer, tab_counter);
-	//file_buffer<<"}\n";
+	print_tabs(file_buffer, tab_counter);
+	file_buffer<<"in ";
+	party->print(file_buffer);
+	file_buffer<<"{\n";
+	tab_counter++;
+	s_list->print(file_buffer);
+	tab_counter--;
+	print_tabs(file_buffer, tab_counter);
+	file_buffer<<"}\n";
 }
 
 void In_Ast::print_xml(ostream & file_buffer) {
@@ -1207,17 +1202,15 @@ void Each_Statement_Ast::print_xml(ostream & file_buffer){
 
 
 void Iteration_Statement_Ast::print(ostream & file_buffer) {
-	Desugar_Ast d;
-	(d.desugar_loops(this))->print(file_buffer);
-	// print_tabs(file_buffer, tab_counter);
-	// file_buffer<<"for ";
-	// each_block->print(file_buffer);
-	// file_buffer<<"{\n";
-	// tab_counter++;
-	// body->print(file_buffer);
-	// tab_counter--;
-	// print_tabs(file_buffer, tab_counter);
-	// file_buffer<<"}\n";
+	print_tabs(file_buffer, tab_counter);
+	file_buffer<<"for ";
+	each_block->print(file_buffer);
+	file_buffer<<"{\n";
+	tab_counter++;
+	body->print(file_buffer);
+	tab_counter--;
+	print_tabs(file_buffer, tab_counter);
+	file_buffer<<"}\n";
 }
 
 void Iteration_Statement_Ast::print_xml(ostream & file_buffer) {
@@ -1261,7 +1254,7 @@ void Array_Limit_Ast::print_xml(ostream & file_buffer) {
 void Send_Assignment_Ast::print(ostream & file_buffer) {
 	print_tabs(file_buffer, tab_counter);
 	lhs->print(file_buffer);
-	file_buffer<<" => ";
+	file_buffer<<" ==> ";
 	rhs->print(file_buffer);
 	file_buffer<<";\n";
 }

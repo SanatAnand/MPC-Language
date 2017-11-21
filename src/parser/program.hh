@@ -28,6 +28,7 @@ public:
 	void print_xml(ostream & file_buffer);
 
 	void check_semantics();
+	void desugar();
 };
 
 #endif
