@@ -1,3 +1,4 @@
 protocol add(field F) : party A, B {
-	a =>b;
+	int a;
+	a = 5;
 }

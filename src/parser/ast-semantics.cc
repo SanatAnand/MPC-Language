@@ -514,9 +514,53 @@ bool Boolean_Expr_Ast::check_semantics(Symbol_Table* symbol_table, string tag) {
 }
 
 bool Port_Expr_Ast::check_semantics(Symbol_Table* symbol_table, string tag) {
+	//lhs is a party term
+	//rhs is a port term
+	bool b1 = true;
+
 }
 
 bool Party_Expr_Ast::check_semantics(Symbol_Table* symbol_table, string tag) {
+	bool b1 = true;
+
+	//lhs must be a term ast of type variable
+	CHECK_INPUT(typeid(*(this->lhs))==typeid(Term_Ast) && ((Term_Ast*)(this->lhs))->t == variable, "Not a valid party expression", this->lineno);
+	if(!(typeid(*(this->lhs))==typeid(Term_Ast) && ((Term_Ast*)(this->lhs))->t == variable))
+		return false;
+	//check semantics of lhs and set data_type in its term_ast
+	//TODO: lhs is an indexed array variable (out of bounds check)
+	b1 = b1 && this->lhs->check_semantics(symbol_table, tag);
+
+	//rhs must be a party_expr_ast or port_expr_ast or term_ast
+	CHECK_INPUT(typeid(*(this->rhs))==typeid(Term_Ast) || typeid(*(this->rhs))==typeid(Party_Expr_Ast) || typeid(*(this->rhs))==typeid(Port_Expr_Ast)
+		, "Not a valid party expression" , this->lineno);
+	if(!(typeid(*(this->rhs))==typeid(Term_Ast) || typeid(*(this->rhs))==typeid(Party_Expr_Ast) || typeid(*(this->rhs))==typeid(Port_Expr_Ast)))
+		return false;
+	if(typeid(*(this->rhs))==typeid(Term_Ast))
+	{
+		//rhs must be of type variable
+		CHECK_INPUT(((Term_Ast*)(this->rhs))->t == variable, "Not a valid party expression", this->lineno);
+		if(!(((Term_Ast*)(this->rhs))->t == variable))
+			return false;
+	}
+	//check semantics of rhs and set data_type in its expr_ast
+	//tag for rhs must include lhs name
+	string tag2 = Symbol_Table::build_tag(tag, ((Name_Ast*)((Term_Ast*)(this->lhs))->child)->name);
+	b1 = b1 && this->rhs->check_semantics(symbol_table, tag2);
+
+	//check data_types of lhs and rhs are appropriate
+	Data_Type temp1 = ((Expr_Ast*)(this->lhs))->data_type;
+	Data_Type temp2 = ((Expr_Ast*)(this->rhs))->data_type;
+	//lhs must be of party_data_type
+	CHECK_INPUT(temp1 == party_data_type, "Not a valid party expression", this->lineno);
+	if(((Term_Ast*)(this->lhs))->data_type != party_data_type)
+		return false;
+	//rhs must be of party_data_type or port_data_type
+	CHECK_INPUT(temp2 == party_data_type || temp2 == port_data_type, "not a valid party expression", this->lineno);
+	if(!(temp2 == party_data_type || temp2 == port_data_type))
+		return false;
+
+	return b1;
 }
 
 bool From_Expr_Ast::check_semantics(Symbol_Table* symbol_table, string tag) {
@@ -622,7 +666,7 @@ bool Array_Limit_Ast::check_semantics(Symbol_Table* symbol_table, string tag) {
 }
 
 bool Send_Assignment_Ast::check_semantics(Symbol_Table* symbol_table, string tag)
-{
+{	
 	bool b1 = true;
 	//rhs must be a term_ast
 	CHECK_INPUT( typeid(*(this->rhs))==typeid(Term_Ast), "rhs of send not a term", this->lineno);
